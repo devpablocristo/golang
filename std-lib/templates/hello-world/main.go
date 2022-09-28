@@ -8,7 +8,8 @@ import (
 
 func main() {
 	// template.ParseFiles, can get 0 or more files
-	tpl, err := template.ParseFiles("tpl.gohtlm")
+
+	tpl, err := template.ParseFiles("tpl.gohtml")
 	if err != nil {
 		log.Fatalln(err)
 	}
