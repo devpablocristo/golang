@@ -21,7 +21,7 @@ type Band struct {
 
 func main() {
 
-	lennon := Person{
+	/*lennon := Person{
 		Name: "John",
 		Age:  30,
 	}
@@ -106,6 +106,8 @@ func main() {
 			Albums:  albumsStones,
 		}}
 
-	fmt.Println(bands)
+	fmt.Println(bands)*/
+	go fmt.Print("1")
+	fmt.Print("2")
 
 }
