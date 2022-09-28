@@ -19,7 +19,7 @@ var funcs = template.FuncMap{
 
 func main() {
 
-	p1 := &Person{"Lucia", 26, []string{"Pintar", "Ir al gym", "Estudiar inglés"}}
+	p1 := &Person{"Lucia", 26, []string{"Leer", "Pintar", "Ir al gym", "Estudiar inglés"}}
 
 	loadTemplate("template2.txt", p1)
 
