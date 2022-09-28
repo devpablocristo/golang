@@ -1,4 +1,4 @@
 Hola!
-
+{{ range .pers}}
 Soy {{.Nombre}} y tengo {{.Edad}} años
-
+{{end}} 

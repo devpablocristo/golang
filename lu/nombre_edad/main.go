@@ -17,11 +17,17 @@ var funcs = template.FuncMap{
 	},
 }
 
+var Persons []Person
+
 func main() {
 
 	p1 := &Person{"Lucia", 26, []string{"Leer", "Pintar", "Ir al gym", "Estudiar inglés"}}
+	p2 := &Person{"Maria", 22, []string{"Pintar", "Ir al gym", "Estudiar inglés"}}
+	p3 := &Person{"Emilia", 24, []string{"Bailar", "Ir al gym", "Estudiar francés"}}
 
-	loadTemplate("template2.txt", p1)
+	Persons = append(Persons, *p1, *p2, *p3)
+
+	loadTemplate("template2.txt", map[string]interface{}{"pers": Persons})
 
 }
 
