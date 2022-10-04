@@ -1,6 +1,10 @@
 package service
 
-import "fmt"
+import (
+	"fmt"
+
+	ports "github.com/JoakoMeLi/go-concepts/3rd-party-libs/gomock/ports"
+)
 
 type Person struct {
 	First string
@@ -8,16 +12,12 @@ type Person struct {
 
 // Accesor is how to store or retrieve a person
 // When retriving a person, if they do not exist, return the zero value
-type Accessor interface {
-	Save(n int, p Person)
-	Retrieve(n int) Person
-}
 
 type PersonService struct {
-	a Accessor
+	a ports.Accesor
 }
 
-func NewPersonService(a Accessor) PersonService {
+func NewPersonService(a ports.Accessor) PersonService {
 	return PersonService{
 		a: a,
 	}
@@ -31,10 +31,10 @@ func (ps PersonService) Get(n int) (Person, error) {
 	return p, nil
 }
 
-func Put(a Accessor, n int, p Person) {
+func Put(a ports.Accessor, n int, p Person) {
 	a.Save(n, p)
 }
 
-func Get(a Accessor, n int) Person {
+func Get(a ports.Accessor, n int) Person {
 	return a.Retrieve(n)
 }
