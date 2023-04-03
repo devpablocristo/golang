@@ -33,7 +33,7 @@ func MinMaxSum(si []int) (int, int) {
 
 	siAux = append(siAux[:iAux], siAux[iAux+1:]...)
 
-	//fmt.Println(siAux)
+	//fmt.Println(siAux) little change
 
 	for i := 0; i < len(siAux); i++ {
 		min += siAux[i]
