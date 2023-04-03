@@ -20,4 +20,6 @@ func ChatService(wg *sync.WaitGroup) {
 	log.Println("Inventory Service starting server on port:", port)
 
 	_ = http.ListenAndServe(port, mux)
+
+	// holas soy ximena
 }
