@@ -46,7 +46,7 @@ func autoMigrate(db *sqlx.DB) error {
 	}
 
 	dbMigration, err := migrate.NewWithDatabaseInstance(
-		"file://../../internal/infra/mysql/migration",
+		"file://../../item/infra/mysql/migration",
 		"mysql",
 		driver,
 	)
