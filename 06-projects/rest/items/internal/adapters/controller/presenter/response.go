@@ -1,11 +1,11 @@
 package presenter
 
-type BookResponse struct {
+type ItemResponse struct {
 	Error bool     `json:"error"`
-	Data  jsonBook `json:"data"`
+	Data  jsonItem `json:"data"`
 }
 
-type BooksResponse struct {
+type ItemsResponse struct {
 	Error bool       `json:"error"`
-	Data  []jsonBook `json:"data"`
+	Data  []jsonItem `json:"data"`
 }
