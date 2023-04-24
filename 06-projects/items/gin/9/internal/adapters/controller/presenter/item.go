@@ -9,23 +9,9 @@ import (
 /*
 Presenters
 
-En Golang, un presenter es una capa de la arquitectura del software que se utiliza para formatear y presentar los datos al usuario. El objetivo principal de un presenter es separar la lógica de presentación del resto del sistema y proporcionar una interfaz de usuario clara y fácil de usar.
+En la arquitectura limpia, el Presenter es una capa de la aplicación que se encarga de mostrar la información al usuario de la manera en que se requiere, a menudo en forma de HTML, JSON, XML, etc. En otras palabras, el Presenter se encarga de la presentación de los datos.
 
-En la arquitectura limpia, el presenter se encuentra en la capa de aplicación del sistema, que se encarga de gestionar la lógica de negocio y actúa como una capa intermedia entre la interfaz de usuario y la capa de persistencia de datos. En esta arquitectura, el presenter se utiliza para convertir los datos de la capa de aplicación en un formato adecuado para ser presentado al usuario.
-
-Por ejemplo, si se está construyendo una aplicación web, un presenter podría tomar los datos de un modelo de usuario y presentarlos en una página HTML. El presenter sería responsable de dar formato a los datos para que sean fácilmente legibles y entendibles por el usuario.
-
-Los presenters pueden ser implementados de diferentes maneras, pero generalmente se utilizan para tomar los datos del sistema y convertirlos en un formato adecuado para ser mostrados al usuario. Los presenters son una forma útil de separar la lógica de presentación del resto del sistema y hacer que el sistema sea más modular y fácil de mantener.
-*/
-
-/*
-DTOs
-
-En Golang, un DTO (Data Transfer Object) es una estructura de datos que se utiliza para transferir datos entre diferentes componentes de un sistema. Por lo general, los DTOs son estructuras simples que solo contienen los datos necesarios para realizar la transferencia, y suelen ser utilizados para minimizar el acoplamiento entre las diferentes partes del sistema.
-
-Un DTO puede ser definido como una estructura que contiene un conjunto de campos que representan los datos que se van a transferir. Por ejemplo, si se está construyendo un sistema de gestión de usuarios, se podría definir un DTO de usuario que contenga los campos como nombre, correo electrónico, contraseña, etc. Luego, este DTO de usuario se utilizaría para transferir datos entre diferentes componentes del sistema, como la capa de presentación y la capa de persistencia de datos.
-
-Se pueden utilizar en combinación con otros patrones de diseño, como el patrón de repositorio, para transferir datos de la capa de persistencia de datos a la capa de presentación, sin exponer los detalles de implementación de la capa de persistencia de datos. En general, los DTOs son una forma útil de organizar los datos de un sistema de software y facilitar su transferencia entre diferentes componentes del mismo.
+El Presenter es responsable de tomar los datos que se generan a través de las interacciones entre la capa de negocios (Interactor) y la capa de acceso a datos (Repositorio) y transformarlos en un formato adecuado para su visualización o envío a otras aplicaciones o servicios.
 */
 
 /*
@@ -39,8 +25,28 @@ Por otro lado, un presenter es una capa de la arquitectura del software que se u
 En resumen, mientras que los DTOs se utilizan para transferir datos entre diferentes partes del sistema, los presenters se utilizan para presentar los datos al usuario en un formato adecuado. Ambos conceptos son importantes en la arquitectura de software y se utilizan en combinación con otros patrones de diseño para crear sistemas modulares y escalables.
 */
 
-type itemDTO struct {
-	ID          uint      `json:"id"`
+/*
+En la arquitectura limpia, los DTO (Data Transfer Objects) se utilizan para transferir datos entre las diferentes capas de la aplicación, ya que cada capa tiene su propio modelo de datos. Los DTO permiten que los datos se muevan de manera transparente a través de las capas de la aplicación, sin que la capa de presentación tenga que conocer los detalles de implementación de las capas subyacentes.
+
+En Go, los DTO se pueden definir como estructuras que representan los datos que se van a transferir entre las diferentes capas de la aplicación. Por ejemplo, en una aplicación de gestión de usuarios, se podría definir un DTO para representar la información del usuario:
+
+```
+
+	type UserDTO struct {
+		ID    int
+		Name  string
+		Email string
+	}
+
+```
+
+Los DTO se utilizan en la capa de presentación para recibir y enviar datos a la capa de Interactor y viceversa. En la capa de Interactor, los DTO se pueden utilizar para transferir datos entre las capas de negocio y la capa de Infraestructura, donde se realizan las operaciones de acceso a datos.
+
+Es importante tener en cuenta que los DTO deben ser simples y contener solo la información necesaria para transferir los datos entre las capas. No deben contener ninguna lógica de negocio, ya que esto debe ser manejado por la capa de Interactor.
+
+En resumen, los DTO se utilizan en Go y en la arquitectura limpia para transferir datos entre las diferentes capas de la aplicación, permitiendo que los datos se muevan de manera transparente a través de la aplicación sin que la capa de presentación tenga que conocer los detalles de implementación de las capas subyacentes.
+*/
+type jsonItem struct {
 	Code        string    `json:"code"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
@@ -51,10 +57,9 @@ type itemDTO struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-func Item(i entity.Item, id uint) itemDTO {
-	var itemResponse itemDTO
+func Item(i entity.Item) jsonItem {
+	var itemResponse jsonItem
 
-	itemResponse.ID = id
 	itemResponse.Code = i.Code
 	itemResponse.Title = i.Title
 	itemResponse.Description = i.Description
@@ -66,12 +71,12 @@ func Item(i entity.Item, id uint) itemDTO {
 	return itemResponse
 }
 
-// func Items(items []entity.Item) []itemDTO {
-// 	var itemResponse []itemDTO
+func Items(items []entity.Item) []jsonItem {
+	var itemResponse []jsonItem
 
-// 	for _, val := range items {
-// 		itemResponse = append(itemResponse, Item(val))
-// 	}
+	for _, val := range items {
+		itemResponse = append(itemResponse, Item(val))
+	}
 
-// 	return itemResponse
-// }
+	return itemResponse
+}

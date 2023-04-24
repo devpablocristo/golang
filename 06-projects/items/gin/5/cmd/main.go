@@ -20,14 +20,14 @@ func main() {
 
 	u := newItemUsecase(r)
 
-	// Creación instancia del handler
-	// es necesario inyectar en newHandler un usecase
-	h := newHandler(u)
+	// Creación instancia del controller
+	// es necesario inyectar en newController un usecase
+	h := newController(u)
 
 	// Se definen las rutas
 	router.GET("/", h.helloWorld)
-	router.POST("/items", h.saveItemHandler)
-	router.GET("/items", h.getAllItemsHandler)
+	router.POST("/items", h.saveItemController)
+	router.GET("/items", h.getAllItemsController)
 
 	log.Println("Server started at http://localhost:80808080/")
 
@@ -40,24 +40,24 @@ func main() {
 // Error global
 var ErrNotFound = errors.New("not found")
 
-// Handler
-type handler struct {
+// Controller
+type controller struct {
 	usecase itemUsecaseInterface
 }
 
-// Constructor del tipo handler, en los parametros de entrada se inyecta el un usecase
-func newHandler(u itemUsecaseInterface) *handler {
-	return &handler{
-		usecase: u, // Aquí se carga el usecase inyectado dentro del handler
+// Constructor del tipo controller, en los parametros de entrada se inyecta el un usecase
+func newController(u itemUsecaseInterface) *controller {
+	return &controller{
+		usecase: u, // Aquí se carga el usecase inyectado dentro del controller
 	}
 }
 
-// La función helloWorld ahora es un método de handler
-func (h *handler) helloWorld(c *gin.Context) {
+// La función helloWorld ahora es un método de controller
+func (h *controller) helloWorld(c *gin.Context) {
 	c.String(http.StatusOK, "¡Hello World!")
 }
 
-func (h *handler) saveItemHandler(c *gin.Context) {
+func (h *controller) saveItemController(c *gin.Context) {
 	var item Item
 	err := c.BindJSON(&item)
 	if err != nil {
@@ -74,7 +74,7 @@ func (h *handler) saveItemHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, savedItem)
 }
 
-func (h *handler) getAllItemsHandler(c *gin.Context) {
+func (h *controller) getAllItemsController(c *gin.Context) {
 	items, err := h.usecase.getAllItems()
 	if err != nil {
 		if err == ErrNotFound {

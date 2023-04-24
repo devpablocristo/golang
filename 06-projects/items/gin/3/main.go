@@ -18,9 +18,9 @@ func main() {
 
 	r := newRepository()
 
-	// creacion instacia del handler
-	// es necesario inyectar en newHandler un repositorio
-	h := newHandler(r)
+	// creacion instacia del controller
+	// es necesario inyectar en newController un repositorio
+	h := newController(r)
 
 	// Se definen las rutas
 	router.GET("/", h.helloWorld)
@@ -35,22 +35,22 @@ func main() {
 
 // ATENCION: solo se implemento un repostorio pero todavia no utiliza en ningun lado
 
-// se crea el tipo o type handler
+// se crea el tipo o type controller
 // con un campo de tipo repository
-type handler struct {
+type controller struct {
 	repo *repository
 }
 
-// constructor de typo handler, en los parametros de entrada se inyencta el un repository
-func newHandler(r *repository) *handler {
-	return &handler{
-		repo: r, // aqui se carga el repostory inyectoado dentro del handler
+// constructor de typo controller, en los parametros de entrada se inyencta el un repository
+func newController(r *repository) *controller {
+	return &controller{
+		repo: r, // aqui se carga el repostory inyectoado dentro del controller
 	}
 }
 
-// como ahora la antigua funcion helloWorld, tiene un reciber de tipo handler,
-// es un metodo de handler
-func (h handler) helloWorld(c *gin.Context) {
+// como ahora la antigua funcion helloWorld, tiene un reciber de tipo controller,
+// es un metodo de controller
+func (h controller) helloWorld(c *gin.Context) {
 	c.String(http.StatusOK, "¡Hello World!")
 }
 

@@ -1,4 +1,4 @@
-package handler
+package controller
 
 import (
 	"net/http"
@@ -6,29 +6,29 @@ import (
 	// Se importa la librería Gin
 	gin "github.com/gin-gonic/gin"
 
-	entity "github.com/devpablocristo/golang/06-projects/items/gin/6/entity"
-	usecase "github.com/devpablocristo/golang/06-projects/items/gin/6/usecase"
+	entity "github.com/devpablocristo/golang/06-projects/items/gin/8/internal/entity"
+	usecase "github.com/devpablocristo/golang/06-projects/items/gin/8/internal/usecase"
 )
 
 // ATENCION aqui se ultiliza la interface del usercase, no el tipo del usercase
-type handler struct {
+type ItemController struct {
 	usecase usecase.ItemUsecaseInterface
 }
 
-// Constructor del tipo handler, en los parametros de entrada se inyecta el un usecase
+// Constructor del tipo ItemController, en los parametros de entrada se inyecta el un usecase
 // como el campo usecase es de tipo interface, tiene sentido poner como paramtro de entrada tambien la misma interface
-func NewHandler(u usecase.ItemUsecaseInterface) *handler {
-	return &handler{
-		usecase: u, // Aquí se carga el usecase inyectado dentro del handler
+func NewController(u usecase.ItemUsecaseInterface) *ItemController {
+	return &ItemController{
+		usecase: u, // Aquí se carga el usecase inyectado dentro del ItemController
 	}
 }
 
-// La función helloWorld ahora es un método de handler
-func (h *handler) HelloWorld(c *gin.Context) {
+// La función helloWorld ahora es un método de ItemController
+func (h *ItemController) HelloWorld(c *gin.Context) {
 	c.String(http.StatusOK, "¡Hello World!")
 }
 
-func (h *handler) SaveItem(c *gin.Context) {
+func (h *ItemController) SaveItem(c *gin.Context) {
 	var item entity.Item
 	err := c.BindJSON(&item)
 	if err != nil {
@@ -45,7 +45,7 @@ func (h *handler) SaveItem(c *gin.Context) {
 	c.JSON(http.StatusOK, savedItem)
 }
 
-func (h *handler) GetAllItems(c *gin.Context) {
+func (h *ItemController) GetAllItems(c *gin.Context) {
 	items, err := h.usecase.GetAllItems()
 	if err != nil {
 		if err == entity.ErrNotFound {

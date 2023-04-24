@@ -5,12 +5,12 @@ import (
 
 	gin "github.com/gin-gonic/gin"
 
-	handler "github.com/devpablocristo/golang/06-projects/items/gin/7/internal/adapters/handler"
+	controller "github.com/devpablocristo/golang/06-projects/items/gin/7/internal/adapters/controller"
 )
 
 const port = ":8080"
 
-func NewHTTPServer(h *handler.ItemHandler) error {
+func NewHTTPServer(h *controller.ItemController) error {
 	// Se crea una instancia de `gin.Engine`
 	// `gin.Default()` crea un enrutador con los middleware Logger y Recovery por defecto.
 	router := gin.Default()
