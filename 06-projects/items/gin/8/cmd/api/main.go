@@ -1,0 +1,24 @@
+package main
+
+import (
+	"log"
+
+	// Se importa la librería Gin
+
+	handler "github.com/devpablocristo/golang/06-projects/items/gin/8/internal/adapters/handler"
+	repository "github.com/devpablocristo/golang/06-projects/items/gin/8/internal/adapters/repository"
+	web "github.com/devpablocristo/golang/06-projects/items/gin/8/internal/infra/web"
+	usecase "github.com/devpablocristo/golang/06-projects/items/gin/8/internal/usecase"
+)
+
+func main() {
+	r := repository.NewRepository()
+	u := usecase.NewItemUsecase(r)
+	h := handler.NewHandler(u)
+
+	// se mueven ls rutas a otro archivo
+	err := web.NewHTTPServer(h)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}

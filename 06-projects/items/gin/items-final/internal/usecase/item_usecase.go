@@ -6,7 +6,7 @@ import (
 	"github.com/devpablocristo/golang/06-projects/items/gin/items-final/internal/entity"
 )
 
-type ItemUsecase interface {
+type ItemUsecasee interface {
 	GetAllItems() ([]entity.Item, error)
 	GetItemByID(id int) (entity.Item, error)
 	AddItem(item entity.Item) (entity.Item, error)
@@ -16,7 +16,7 @@ type itemUsecase struct {
 	repo entity.ItemRepository
 }
 
-func NewItemUsecase(repo entity.ItemRepository) ItemUsecase {
+func NewItemUsecase(repo entity.ItemRepository) ItemUsecasee {
 	return &itemUsecase{
 		repo: repo,
 	}

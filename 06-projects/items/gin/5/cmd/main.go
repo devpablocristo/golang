@@ -7,28 +7,27 @@ import (
 	"net/http"
 	"time"
 
-	// Se importa la librería Gin
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
-	//  Se crea una instancia de `gin.Engine`
+	// Se crea una instancia de `gin.Engine`
 	// `gin.Default()` crea un enrutador con los middleware Logger y Recovery por defecto.
 	router := gin.Default()
 
 	r := newRepository()
 
-	u := newitemUsecase(r)
+	u := newItemUsecase(r)
 
-	// creacion instacia del handler
-	// es necesario inyectar en newHandler un repositorio
+	// Creación instancia del handler
+	// es necesario inyectar en newHandler un usecase
 	h := newHandler(u)
 
 	// Se definen las rutas
 	router.GET("/", h.helloWorld)
-	router.POST("/items", h.saveItem)
-	router.GET("/items", h.getAllItems)
+	router.POST("/items", h.saveItemHandler)
+	router.GET("/items", h.getAllItemsHandler)
 
 	log.Println("Server started at http://localhost:80808080/")
 
@@ -38,34 +37,28 @@ func main() {
 	}
 }
 
-// ////////////////////////////////////////////////////////////////////////////
-// error global
-// ////////////////////////////////////////////////////////////////////////////
+// Error global
 var ErrNotFound = errors.New("not found")
 
-//////////////////////////////////////////////////////////////////////////////
 // Handler
-//////////////////////////////////////////////////////////////////////////////
-
 type handler struct {
-	usecase *itemUsecase
+	usecase itemUsecaseInterface
 }
 
-// constructor de typo handler, en los parametros de entrada se inyencta el un repository
-func newHandler(u *itemUsecase) *handler {
+// Constructor del tipo handler, en los parametros de entrada se inyecta el un usecase
+func newHandler(u itemUsecaseInterface) *handler {
 	return &handler{
-		usecase: u, // aqui se carga el repostory inyectoado dentro del handler
+		usecase: u, // Aquí se carga el usecase inyectado dentro del handler
 	}
 }
 
-// como ahora la antigua funcion helloWorld, tiene un reciber de tipo handler,
-// es un metodo de handler
+// La función helloWorld ahora es un método de handler
 func (h *handler) helloWorld(c *gin.Context) {
 	c.String(http.StatusOK, "¡Hello World!")
 }
 
-func (h *handler) saveItem(c *gin.Context) {
-	var item item
+func (h *handler) saveItemHandler(c *gin.Context) {
+	var item Item
 	err := c.BindJSON(&item)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -81,7 +74,7 @@ func (h *handler) saveItem(c *gin.Context) {
 	c.JSON(http.StatusOK, savedItem)
 }
 
-func (h *handler) getAllItems(c *gin.Context) {
+func (h *handler) getAllItemsHandler(c *gin.Context) {
 	items, err := h.usecase.getAllItems()
 	if err != nil {
 		if err == ErrNotFound {
@@ -95,12 +88,8 @@ func (h *handler) getAllItems(c *gin.Context) {
 	c.JSON(http.StatusOK, items)
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Repositorio
-/////////////////////////////////////////////////////////////////////////////
-
-// entidad item
-type item struct {
+type Item struct {
 	ID          int
 	Code        string
 	Title       string
@@ -112,23 +101,19 @@ type item struct {
 	UpdatedAt   time.Time
 }
 
-type mapRepo map[int]item
+type MapRepo map[int]Item
 
-// creacion del tipo Repository
-type repository struct {
-	items mapRepo
+type Repository struct {
+	items MapRepo
 }
 
-// constructor del repositorio
-func newRepository() *repository {
-	return &repository{
-		items: make(mapRepo), // ATENCION, aqui se satisface el campo items de Repository
+func newRepository() *Repository {
+	return &Repository{
+		items: make(MapRepo),
 	}
 }
 
-// este metodo sirve para guardar un item en la base de datos
-// este metodo, si bien esta implementado, TODAVIA NO SE UTILIZA
-func (r *repository) saveItem(item item) error {
+func (r *Repository) saveItem(item Item) error {
 	if item.ID == 0 {
 		return fmt.Errorf("item ID cannot be 0")
 	}
@@ -139,7 +124,7 @@ func (r *repository) saveItem(item item) error {
 	return nil
 }
 
-func (r *repository) getAllItems() (mapRepo, error) {
+func (r *Repository) getAllItems() (MapRepo, error) {
 	return r.items, nil
 }
 
@@ -147,25 +132,31 @@ func (r *repository) getAllItems() (mapRepo, error) {
 // Usecases
 /////////////////////////////////////////////////////////////////////////////
 
-type itemUsecase struct {
-	repo *repository
+// Usecases
+type itemUsecaseInterface interface {
+	saveItem(Item) (Item, error)
+	getAllItems() (MapRepo, error)
 }
 
-func newitemUsecase(repo *repository) *itemUsecase {
+type itemUsecase struct {
+	repo *Repository
+}
+
+func newItemUsecase(repo *Repository) itemUsecaseInterface {
 	return &itemUsecase{
 		repo: repo,
 	}
 }
 
-func (u *itemUsecase) saveItem(item item) (item, error) {
+func (u *itemUsecase) saveItem(item Item) (Item, error) {
 	if err := u.repo.saveItem(item); err != nil {
-		return item, fmt.Errorf("error saving item: %w", err)
+		return item, fmt.Errorf("error saving Item: %w", err)
 	}
 
 	return item, nil
 }
 
-func (u *itemUsecase) getAllItems() (mapRepo, error) {
+func (u *itemUsecase) getAllItems() (MapRepo, error) {
 	items, err := u.repo.getAllItems()
 	if err != nil {
 		return items, fmt.Errorf("error in repository: %w", err)
