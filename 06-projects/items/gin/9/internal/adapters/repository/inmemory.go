@@ -1,7 +1,8 @@
 package repository
 
 import (
-	"fmt"
+	"errors"
+	"time"
 
 	entity "github.com/devpablocristo/golang/06-projects/items/gin/9/internal/entity"
 )
@@ -18,15 +19,21 @@ func NewRepository() entity.ItemRepository {
 	}
 }
 
-func (r *Repository) SaveItem(item entity.Item) error {
-	if item.ID == 0 {
-		return fmt.Errorf("item ID cannot be 0")
+func (r *Repository) SaveItem(item entity.Item) (entity.Item, error) {
+	item.CreatedAt = time.Now().UTC()
+	item.UpdatedAt = time.Now().UTC()
+	id := entity.ID(len(r.items) + 1)
+	r.items[id] = item
+
+	return r.items[id], nil
+}
+
+func (r *Repository) GetItemByID(id entity.ID) (entity.Item, error) {
+	item, ok := r.items[id]
+	if !ok {
+		return entity.Item{}, errors.New("item not found")
 	}
-	if _, exists := r.items[item.ID]; exists {
-		return fmt.Errorf("item with ID %d already exists", item.ID)
-	}
-	r.items[item.ID] = item
-	return nil
+	return item, nil
 }
 
 func (r *Repository) GetItems() (entity.MapRepo, error) {

@@ -25,11 +25,12 @@ func NewItemUsecase(repo entity.ItemRepository) ItemUsecaseInterface {
 }
 
 func (u *ItemUsecase) SaveItem(item entity.Item) (entity.Item, error) {
-	if err := u.repo.SaveItem(item); err != nil {
+	savedItem, err := u.repo.SaveItem(item)
+	if err != nil {
 		return entity.Item{}, fmt.Errorf("error saving entity.entity.Item: %w", err)
 	}
 
-	return item, nil
+	return savedItem, nil
 }
 
 func (u *ItemUsecase) GetItems() (entity.MapRepo, error) {
@@ -39,11 +40,8 @@ func (u *ItemUsecase) GetItems() (entity.MapRepo, error) {
 	}
 
 	if len(items) == 0 {
-		return items, entity.ErrNotFound
+		return items, errNotFound
 	}
 
 	return items, nil
 }
-
-
-func dtoToItem (dto )

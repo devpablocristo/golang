@@ -1,5 +1,5 @@
-// Para estar alineado con el naming de clean arch, se cambiar el nombre del directorio de handler a controller
-package handler
+// Para estar alineado con el naming de clean arch, se cambiar el nombre del directorio de controller a controller
+package controller
 
 import (
 	"net/http"
@@ -12,24 +12,26 @@ import (
 )
 
 // ATENCION aqui se ultiliza la interface del usercase, no el tipo del usercase
-type ItemHandler struct {
+// interactor ques la estructura?????
+type ItemController struct {
 	usecase usecase.ItemUsecaseInterface
 }
 
-// Constructor del tipo ItemHandler, en los parametros de entrada se inyecta el un usecase
+// Constructor del tipo ItemController, en los parametros de entrada se inyecta el un usecase
 // como el campo usecase es de tipo interface, tiene sentido poner como paramtro de entrada tambien la misma interface
-func NewHandler(u usecase.ItemUsecaseInterface) *ItemHandler {
-	return &ItemHandler{
-		usecase: u, // Aquí se carga el usecase inyectado dentro del ItemHandler
+func NewController(u usecase.ItemUsecaseInterface) *ItemController {
+	return &ItemController{
+		usecase: u, // Aquí se carga el usecase inyectado dentro del ItemController
 	}
 }
 
-// La función helloWorld ahora es un método de ItemHandler
-func (h *ItemHandler) HelloWorld(c *gin.Context) {
+// La función helloWorld ahora es un método de ItemController
+func (h *ItemController) HelloWorld(c *gin.Context) {
 	c.String(http.StatusOK, "¡Hello World!")
 }
 
-func (h *ItemHandler) SaveItem(c *gin.Context) {
+// recibe un array de items
+func (h *ItemController) SaveItem(c *gin.Context) {
 	var item entity.Item
 	err := c.BindJSON(&item)
 	if err != nil {
@@ -37,20 +39,20 @@ func (h *ItemHandler) SaveItem(c *gin.Context) {
 		return
 	}
 
-	// trad de dto a entity
-	savedItem, err := h.usecase.SaveItem(item)
+	savedItems, err := h.usecase.SaveItem(item)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, savedItem)
+	c.JSON(http.StatusOK, savedItems)
 }
 
-func (h *ItemHandler) GetItems(c *gin.Context) {
+// devuelve un array de items
+func (h *ItemController) GetItems(c *gin.Context) {
 	items, err := h.usecase.GetItems()
 	if err != nil {
-		if err == entity.ErrNotFound {
+		if err == errNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

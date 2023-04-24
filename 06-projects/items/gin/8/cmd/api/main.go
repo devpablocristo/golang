@@ -5,7 +5,7 @@ import (
 
 	// Se importa la librería Gin
 
-	handler "github.com/devpablocristo/golang/06-projects/items/gin/8/internal/adapters/handler"
+	controller "github.com/devpablocristo/golang/06-projects/items/gin/8/internal/adapters/controller"
 	repository "github.com/devpablocristo/golang/06-projects/items/gin/8/internal/adapters/repository"
 	web "github.com/devpablocristo/golang/06-projects/items/gin/8/internal/infra/web"
 	usecase "github.com/devpablocristo/golang/06-projects/items/gin/8/internal/usecase"
@@ -14,7 +14,7 @@ import (
 func main() {
 	r := repository.NewRepository()
 	u := usecase.NewItemUsecase(r)
-	h := handler.NewHandler(u)
+	h := controller.NewController(u)
 
 	// se mueven ls rutas a otro archivo
 	err := web.NewHTTPServer(h)

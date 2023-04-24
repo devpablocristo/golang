@@ -5,19 +5,19 @@ import (
 
 	gin "github.com/gin-gonic/gin"
 
-	handler "github.com/devpablocristo/golang/06-projects/items/gin/9/internal/adapters/controller"
+	controller "github.com/devpablocristo/golang/06-projects/items/gin/9/internal/adapters/controller"
 )
 
 const port = ":8080"
 
-func NewHTTPServer(h *handler.ItemHandler) error {
+func NewHTTPServer(h *controller.ItemController) error {
 	// Se crea una instancia de `gin.Engine`
 	// `gin.Default()` crea un enrutador con los middleware Logger y Recovery por defecto.
 	router := gin.Default()
 
 	// Se definen las rutas
 	router.GET("/", h.HelloWorld)
-	router.POST("/save-items", h.SaveItems)
+	router.POST("/save-item", h.SaveItem)
 	router.GET("/get-items", h.GetItems)
 
 	log.Println("Server started at http://localhost" + port)

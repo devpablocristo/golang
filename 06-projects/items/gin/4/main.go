@@ -21,9 +21,9 @@ func main() {
 
 	u := newitemUsecase(r)
 
-	// creacion instacia del handler
-	// es necesario inyectar en newHandler un repositorio
-	h := newHandler(u)
+	// creacion instacia del controller
+	// es necesario inyectar en newController un repositorio
+	h := newController(u)
 
 	// Se definen las rutas
 	router.GET("/", h.helloWorld)
@@ -44,27 +44,27 @@ func main() {
 var ErrNotFound = errors.New("not found")
 
 //////////////////////////////////////////////////////////////////////////////
-// Handler
+// Controller
 //////////////////////////////////////////////////////////////////////////////
 
-type handler struct {
+type controller struct {
 	usecase *itemUsecase
 }
 
-// constructor de typo handler, en los parametros de entrada se inyencta el un repository
-func newHandler(u *itemUsecase) *handler {
-	return &handler{
-		usecase: u, // aqui se carga el repostory inyectoado dentro del handler
+// constructor de typo controller, en los parametros de entrada se inyencta el un repository
+func newController(u *itemUsecase) *controller {
+	return &controller{
+		usecase: u, // aqui se carga el repostory inyectoado dentro del controller
 	}
 }
 
-// como ahora la antigua funcion helloWorld, tiene un reciber de tipo handler,
-// es un metodo de handler
-func (h *handler) helloWorld(c *gin.Context) {
+// como ahora la antigua funcion helloWorld, tiene un reciber de tipo controller,
+// es un metodo de controller
+func (h *controller) helloWorld(c *gin.Context) {
 	c.String(http.StatusOK, "¡Hello World!")
 }
 
-func (h *handler) saveItem(c *gin.Context) {
+func (h *controller) saveItem(c *gin.Context) {
 	var item item
 	err := c.BindJSON(&item)
 	if err != nil {
@@ -81,7 +81,7 @@ func (h *handler) saveItem(c *gin.Context) {
 	c.JSON(http.StatusOK, savedItem)
 }
 
-func (h *handler) getAllItems(c *gin.Context) {
+func (h *controller) getAllItems(c *gin.Context) {
 	items, err := h.usecase.getAllItems()
 	if err != nil {
 		if err == ErrNotFound {

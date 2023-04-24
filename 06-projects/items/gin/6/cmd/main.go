@@ -6,7 +6,7 @@ import (
 	// Se importa la librería Gin
 	gin "github.com/gin-gonic/gin"
 
-	handler "github.com/devpablocristo/golang/06-projects/items/gin/6/handler"
+	controller "github.com/devpablocristo/golang/06-projects/items/gin/6/controller"
 	repository "github.com/devpablocristo/golang/06-projects/items/gin/6/repository"
 	usecase "github.com/devpablocristo/golang/06-projects/items/gin/6/usecase"
 )
@@ -21,9 +21,9 @@ func main() {
 
 	u := usecase.NewItemUsecase(r)
 
-	// Creación instancia del handler
-	// es necesario inyectar en newHandler un usecase
-	h := handler.NewHandler(u)
+	// Creación instancia del controller
+	// es necesario inyectar en newController un usecase
+	h := controller.NewController(u)
 
 	// Se definen las rutas
 	router.GET("/", h.HelloWorld)
@@ -43,7 +43,7 @@ func main() {
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
-// Se mueve el Handler
+// Se mueve el Controller
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
