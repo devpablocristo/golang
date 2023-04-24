@@ -26,12 +26,14 @@ func main() {
 	router := gin.Default()
 
 	// Se definen las rutas
-	router.GET("/", helloWorld)
+	router.GET("/qwerty", helloWorld)
 
-	log.Println("Servidor escuchando en http://localhost:8080/")
+	// esto es simplemente un texto que sale por la salida estandar avisando que el servidor esta online
+	log.Println("Server started at http://localhost:80808080/")
 
 	// Se crea el servidor con el método `Run` de Gin:
-	if err := router.Run(":8080"); err != nil {
+	err := router.Run(":8080")
+	if err != nil {
 		log.Fatal(err)
 	}
 }

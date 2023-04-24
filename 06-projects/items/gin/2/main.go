@@ -20,7 +20,7 @@ func main() {
 	// Se definen las rutas
 	router.GET("/", h.helloWorld)
 
-	log.Println("Servidor escuchando en http://localhost:8080/")
+	log.Println("Server started at http://localhost:80808080/")
 
 	// Se crea el servidor con el método `Run` de Gin:
 	if err := router.Run(":8080"); err != nil {
@@ -34,12 +34,12 @@ type handler struct{}
 // constructor de typo handler, en los parametros de entrada de esta es donde
 // se usara inyeccion de dependencias para crear el servicio, en esta caso un handler,
 // con todo lo que necesite para funcionar
-func newHandler() *handler {
+func newHandler( /*paramentros de entrada*/ ) *handler {
 	return &handler{}
 }
 
 // como ahora la antigua funcion helloWorld, tiene un reciber de tipo handler,
 // es un metodo de handler
-func (h handler) helloWorld(c *gin.Context) {
+func (h *handler) helloWorld(c *gin.Context) {
 	c.String(http.StatusOK, "¡Hello World!")
 }
