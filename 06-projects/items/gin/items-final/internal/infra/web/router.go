@@ -16,7 +16,7 @@ func NewHTTPServer(ItemCtrl ctrl.ItemController) error {
 	basePath := "/api/v1/inventory"
 	publicRouter := r.Group(basePath)
 
-	publicRouter.GET("/Items", ItemCtrl.GetItems)
+	publicRouter.GET("/Items", ItemCtrl.GetAllItems)
 	publicRouter.POST("/Items", ItemCtrl.AddItem)
 	publicRouter.GET("/Items/:id", ItemCtrl.GetItem)
 

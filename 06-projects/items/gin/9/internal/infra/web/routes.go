@@ -15,10 +15,17 @@ func NewHTTPServer(h *controller.ItemController) error {
 	// `gin.Default()` crea un enrutador con los middleware Logger y Recovery por defecto.
 	router := gin.Default()
 
+	// La función Group de Gin se utiliza para definir un grupo de rutas.
+	// Toma una cadena como primer argumento que especifica el prefijo común para todas las rutas en el grupo.
+	v1 := router.Group("/v1")
+
 	// Se definen las rutas
-	router.GET("/", h.HelloWorld)
-	router.POST("/save-item", h.SaveItem)
-	router.GET("/get-items", h.GetItems)
+	v1.POST("/items", h.SaveItem)
+	v1.GET("/items", h.GetAllItems)
+	v1.GET("/items/:id", h.GetItemsByID)
+
+	// PUT v1/items/{id}
+	// DELETE v1/items/{id}
 
 	log.Println("Server started at http://localhost" + port)
 

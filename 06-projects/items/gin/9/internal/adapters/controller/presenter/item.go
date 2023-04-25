@@ -50,7 +50,7 @@ type jsonItem struct {
 	Code        string    `json:"code"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
-	Price       float64   `json:"price"`
+	Price       float32   `json:"price"`
 	Stock       int       `json:"stock"`
 	Status      string    `json:"status"`
 	CreatedAt   time.Time `json:"created_at"`

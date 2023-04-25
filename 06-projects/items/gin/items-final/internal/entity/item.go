@@ -18,7 +18,7 @@ type Item struct {
 }
 
 type ItemRepository interface {
-	GetItems() ([]Item, error)
+	GetAllItems() ([]Item, error)
 	GetItemByID(id uint) (Item, error)
 	CheckItemByCode(code string) (bool, error)
 	AddItem(item *Item) error

@@ -95,7 +95,7 @@ func (r *mysqlItemRepository) AddItem(item *entity.Item) error {
 	return nil
 }
 
-func (r *mysqlItemRepository) GetItems() ([]entity.Item, error) {
+func (r *mysqlItemRepository) GetAllItems() ([]entity.Item, error) {
 	var items []entity.Item
 	var itemsDB []itemDAO
 
