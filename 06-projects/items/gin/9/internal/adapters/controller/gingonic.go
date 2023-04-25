@@ -3,11 +3,12 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	// Se importa la librería Gin
 	gin "github.com/gin-gonic/gin"
 
-	entity "github.com/devpablocristo/golang/06-projects/items/gin/9/internal/entity"
+	"github.com/devpablocristo/golang/06-projects/items/gin/9/internal/entity"
 	usecase "github.com/devpablocristo/golang/06-projects/items/gin/9/internal/usecase"
 )
 
@@ -25,20 +26,15 @@ func NewController(u usecase.ItemUsecaseInterface) *ItemController {
 	}
 }
 
-// La función helloWorld ahora es un método de ItemController
-func (h *ItemController) HelloWorld(c *gin.Context) {
-	c.String(http.StatusOK, "¡Hello World!")
-}
-
-// recibe un array de items
 func (h *ItemController) SaveItem(c *gin.Context) {
-	var item entity.Item
-	err := c.BindJSON(&item)
+	var dto *itemDTO
+	err := c.BindJSON(&dto)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	item := dto2Item(dto)
 	savedItems, err := h.usecase.SaveItem(item)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -49,8 +45,8 @@ func (h *ItemController) SaveItem(c *gin.Context) {
 }
 
 // devuelve un array de items
-func (h *ItemController) GetItems(c *gin.Context) {
-	items, err := h.usecase.GetItems()
+func (h *ItemController) GetAllItems(c *gin.Context) {
+	items, err := h.usecase.GetAllItems()
 	if err != nil {
 		if err == errNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -61,4 +57,25 @@ func (h *ItemController) GetItems(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, items)
+}
+
+func (h *ItemController) GetItemsByID(c *gin.Context) {
+	id := string2ID(c.Param(id))
+	items, err := h.usecase.GetItemByID(id)
+	if err != nil {
+		if err == errNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, items)
+}
+
+func string2ID(s string) entity.ID {
+	id, _ := strconv.Atoi(s)
+	convID := entity.ID(id)
+	return convID
 }

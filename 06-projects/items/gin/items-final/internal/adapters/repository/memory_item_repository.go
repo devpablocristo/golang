@@ -17,7 +17,7 @@ func NewItemRepository() entity.ItemRepository {
 	return &itemRepository{}
 }
 
-func (r *itemRepository) GetItems() ([]entity.Item, error) {
+func (r *itemRepository) GetAllItems() ([]entity.Item, error) {
 	return r.db, nil
 }
 

@@ -19,23 +19,33 @@ func NewRepository() entity.ItemRepository {
 	}
 }
 
-func (r *Repository) SaveItem(item entity.Item) (entity.Item, error) {
+func (r *Repository) SaveItem(item *entity.Item) (*entity.Item, error) {
 	item.CreatedAt = time.Now().UTC()
-	item.UpdatedAt = time.Now().UTC()
+	item.UpdatedAt = item.CreatedAt
 	id := entity.ID(len(r.items) + 1)
 	r.items[id] = item
 
 	return r.items[id], nil
 }
 
-func (r *Repository) GetItemByID(id entity.ID) (entity.Item, error) {
+func (r *Repository) GetItemByID(id entity.ID) (*entity.Item, error) {
 	item, ok := r.items[id]
 	if !ok {
-		return entity.Item{}, errors.New("item not found")
+		return nil, errors.New("item not found")
 	}
 	return item, nil
 }
 
-func (r *Repository) GetItems() (entity.MapRepo, error) {
+func (r *Repository) GetItemByCode(code string) (*entity.Item, error) {
+	for _, item := range r.items {
+		if item.Code == code {
+			return item, errors.New("existing code")
+		}
+	}
+
+	return nil, nil
+}
+
+func (r *Repository) GetAllItems() (entity.MapRepo, error) {
 	return r.items, nil
 }

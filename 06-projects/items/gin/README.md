@@ -18,9 +18,9 @@ A continuación un ejemplo de la representación _JSON_ de un item:
   "code": "SAM27324354",
   "title": "Tablet Samsung Galaxy Tab S7",
   "description": "Galaxy Tab S7 with S Pen SM-t733 12.4 pulgadas y 4GB de memoria RAM",
-  "price": 150000,
+  "price": 150000.35,
   "stock": 3,
-  "status": "ACTIVE"
+  "status": "ACTIVE",
   "created_at": "2020-05-10T04:20:33Z",
   "updated_at": "2020-05-10T05:30:00Z"
 }
@@ -56,7 +56,7 @@ _Body_:
   "code": "SAM27324354",
   "title": "Tablet Samsung Galaxy Tab S7",
   "description": "Galaxy Tab S7 with S Pen SM-t733 12.4 pulgadas y 4GB de memoria RAM",
-  "price": 150000,
+  "price": 150000.31,
   "stock": 15
 }
 ```
@@ -80,7 +80,7 @@ _Body_:
   "code": "SAM27324354",
   "title": "Tablet Samsung Galaxy Tab S7",
   "description": "Galaxy Tab S7 with S Pen SM-t733 12.4 pulgadas y 4GB de memoria RAM",
-  "price": 158000,
+  "price": 158000.65,
   "stock": 25
 }
 ```

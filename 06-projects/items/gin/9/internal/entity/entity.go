@@ -5,22 +5,24 @@ import (
 )
 
 type ID uint
-type MapRepo map[ID]Item
+type MapRepo map[ID]*Item
 
 // entidad Item
 type Item struct {
 	Code        string
 	Title       string
 	Description string
-	Price       float64
+	Price       float32
 	Stock       int
 	Status      string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
 
-// esta es la interface qie utizaran cualquier repositorio que se implemente
+// esta es la interface del repositorio, o sea, el conector del repositorio con el resto de la app
 type ItemRepository interface {
-	SaveItem(Item Item) (Item, error)
-	GetItems() (MapRepo, error)
+	SaveItem(*Item) (*Item, error)
+	GetAllItems() (MapRepo, error)
+	GetItemByCode(string) (*Item, error)
+	GetItemByID(ID) (*Item, error)
 }

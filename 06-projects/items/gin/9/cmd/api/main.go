@@ -3,8 +3,6 @@ package main
 import (
 	"log"
 
-	// Se importa la librería Gin
-
 	controller "github.com/devpablocristo/golang/06-projects/items/gin/9/internal/adapters/controller"
 	repository "github.com/devpablocristo/golang/06-projects/items/gin/9/internal/adapters/repository"
 	web "github.com/devpablocristo/golang/06-projects/items/gin/9/internal/infra/web"

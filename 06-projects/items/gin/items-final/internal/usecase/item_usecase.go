@@ -12,7 +12,7 @@ type ItemUsecasee interface {
 	AddItem(item entity.Item) (entity.Item, error)
 }
 
-type itemUsecase struct {
+type sitemUsecase struct {
 	repo entity.ItemRepository
 }
 
@@ -23,7 +23,7 @@ func NewItemUsecase(repo entity.ItemRepository) ItemUsecasee {
 }
 
 func (u *itemUsecase) GetAllItems() ([]entity.Item, error) {
-	items, err := u.repo.GetItems()
+	items, err := u.repo.GetAllItems()
 	if err != nil {
 		return items, fmt.Errorf("error in repository: %w", err)
 	}

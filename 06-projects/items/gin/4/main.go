@@ -105,7 +105,7 @@ type item struct {
 	Code        string
 	Title       string
 	Description string
-	Price       float64
+	Price       float32
 	Stock       int
 	Status      string
 	CreatedAt   time.Time

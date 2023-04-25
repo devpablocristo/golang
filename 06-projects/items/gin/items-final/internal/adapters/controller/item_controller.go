@@ -29,7 +29,7 @@ func Pong(c *gin.Context) {
 	})
 }
 
-func (ctrl ItemController) GetItems(c *gin.Context) {
+func (ctrl ItemController) GetAllItems(c *gin.Context) {
 	items, err := ctrl.itemUsecase.GetAllItems()
 	c.JSON(http.StatusInternalServerError, presenter.ApiError{
 		StatusCode: http.StatusInternalServerError,
