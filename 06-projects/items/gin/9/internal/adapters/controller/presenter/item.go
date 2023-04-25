@@ -57,7 +57,7 @@ type jsonItem struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-func Item(i entity.Item) jsonItem {
+func Item(i *entity.Item) *jsonItem {
 	var itemResponse jsonItem
 
 	itemResponse.Code = i.Code
@@ -65,18 +65,28 @@ func Item(i entity.Item) jsonItem {
 	itemResponse.Description = i.Description
 	itemResponse.Price = i.Price
 	itemResponse.Stock = i.Stock
+	itemResponse.Status = i.Status
 	itemResponse.CreatedAt = i.CreatedAt
 	itemResponse.UpdatedAt = i.UpdatedAt
 
-	return itemResponse
+	return &itemResponse
 }
 
-func Items(items []entity.Item) []jsonItem {
-	var itemResponse []jsonItem
-
-	for _, val := range items {
-		itemResponse = append(itemResponse, Item(val))
+func Items(items entity.MapRepo) map[entity.ID]*jsonItem {
+	mJson := make(map[entity.ID]*jsonItem)
+	for id, i := range items {
+		mJson[id] = Item(i)
 	}
 
-	return itemResponse
+	return mJson
 }
+
+// func Items(items []entity.Item) []jsonItem {
+// 	var itemResponse []jsonItem
+
+// 	for _, val := range items {
+// 		itemResponse = append(itemResponse, Item(val))
+// 	}
+
+// 	return itemResponse
+// }

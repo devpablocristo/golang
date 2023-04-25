@@ -23,7 +23,7 @@ type itemDTO struct {
 }
 
 func dto2Item(dto *itemDTO) *entity.Item {
-	var i *entity.Item
+	var i entity.Item
 
 	i.Code = dto.Code
 	i.Title = dto.Title
@@ -32,5 +32,5 @@ func dto2Item(dto *itemDTO) *entity.Item {
 	i.Stock = dto.Stock
 	i.Status = dto.Status
 
-	return i
+	return &i
 }

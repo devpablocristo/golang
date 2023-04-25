@@ -8,7 +8,8 @@ import (
 	// Se importa la librería Gin
 	gin "github.com/gin-gonic/gin"
 
-	"github.com/devpablocristo/golang/06-projects/items/gin/9/internal/entity"
+	presenter "github.com/devpablocristo/golang/06-projects/items/gin/9/internal/adapters/controller/presenter"
+	entity "github.com/devpablocristo/golang/06-projects/items/gin/9/internal/entity"
 	usecase "github.com/devpablocristo/golang/06-projects/items/gin/9/internal/usecase"
 )
 
@@ -27,21 +28,21 @@ func NewController(u usecase.ItemUsecaseInterface) *ItemController {
 }
 
 func (h *ItemController) SaveItem(c *gin.Context) {
-	var dto *itemDTO
-	err := c.BindJSON(&dto)
+	var dto itemDTO         // Declarar una variable de tipo itemDTO
+	err := c.BindJSON(&dto) // Pasar la dirección de dto a BindJSON
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error1": err.Error()})
 		return
 	}
 
-	item := dto2Item(dto)
-	savedItems, err := h.usecase.SaveItem(item)
+	item := dto2Item(&dto) // Pasar la dirección de dto a dto2Item
+	savedItem, err := h.usecase.SaveItem(item)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, savedItems)
+	c.JSON(http.StatusOK, presenter.Item(savedItem))
 }
 
 // devuelve un array de items
@@ -56,12 +57,12 @@ func (h *ItemController) GetAllItems(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, items)
+	c.JSON(http.StatusOK, presenter.Items(items))
 }
 
 func (h *ItemController) GetItemsByID(c *gin.Context) {
-	id := string2ID(c.Param(id))
-	items, err := h.usecase.GetItemByID(id)
+	id := string2ID(c.Param("id"))
+	item, err := h.usecase.GetItemByID(id)
 	if err != nil {
 		if err == errNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -71,7 +72,7 @@ func (h *ItemController) GetItemsByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, items)
+	c.JSON(http.StatusOK, presenter.Item(item))
 }
 
 func string2ID(s string) entity.ID {
