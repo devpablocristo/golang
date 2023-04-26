@@ -13,7 +13,7 @@ type itemDAO struct {
 	Description string    `db:"description"`
 	Price       float64   `db:"price"`
 	Stock       int       `db:"stock"`
-	Status      string    `db:"is_active"`
+	Status      string    `db:"status"`
 	CreatedAt   time.Time `db:"created_at"`
 	UpdatedAt   time.Time `db:"updated_at"`
 }

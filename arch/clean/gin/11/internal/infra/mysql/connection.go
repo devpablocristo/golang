@@ -4,16 +4,14 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 )
 
 const (
-	DB_HOST = "mysql-repo" // nombre del container en docker
+	DB_HOST = "mysql-container" // nombre del container en docker
 	DB_PORT = 3306
-	DB_NAME = "meli-items"
+	DB_NAME = "meli_items"
 	DB_USER = "root"
 	DB_PASS = "secret"
 )
@@ -31,38 +29,38 @@ func GetConnectionDB() (*sqlx.DB, error) {
 		}
 	}
 
-	if err := autoMigrate(db); err != nil {
-		return nil, err
-	}
+	// if err := autoMigrate(db); err != nil {
+	// 	return nil, err
+	// }
 
 	return db, nil
 }
 
-func autoMigrate(db *sqlx.DB) error {
-	driver, err := mysql.WithInstance(db.DB, &mysql.Config{})
-	if err != nil {
-		fmt.Printf("########## DB ERROR: " + err.Error() + " #############")
-		return fmt.Errorf("error instantiating migration: %w", err)
-	}
+// func autoMigrate(db *sqlx.DB) error {
+// 	driver, err := mysql.WithInstance(db.DB, &mysql.Config{})
+// 	if err != nil {
+// 		fmt.Printf("########## DB ERROR: " + err.Error() + " #############")
+// 		return fmt.Errorf("error instantiating migration: %w", err)
+// 	}
 
-	dbMigration, err := migrate.NewWithDatabaseInstance(
-		"file://../../../db",
-		"mysql",
-		driver,
-	)
+// 	dbMigration, err := migrate.NewWithDatabaseInstance(
+// 		"file://../../../db",
+// 		"mysql",
+// 		driver,
+// 	)
 
-	if err != nil {
-		fmt.Printf("########## DB ERROR: " + err.Error() + " #############")
-		return fmt.Errorf("error instantiating migration: %w", err)
-	}
+// 	if err != nil {
+// 		fmt.Printf("########## DB ERROR: " + err.Error() + " #############")
+// 		return fmt.Errorf("error instantiating migration: %w", err)
+// 	}
 
-	if err := dbMigration.Up(); err != nil && err != migrate.ErrNoChange {
-		return fmt.Errorf("error executing migration: %w", err)
-	}
+// 	if err := dbMigration.Up(); err != nil && err != migrate.ErrNoChange {
+// 		return fmt.Errorf("error executing migration: %w", err)
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func dbConnectionURL() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True", DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME)
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True", DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME)
 }

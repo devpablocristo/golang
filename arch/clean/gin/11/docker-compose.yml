@@ -13,7 +13,7 @@ services:
     volumes:
       - .:/app/data
   mysql:
-    container_name: mysql-repo
+    container_name: mysql-container
     # platform: linux/arm64/v8
     # platform: linux/x86_64
     image: mysql:5.7
@@ -46,7 +46,7 @@ services:
     ports:
       - "9090:80"
     environment:
-      PMA_HOST: mysql-repo
+      PMA_HOST: mysql-container
       MYSQL_ROOT_PASSWORD: secret
 
 networks:
