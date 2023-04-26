@@ -25,3 +25,6 @@ Para ejecutarlo:
 <http://localhost:9090>
 usuario: root
 contraseña: secret
+
+docker rm -f $(docker ps -a -q)
+docker volume rm $(docker volume ls -q)
