@@ -35,7 +35,7 @@ func (h *ItemController) SaveItem(c *gin.Context) {
 		return
 	}
 
-	item := dto2Item(&dto) // Pasar la dirección de dto a dto2Item
+	item := dto.dto2Item() // Pasar la dirección de dto a dto2Item
 	savedItem, err := h.usecase.SaveItem(item)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error()})

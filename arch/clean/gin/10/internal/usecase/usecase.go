@@ -39,7 +39,7 @@ func NewItemUsecase(repo entity.ItemRepository) ItemUsecaseInterface {
 func (u *ItemUsecase) SaveItem(item *entity.Item) (*entity.Item, error) {
 	_, err := u.repository.GetItemByCode(item.Code)
 	if err != nil {
-		return nil, fmt.Errorf("codes must be unique %s: %s", err.Error(), item.Code)
+		return nil, fmt.Errorf("codes must be unique %v: %s", err.Error(), item.Code)
 	}
 
 	item.Status = inactiveStatus

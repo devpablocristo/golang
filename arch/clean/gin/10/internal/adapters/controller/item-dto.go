@@ -22,15 +22,13 @@ type itemDTO struct {
 	Status      string  `json:"status"`
 }
 
-func dto2Item(dto *itemDTO) *entity.Item {
-	var i entity.Item
-
-	i.Code = dto.Code
-	i.Title = dto.Title
-	i.Description = dto.Description
-	i.Price = dto.Price
-	i.Stock = dto.Stock
-	i.Status = dto.Status
-
-	return &i
+func (dto *itemDTO) dto2Item() *entity.Item {
+	return &entity.Item{
+		Code:        dto.Code,
+		Title:       dto.Title,
+		Description: dto.Description,
+		Price:       dto.Price,
+		Stock:       dto.Stock,
+		Status:      dto.Status,
+	}
 }

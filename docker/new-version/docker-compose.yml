@@ -14,6 +14,8 @@ services:
       - .:/app/data
   mysql:
     container_name: mysql-repo
+    platform: linux/x86_64 #compatibity problem with M1
+    image: mysql:8.0
     build:
       context: .
       dockerfile: Dockerfile.mysql
@@ -22,15 +24,15 @@ services:
     restart: always
     ports:
       - "3306:3306"
-    image: mysql:5.7
+    expose:
+      - '3306'  # Opens port 3306 on the container
     environment:
-      MYSQL_DATABASE: app
+      MYSQL_DATABASE: items
       MYSQL_USER: tester
       MYSQL_PASSWORD: secret
       MYSQL_ROOT_PASSWORD: secret
-    # we mount a data volume to make sure we don't lose data
-    volumes:
-      - mysql_data:/var/lib/mysql
+    volumes: # we mount a data volume to make sure we don't lose data
+      - mysql-data:/var/lib/mysql # Where our data will be persisted
     command: --default-authentication-plugin=mysql_native_password
 
   # se agrega el servicio de phpMyAdmin
@@ -48,4 +50,41 @@ networks:
   default:
 
 volumes:
-  mysql_data:
+  mysql-data:
+
+
+
+
+
+
+# services:
+#   postgres:
+#     container_name: postgres_container
+#     image: postgres:14.4
+#     restart: unless-stopped
+#     environment:
+#       POSTGRES_USER: root
+#       POSTGRES_PASSWORD: rootroot
+#     ports:
+#       - "5432:5432"
+    
+#   mariadb:
+#     container_name: mariadb_container
+#     image: mariadb:10.7.4
+#     restart: unless-stopped
+#     environment:
+#       MARIADB_USER: root
+#       MARIADB_ROOT_PASSWORD: rootroot
+#     ports: 
+#       - "3306:3306" #locat port : container port
+
+#   mysql:
+#     container_name: mysql_container
+#     platform: linux/x86_64 #compatibity problem with M1
+#     image: mysql:8.0
+#     restart: unless-stopped
+#     environment:
+#       MYSQL_USER: root
+#       MYSQL_ROOT_PASSWORD: rootroot
+#     ports:
+#       - "33066:33006"

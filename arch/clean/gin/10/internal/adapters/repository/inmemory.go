@@ -8,18 +8,18 @@ import (
 )
 
 // el campo items es del type que maneja el repositorio
-type Repository struct {
+type repository struct {
 	items entity.MapRepo
 }
 
 // de nuevo, aqui el tipo retornado utiliza una interface
 func NewRepository() entity.ItemRepository {
-	return &Repository{
+	return &repository{
 		items: make(entity.MapRepo),
 	}
 }
 
-func (r *Repository) SaveItem(item *entity.Item) (*entity.Item, error) {
+func (r *repository) SaveItem(item *entity.Item) (*entity.Item, error) {
 	item.CreatedAt = time.Now().UTC()
 	item.UpdatedAt = item.CreatedAt
 	id := entity.ID(len(r.items) + 1)
@@ -28,7 +28,7 @@ func (r *Repository) SaveItem(item *entity.Item) (*entity.Item, error) {
 	return r.items[id], nil
 }
 
-func (r *Repository) GetItemByID(id entity.ID) (*entity.Item, error) {
+func (r *repository) GetItemByID(id entity.ID) (*entity.Item, error) {
 	item, ok := r.items[id]
 	if !ok {
 		return nil, errors.New("item not found")
@@ -36,7 +36,7 @@ func (r *Repository) GetItemByID(id entity.ID) (*entity.Item, error) {
 	return item, nil
 }
 
-func (r *Repository) GetItemByCode(code string) (*entity.Item, error) {
+func (r *repository) GetItemByCode(code string) (*entity.Item, error) {
 	for _, item := range r.items {
 		if item.Code == code {
 			return item, errors.New("existing code")
@@ -46,6 +46,6 @@ func (r *Repository) GetItemByCode(code string) (*entity.Item, error) {
 	return nil, nil
 }
 
-func (r *Repository) GetAllItems() (entity.MapRepo, error) {
+func (r *repository) GetAllItems() (entity.MapRepo, error) {
 	return r.items, nil
 }

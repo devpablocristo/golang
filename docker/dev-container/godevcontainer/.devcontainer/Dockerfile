@@ -1,0 +1,1 @@
+FROM devpablocristo/godevcontainer

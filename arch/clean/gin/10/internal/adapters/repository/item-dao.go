@@ -18,9 +18,8 @@ type itemDAO struct {
 	UpdatedAt   time.Time `db:"updated_at"`
 }
 
-func dao2Item(dao itemDAO) entity.Item {
-	return entity.Item{
-		ID:          dao.ID,
+func (dao *itemDAO) dao2Item() *entity.Item {
+	return &entity.Item{
 		Code:        dao.Code,
 		Description: dao.Description,
 		Title:       dao.Title,

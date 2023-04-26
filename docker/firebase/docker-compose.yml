@@ -1,0 +1,30 @@
+version: "3.7"
+services:
+#######################################
+  app:
+    container_name: prueba-go-app
+    image: prueba-go
+    restart: unless-stopped
+    working_dir: /app
+    build:
+      #?????
+      args:
+        user: pablo
+        uid: 1000
+      #context: ./folder/containing/files
+      context: ./
+      #dockerfile: path/to/dockerfile/relative/to/context/Dockerfile
+      dockerfile: Dockerfile
+      target: debug
+    volumes:
+      - ./:/app
+    ports:
+      - '90:8080' #puerto local : puerto container, en este caso esta escificado en el .go
+    networks:
+      - prueba-go
+#######################################
+
+#?
+networks:
+  prueba-go:
+    driver: bridge
