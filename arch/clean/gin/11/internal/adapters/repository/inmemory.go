@@ -36,14 +36,14 @@ func (r *repository) GetItemByID(id entity.ID) (*entity.Item, error) {
 	return item, nil
 }
 
-func (r *repository) GetItemByCode(code string) (*entity.Item, error) {
+func (r *repository) CheckItemByCode(code string) (bool, error) {
 	for _, item := range r.items {
 		if item.Code == code {
-			return item, errors.New("existing code")
+			return true, errors.New("existing code")
 		}
 	}
 
-	return nil, nil
+	return false, nil
 }
 
 func (r *repository) GetAllItems() (entity.MapRepo, error) {

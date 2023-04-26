@@ -23,6 +23,6 @@ type Item struct {
 type ItemRepository interface {
 	SaveItem(*Item) (*Item, error)
 	GetAllItems() (MapRepo, error)
-	GetItemByCode(string) (*Item, error)
+	CheckItemByCode(string) (bool, error)
 	GetItemByID(ID) (*Item, error)
 }
