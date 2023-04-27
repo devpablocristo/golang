@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DB_HOST = "mysql-container" // nombre del container en docker
+	DB_HOST = "mysql-meli-items" // nombre del container en docker
 	DB_PORT = 3306
 	DB_NAME = "meli_items"
 	DB_USER = "root"

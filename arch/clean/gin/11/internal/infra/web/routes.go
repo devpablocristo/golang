@@ -8,7 +8,7 @@ import (
 	controller "items/internal/adapters/controller"
 )
 
-const port = ":8080"
+const port = ":9000"
 
 func NewHTTPServer(h *controller.ItemController) error {
 	// Se crea una instancia de `gin.Engine`
