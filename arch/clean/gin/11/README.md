@@ -178,3 +178,20 @@ Dentro de los criterios que vamos a tener en cuenta a la hora de revisar su cód
 - Mantenibilidad
 - Facilidad para hacer tests
 - Valoraremos adicionalmente si usa alguna arquitectura limpia (ej. arquitectura hexagonal).
+
+
+{
+  "code": "apple-iphone13",
+  "title": "Apple iPhone 13",
+  "description": "The latest iPhone 13 with A15 Bionic chip, 5G capable, and 128GB of storage",
+  "price": 999.99,
+  "stock": 100
+}
+
+{
+  "code": "samgts7",
+  "title": "Tablet Samsung Galaxy Tab S7",
+  "description": "Galaxy Tab S7 with S Pen SM-t733 12.4 pulgadas y 4GB de memoria RAM",
+  "price": 158000.65,
+  "stock": 25
+}
