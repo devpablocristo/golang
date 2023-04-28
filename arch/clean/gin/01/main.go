@@ -29,7 +29,7 @@ func main() {
 	router.GET("/qwerty", helloWorld)
 
 	// esto es simplemente un texto que sale por la salida estandar avisando que el servidor esta online
-	log.Println("Server started at http://localhost:80808080/")
+	log.Println("Server started at http://localhost:8080/")
 
 	// Se crea el servidor con el método `Run` de Gin:
 	err := router.Run(":8080")
