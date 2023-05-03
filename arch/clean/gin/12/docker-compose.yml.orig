@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile.api
     ports:
-      - "8080:8080" # locat port : container port
+      - ${SERVER_PORT}:${SERVER_PORT} # locat port : container port
     restart: unless-stopped
     depends_on:
       - mysql
@@ -17,25 +17,34 @@ services:
         ipv4_address: 192.168.1.1
 
   mysql:
-    container_name: mysql-meli-items
+    container_name: ${DB_HOST}
+    # platform: linux/arm64/v8
+    # platform: linux/x86_64
     image: mysql:5.7
+    # image: mysql:8.0
+    # image: arm64v8/mysql:8.0
     build:
       context: .
       dockerfile: Dockerfile.mysql
+    # networks:
+    #   - default
     restart: always
     ports:
-      - "3306:3306" # locat port : container port
+      - ${DB_PORT}:${DB_PORT} # locat port : container port
+    # expose:
+    #   - "3306"  # Opens port 3306 on the container
     environment:
-      MYSQL_DATABASE: meli_items
-      MYSQL_USER: tester
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes: # we mount a data volume to make sure we don't lose data
       - mysql-data:/var/lib/mysql # Where our data will be persisted
     command: --default-authentication-plugin=mysql_native_password
     networks:
       items_net:
         ipv4_address: 192.168.1.2
+
 
   # se agrega el servicio de phpMyAdmin
   phpmyadmin:
@@ -50,6 +59,7 @@ services:
     networks:
       items_net:
         ipv4_address: 192.168.1.3
+
 
 networks:
   items_net:

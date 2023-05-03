@@ -6,7 +6,7 @@ import (
 	entity "items/internal/entity"
 )
 
-type itemDAO struct {
+type ItemDAO struct {
 	ID          uint      `db:"id"`
 	Code        string    `db:"code"`
 	Title       string    `db:"title"`
@@ -18,7 +18,7 @@ type itemDAO struct {
 	UpdatedAt   time.Time `db:"updated_at"`
 }
 
-func (dao *itemDAO) dao2Item() *entity.Item {
+func (dao *ItemDAO) dao2Item() *entity.Item {
 	return &entity.Item{
 		Code:        dao.Code,
 		Description: dao.Description,

@@ -7,6 +7,8 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"items/internal/adapters/repository"
 )
 
 func GormConn() (*gorm.DB, error) {
@@ -18,7 +20,7 @@ func GormConn() (*gorm.DB, error) {
 	}
 	log.Println("Gorm connection established")
 
-	db.AutoMigrate(&eventDAO{})
+	db.AutoMigrate(&repository.ItemDAO{})
 
 	return db, nil
 }

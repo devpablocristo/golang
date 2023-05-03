@@ -8,8 +8,6 @@ import (
 	controller "items/internal/adapters/controller"
 )
 
-const port = ":9000"
-
 func NewHTTPServer(h *controller.ItemController) error {
 	// Se crea una instancia de `gin.Engine`
 	// `gin.Default()` crea un enrutador con los middleware Logger y Recovery por defecto.
@@ -27,6 +25,8 @@ func NewHTTPServer(h *controller.ItemController) error {
 	// PUT v1/items/{id}
 	// DELETE v1/items/{id}
 	// PATCH v1/items/{id}
+
+	port := ":8080" // + os.Getenv("SERVER_PORT")
 
 	log.Println("Server started at http://localhost" + port)
 

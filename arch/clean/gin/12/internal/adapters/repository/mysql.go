@@ -22,7 +22,7 @@ func NewMySQLItemRepository(db *sqlx.DB) entity.ItemRepository {
 }
 
 func (r *mysqlItemRepository) GetItemByID(id entity.ID) (*entity.Item, error) {
-	var itemDB itemDAO
+	var itemDB ItemDAO
 	err := r.conn.Get(&itemDB, "SELECT * FROM item WHERE id=?", id)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -45,14 +45,6 @@ func (r *mysqlItemRepository) CheckItemByCode(code string) (bool, error) {
 	return exist, nil
 }
 
-// //////////////////
-// //////////////////
-// //////////////////
-// //////////////////
-// //////////////////
-// //////////////////
-// //////////////////
-// //////////////////
 func (r *mysqlItemRepository) SaveItem(item *entity.Item) (*entity.Item, error) {
 	createdAt := time.Now()
 	updatedAt := createdAt
@@ -83,7 +75,7 @@ func (r *mysqlItemRepository) SaveItem(item *entity.Item) (*entity.Item, error) 
 
 func (r *mysqlItemRepository) GetAllItems() (entity.MapRepo, error) {
 	items := make(entity.MapRepo)
-	var itemsDB []itemDAO
+	var itemsDB []ItemDAO
 
 	err := r.conn.Select(&itemsDB, "SELECT * FROM item")
 	if err != nil {

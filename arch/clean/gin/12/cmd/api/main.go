@@ -3,14 +3,17 @@ package main
 import (
 	"log"
 
+	cmsenv "items/common/env"
 	controller "items/internal/adapters/controller"
 	repository "items/internal/adapters/repository"
-	"items/internal/infra/mysql"
+	mysql "items/internal/infra/mysql"
 	web "items/internal/infra/web"
 	usecase "items/internal/usecase"
 )
 
 func main() {
+
+	cmsenv.LoadEnv()
 
 	//MySQL
 	conn, err := mysql.GetConnectionDB()
