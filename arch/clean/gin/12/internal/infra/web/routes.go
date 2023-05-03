@@ -2,6 +2,7 @@ package web
 
 import (
 	"log"
+	"os"
 
 	gin "github.com/gin-gonic/gin"
 
@@ -26,7 +27,7 @@ func NewHTTPServer(h *controller.ItemController) error {
 	// DELETE v1/items/{id}
 	// PATCH v1/items/{id}
 
-	port := ":8080" // + os.Getenv("SERVER_PORT")
+	port := ":" + os.Getenv("SERVER_PORT")
 
 	log.Println("Server started at http://localhost" + port)
 
