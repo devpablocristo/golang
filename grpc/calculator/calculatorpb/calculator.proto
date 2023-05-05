@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package calculator;
 
-option go_package = "calculatorpb";
+option go_package = "./calculatorpb";
 
 message AddRequest {
     int32 num1 = 1;

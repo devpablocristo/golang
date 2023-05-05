@@ -1,44 +1,6 @@
-Sacar  de a poco el codigo comprimido y actualizar las dependencias.
-
-Es un buen path para enteder esta parte mas compleja de go.
-
-
-Context
-Protobuf
-gRPC
-
-
-para los modulos:
-
-$ go mod init github.com/devpablocristo/golang-examples/grpc   
-$ go mod tidy
-
-
 protoc --go_out=. --go_opt=paths=source_relative \
     --go-grpc_out=. --go-grpc_opt=paths=source_relative \
     todo/task/task.proto
-
-
-
-
-REST, gRPC y Graph son paradigmas 
-
-Protobuf (gRPC): Mas rapido y mas eficiente. 
-
-
-
-
-Apache thrift es los mismo que protobuf, pero mas incomodo.
-
-O sea:
-
-Thrift
-Json
-XML
-Protobuf
-
-Son todos simplemente formatos de intercambio de datos!
-
 
 
 # Comando

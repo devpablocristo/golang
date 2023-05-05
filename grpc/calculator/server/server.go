@@ -5,8 +5,9 @@ import (
 	"log"
 	"net"
 
-	"github.com/devpablocristo/golang-examples/grpc/calculator/calculatorpb"
 	"google.golang.org/grpc"
+
+	"calculator/calculatorpb"
 )
 
 const (
