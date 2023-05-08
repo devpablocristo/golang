@@ -16,7 +16,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "github.com/devpablocristo/grpc/greeter/proto"
+	pb "greeter/proto"
 )
 
 // Define the port the server will listen on
