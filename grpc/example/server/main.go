@@ -1,22 +1,42 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net"
 
-	pb "devpablocristo/grpc/proto/example"
-
 	"google.golang.org/grpc"
+
+	pb "github.com/devpablocristo/grpc/example/proto"
 )
 
 // define the port
 const (
-	port = ":8080"
+	port = ":50051"
 )
 
 // this is the struct to be created, pb is imported upstairs
 type helloServer struct {
 	pb.GreetServiceServer
+}
+
+func (s *helloServer) SayHelloBidirectionalStreaming(stream pb.GreetService_SayHelloBidirectionalStreamingServer) error {
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		log.Printf("Got request with name : %v", req.Name)
+		res := &pb.HelloResponse{
+			Message: "Hello " + req.Name,
+		}
+		if err := stream.Send(res); err != nil {
+			return err
+		}
+	}
 }
 
 func main() {
