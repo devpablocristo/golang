@@ -1,4 +1,4 @@
-module github.com/devpablocristo/grpc/greeter
+module github.com/devpablocristo/grpc/example
 
 go 1.20
 

@@ -1,8 +1,9 @@
-module github.com/devpablocristo/grpc/greeter
+module calculator
 
-go 1.20
+go 1.19
 
 require (
+	github.com/simplesteph/grpc-go-course v0.0.0-20220125143403-f72ed726e9a7
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
 )
