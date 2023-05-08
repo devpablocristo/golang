@@ -1,8 +1,7 @@
 syntax = "proto3";
 
 package chat;
-
-option go_package = "chatpb";
+option go_package = "./chatpb";
 
 message ChatRequest {
   string user = 1;

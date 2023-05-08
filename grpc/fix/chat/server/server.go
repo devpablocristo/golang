@@ -5,17 +5,20 @@ import (
 	"log"
 	"net"
 
-	"github.com/devpablocristo/golang-examples/grpc/chat/chatpb"
 	"google.golang.org/grpc"
+
+	pb "chat/chatpb"
 )
 
 const (
 	port = ":50051"
 )
 
-type chatServer struct{}
+type chatServer struct {
+	pb.ChatServiceServer
+}
 
-func (b *chatServer) Chat(stream chatpb.ChatService_ChatServer) error {
+func (b *chatServer) Chat(stream pb.ChatService_ChatServer) error {
 
 	for {
 
@@ -28,7 +31,7 @@ func (b *chatServer) Chat(stream chatpb.ChatService_ChatServer) error {
 			return err
 		}
 
-		stream.Send(&chatpb.ChatResponse{
+		stream.Send(&pb.ChatResponse{
 			Content: "Hello " + req.User + "!",
 		})
 		if err != nil {
@@ -45,7 +48,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	chatpb.RegisterChatServiceServer(s, &chatServer{})
+	pb.RegisterChatServiceServer(s, &chatServer{})
 	log.Printf("Server listening at %v", lis.Addr())
 	err = s.Serve(lis)
 	if err != nil {

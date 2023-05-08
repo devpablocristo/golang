@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/devpablocristo/golang-examples/grpc/chat/chatpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	pb "chat/chatpb"
 )
 
 const (
@@ -21,15 +22,15 @@ func main() {
 	}
 	defer conn.Close()
 
-	c := chatpb.NewChatServiceClient(conn)
+	c := pb.NewChatServiceClient(conn)
 
 	biDi(c)
 }
 
-func biDi(c chatpb.ChatServiceClient) {
+func biDi(c pb.ChatServiceClient) {
 	fmt.Println("Starting to do a Unary RPC...")
 
-	req := &chatpb.AddRequest{
+	req := &pb.AddRequest{
 		Num1: 5,
 		Num2: 10,
 	}
