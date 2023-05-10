@@ -1,13 +1,3 @@
-/*
-This code creates a gRPC client that connects to the gRPC server on port 50051.
-
-The client sends requests with names to the server using the callGreetBi function, which performs bidirectional streaming.
-
-The server sends back responses, and the client logs the received messages.
-
-The client sends requests and receives responses concurrently using concurrent goroutines.
-*/
-
 package main
 
 import (
@@ -19,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	pb "greeter/proto"
+	pb "greet/internal/proto"
 )
 
 // Define the port the server listens on

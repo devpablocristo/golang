@@ -1,4 +1,4 @@
-# API gRPC Greeter
+# API gRPC greet
 ## Definir los servicios y mensajes en un archivo .proto
 
 Correr: $ ./generate

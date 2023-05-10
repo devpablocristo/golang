@@ -1,11 +1,11 @@
-package handler
+package grpchandler
 
 import (
 	"io"
 	"log"
 
-	port "greeter/internal/application/ports"
-	pb "greeter/pkg/proto"
+	pb "greet/internal/proto"
+	port "greet/internal/service/ports"
 )
 
 // Declare a struct that embeds the GreetServiceServer interface generated from the gRPC proto file
@@ -14,11 +14,13 @@ type GreetHandler struct {
 	pb.GreetServiceServer
 }
 
-func NewGreetServer(gs port.GreetService) *GreetHandler {
+func NewGreetHandler(gs port.GreetService) *GreetHandler {
 	return &GreetHandler{
 		greetService: gs,
 	}
 }
+
+//HttpServer(port, rou)
 
 // Implement the SayHello method of the GreetServiceServer interface
 func (s *GreetHandler) SayHello(stream pb.GreetService_SayHelloServer) error {
