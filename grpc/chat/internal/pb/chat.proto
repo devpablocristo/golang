@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package chat;
-option go_package = "./pb";
+option go_package = "./internal/pb";
 
 service ChatService {
     rpc Chat (stream ChatMessage) returns (stream ChatMessage) {}

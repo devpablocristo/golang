@@ -1,24 +1,25 @@
-package grpc
+package grpchandler
 
 import (
 	"io"
 	"log"
 
-	"chat-api/internal/application/chat"
-	"chat-api/pkg/chat"
+	port "chat/internal/application/ports"
+	pb "chat/internal/pb"
 )
 
-type ChatServer struct {
-	service chat.UnimplementedChatServiceServer
+type ChatHandler struct {
+	chatService port.ChatService
+	pb.ChatServiceServer
 }
 
-func NewChatServer(service *chat.Service) *ChatServer {
-	return &ChatServer{
-		service: service,
+func NewChatHandler(cs port.ChatService) *ChatHandler {
+	return &ChatHandler{
+		chatService: cs,
 	}
 }
 
-func (s *ChatServer) StreamChat(stream chat.ChatService_StreamChatServer) error {
+func (s *ChatHandler) StreamChat(stream pb.ChatService_ChatServer) error {
 	for {
 		incomingMsg, err := stream.Recv()
 		if err == io.EOF {
@@ -29,7 +30,7 @@ func (s *ChatServer) StreamChat(stream chat.ChatService_StreamChatServer) error 
 			return err
 		}
 
-		err = s.service.SendMessage(stream.Context(), incomingMsg.Sender, incomingMsg.Message)
+		err = s.chatService.SendMessage(stream.Context(), incomingMsg.Sender, incomingMsg.Message)
 		if err != nil {
 			log.Printf("Error saving message: %v", err)
 			return err

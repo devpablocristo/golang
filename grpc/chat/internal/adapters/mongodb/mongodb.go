@@ -1,23 +1,25 @@
-package mongo
+package mongodb
 
 import (
 	"context"
 
-	"chat-api/internal/domain"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+
+	"chat/internal/domain"
 )
 
-type ChatRepository struct {
+type MongoDB struct {
 	db *mongo.Database
 }
 
-func NewChatRepository(db *mongo.Database) *ChatRepository {
-	return &ChatRepository{db: db}
+func NewRepository(db *mongo.Database) *MongoDB {
+	return &MongoDB{
+		db: db,
+	}
 }
 
-func (r *ChatRepository) SaveMessage(ctx context.Context, message *domain.ChatMessage) error {
+func (r *MongoDB) SaveMessage(ctx context.Context, message *domain.ChatMessage) error {
 	collection := r.db.Collection("messages")
 	_, err := collection.InsertOne(ctx, bson.M{
 		"sender":    message.Sender,
