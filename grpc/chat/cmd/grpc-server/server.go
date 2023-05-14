@@ -33,7 +33,7 @@ func main() {
 
 	db, err := mongodbInit(ctx, cfg)
 	if err != nil {
-		log.Fatalf("error mongod/home/pablo/projects/pablo/github.com/devpablocristo/golang/grpc/chat/internal/configb:%v", err)
+		log.Fatalf("error chat/internal/config:%v", err)
 	}
 	chatRepo := mongodb.NewRepository(db)
 
