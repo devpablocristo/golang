@@ -21,7 +21,6 @@ func NewService(r port.Repo, c context.Context) port.Service {
 }
 
 func (srv *Service) Create(newDocument domain.Listing) error {
-
 	err := srv.repo.Create(newDocument)
 	if err != nil {
 		log.Fatal("Error al crear el documento:", err)
@@ -30,7 +29,14 @@ func (srv *Service) Create(newDocument domain.Listing) error {
 	return nil
 }
 
-func (srv *Service) Read() error {
+func (srv *Service) ReadAll() error {
+	srv.repo.ReadAll()
+
+	//fmt.Println(all)
+	return nil
+}
+
+func (srv *Service) ReadByID() error {
 	// filter := bson.M{}
 	// results, err := mongoService.ReadDocuments(filter)
 	// if err != nil {

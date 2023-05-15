@@ -7,8 +7,9 @@ import (
 )
 
 type Repo interface {
-	Create(domain.Listing) error
-	Read(filter bson.M) ([]bson.M, error)
+	Create(listing domain.Listing) error
+	ReadAll() ([]domain.Listing, error)
+	ReadByID(filter bson.M) ([]bson.M, error)
 	Update(filter bson.M, update bson.M) error
 	Delete(filter bson.M) error
 }

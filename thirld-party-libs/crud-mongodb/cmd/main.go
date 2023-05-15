@@ -8,8 +8,7 @@ import (
 	"log"
 	"time"
 
-	mongodbsrv "crudmongodb/internal/adapters/driven/repositories/mongodb"
-	"crudmongodb/internal/domain"
+	mongodbrepo "crudmongodb/internal/adapters/driven/repositories/mongodb"
 	service "crudmongodb/internal/service"
 )
 
@@ -21,24 +20,22 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Second)
 	defer cancel()
 
-	client, err := mongodbsrv.ConnectMongoDB(ctx)
+	client, err := mongodbrepo.ConnectMongoDB(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer client.Disconnect(ctx)
 
-	repo := mongodbsrv.NewMongoService(client, ctx)
+	repo := mongodbrepo.NewMongoService(client, ctx)
 	serv := service.NewService(repo, ctx)
 
-	newDocument := domain.Listing{
-		Name:    "Nuevo alojamiento",
-		Address: "123 Calle Ejemplo",
-		City:    "Ciudad Ejemplo",
-	}
+	// newDocument := domain.Listing{
+	// 	Name: "Nuevo alojamiento",
+	// }
 
-	serv.Create(newDocument)
-	serv.Read()
-	serv.Update()
-	serv.Delete()
+	//serv.Create(newDocument)
+	serv.ReadAll()
+	// serv.Update()
+	// serv.Delete()
 
 }

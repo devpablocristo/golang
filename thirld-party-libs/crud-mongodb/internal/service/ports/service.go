@@ -4,7 +4,8 @@ import "crudmongodb/internal/domain"
 
 type Service interface {
 	Create(domain.Listing) error
-	Read() error
+	ReadAll() error
+	ReadByID() error
 	Update() error
 	Delete() error
 }
