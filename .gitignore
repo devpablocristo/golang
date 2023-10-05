@@ -22,3 +22,5 @@ go.work
 
 # MacOS cache file
 .DS_Store
+
+.history
