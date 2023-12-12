@@ -13,4 +13,4 @@ echo "MYSQL_CONT_PORT: ${MYSQL_CONT_PORT}"
 wait-for "${MYSQL_CONT}:${MYSQL_CONT_PORT}" -- "$@"
 
 # Otros comandos aquí (si es necesario)
-CompileDaemon --build="go build -o build/test_api" -command="./build/test_api" -build-dir=/app
+CompileDaemon --build="go build -o ./build/test_api -v ./cmd" -command="./build/test_api"

@@ -6,7 +6,7 @@ VERSION=0.1
 LDFLAGS=-ldflags "-X main.Version=${VERSION}"
 
 # Build step, generates the binary.
-build:
+build-bin:
 	go build ${LDFLAGS} -o ${BINARY} cmd/main.go
 
 # Web is a mask to run the web interface, in our case the main function will start the http server.
@@ -41,9 +41,12 @@ test:
 ###################
 # Docker commands #
 ###################
-up:
+build-con:
 	docker-compose up --build
 
+up:	
+	docker-compose up
+	
 down:
 	docker-compose down --remove-orphans
 
