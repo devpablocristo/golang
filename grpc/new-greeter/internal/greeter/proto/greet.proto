@@ -1,0 +1,52 @@
+/*
+This protocol buffer definition file describes a gRPC service called GreetService, which has a single method SayHello. 
+
+The SayHello method receives a stream of HelloRequest messages and returns a stream of HelloResponse messages. 
+
+The HelloRequest and HelloResponse messages each contain a single field, name and message, respectively. 
+
+Additionally, there are two more message types defined: NamesList and MessagesList, both containing repeated fields for holding multiple strings.
+*/
+
+// Specify the syntax version as Proto3
+syntax="proto3";
+
+// Define the Go package for the generated files
+// This line indicates where the generated Go code should be placed
+option go_package = "./internal/greeter/proto";
+
+// Define the package name for the protocol buffer messages and services
+package greetsrv;
+
+// Define a gRPC service called GreetService
+service Greeter {
+    // Declare a gRPC method called SayHello
+    // The method takes a stream of HelloRequest messages as input and returns a stream of HelloResponse messages
+    rpc SayHello(stream HelloRequest) returns (stream HelloResponse);
+}
+
+// Define a message called HelloRequest
+message HelloRequest {
+    // Declare a field called 'name' of type string with the field number 1
+    string name = 1;
+}
+
+// Define a message called HelloResponse
+message HelloResponse {
+    // Declare a field called 'message' of type string with the field number 1
+    string message = 1;
+}
+
+// Define a message called NamesList
+message NamesList {
+    // Declare a repeated field called 'names' of type string with the field number 1
+    // 'repeated' means that this field can hold multiple values (like an array)
+    repeated string names = 1;
+}
+
+// Define a message called MessagesList
+message MessagesList {
+    // Declare a repeated field called 'messages' of type string with the field number 1
+    // 'repeated' means that this field can hold multiple values (like an array)
+    repeated string messages = 1;
+}
