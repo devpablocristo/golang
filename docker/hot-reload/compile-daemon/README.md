@@ -74,8 +74,21 @@ Este comando listará las tablas en DynamoDB Local en el puerto 9876, utilizando
 Recuerda que este enfoque de credenciales ficticias es adecuado para entornos locales de desarrollo o pruebas con DynamoDB Local. En un entorno de producción o en la nube, deberías proporcionar credenciales válidas y seguras.
 
 
-En ubuntu configurar estos permisos, sino no funciona:
-sudo chown $USER docker -R
-chmod 775 -R docker
+
+Por un problema particular de permisos, creo que porque tengo que correr docker como root, tengo que correr estos comandos:
+$ sudo chown $USER docker-volumes -R
+$ chmod 775 -R docker-volumes
+
+Y recien luego puedo crear las tablas:
+$ aws dynamodb create-table \
+--table-name Employee \
+--attribute-definitions \
+    AttributeName=EmployeeID,AttributeType=N \
+--key-schema \
+    AttributeName=EmployeeID,KeyType=HASH \
+--provisioned-throughput \
+    ReadCapacityUnits=5,WriteCapacityUnits=5 \
+--endpoint-url http://localhost:9876
 
 
+nota: los volumes son etiquetas para espacios q define docker, donde guardara la persistencia.

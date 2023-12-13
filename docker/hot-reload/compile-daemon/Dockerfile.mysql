@@ -1,6 +1,0 @@
-# start with base image
-FROM mysql:8.2.0-oracle
-
-# import data into container
-# All scripts in docker-entrypoint-initdb.d/ are automatically executed during container startup
-COPY ./infra/database/*.sql /docker-entrypoint-initdb.d/
