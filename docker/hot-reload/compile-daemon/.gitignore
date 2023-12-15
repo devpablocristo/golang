@@ -62,4 +62,5 @@ __debug*
 # Docker
 .docker-volumes/
 
+# Binary directory
 build/

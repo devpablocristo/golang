@@ -90,5 +90,5 @@ $ aws dynamodb create-table \
     ReadCapacityUnits=5,WriteCapacityUnits=5 \
 --endpoint-url http://localhost:9876
 
-
+    
 nota: los volumes son etiquetas para espacios q define docker, donde guardara la persistencia.
