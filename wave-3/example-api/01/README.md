@@ -1,4 +1,4 @@
-# Go Gin Web App
+# Example API
 
 This is a basic web application written in Go using the Gin web framework.
 
@@ -11,12 +11,3 @@ This is a basic web application written in Go using the Gin web framework.
    ```
 
    The server will start, and you can access the application at [http://localhost:8080](http://localhost:8080).
-
-## Project Structure
-
-- `main.go`: The main entry point of the application.
-- `README.md`: Project documentation.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

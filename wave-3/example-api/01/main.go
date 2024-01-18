@@ -32,5 +32,5 @@ func main() {
 // The helloWorld function, which will be called when a request is made to the root path ("/").
 func helloWorld(c *gin.Context) {
 	// Respond with a simple "Hello World!" message and a status code of 200 OK.
-	c.String(http.StatusOK, "¡Hello World!")
+	c.String(http.StatusOK, "Hello, World!")
 }
