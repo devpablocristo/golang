@@ -7,7 +7,7 @@ import (
 )
 
 // Usecases
-type ItemUsecaseInterface interface {
+type ItemUsecasePort interface {
 	SaveItem(entity.Item) (entity.Item, error)
 	GetAllItems() (entity.MapRepo, error)
 }
@@ -18,7 +18,7 @@ type ItemUsecase struct {
 }
 
 // como parametro de salida se usar la interface de usecase
-func NewItemUsecase(repo entity.ItemRepository) ItemUsecaseInterface {
+func NewItemUsecase(repo entity.ItemRepository) ItemUsecasePort {
 	return &ItemUsecase{
 		repo: repo,
 	}

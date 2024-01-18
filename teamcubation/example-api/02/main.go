@@ -8,11 +8,11 @@ import (
 )
 
 func main() {
-	// Create an instance of `gin.Engine`.
-	router := gin.Default()
-
 	// Create an instance of the handler.
 	h := newHandler()
+
+	// Create an instance of `gin.Engine`.
+	router := gin.Default()
 
 	// Define the route for the handler.
 	router.GET("/", h.helloWorld)

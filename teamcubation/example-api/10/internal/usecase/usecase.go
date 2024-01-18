@@ -18,7 +18,7 @@ const (
 
 // Usecases
 // Esta es la inferface por donde se comunicara usescases con demas capas
-type ItemUsecaseInterface interface {
+type ItemUsecasePort interface {
 	SaveItem(*entity.Item) (*entity.Item, error)
 	GetAllItems() (entity.MapRepo, error)
 	GetItemByID(entity.ID) (*entity.Item, error)
@@ -30,7 +30,7 @@ type ItemUsecase struct {
 }
 
 // como parametro de salida se usar la interface de usecase
-func NewItemUsecase(repo entity.ItemRepository) ItemUsecaseInterface {
+func NewItemUsecase(repo entity.ItemRepository) ItemUsecasePort {
 	return &ItemUsecase{
 		repository: repo,
 	}

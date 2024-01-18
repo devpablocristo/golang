@@ -11,12 +11,11 @@ import (
 )
 
 func main() {
+	r := newRepository()
+	u := newItemUsecase(r) // It is necessary to inject a repository into newItemUsecase
+	h := newHandler(u)     // It is necessary to inject an itemUsecase into newHandler
 
 	router := gin.Default()
-
-	r := newRepository()
-	u := newItemUsecase(r) // It is necessary to inject a repository into newHandler
-	h := newHandler(u)     // It is necessary to inject a itemUsecase into newHandler
 
 	// Define the routes
 	router.GET("/", h.helloWorld)
@@ -44,10 +43,10 @@ type handler struct {
 	usecase *itemUsecase
 }
 
-// Handler type constructor; a repository is injected into the parameters
+// Handler type constructor; an itemUsecase is injected into the parameters
 func newHandler(u *itemUsecase) *handler {
 	return &handler{
-		usecase: u, // Here, the injected repository is loaded into the handler
+		usecase: u, // Here, the injected itemUsecase is loaded into the handler
 	}
 }
 
@@ -96,12 +95,14 @@ type itemUsecase struct {
 	repo *repository
 }
 
+// newItemUsecase is a constructor for itemUsecase; a repository is injected into the parameters
 func newItemUsecase(repo *repository) *itemUsecase {
 	return &itemUsecase{
 		repo: repo,
 	}
 }
 
+// saveItem saves an item and returns it along with any error encountered
 func (u *itemUsecase) saveItem(item item) (item, error) {
 	if err := u.repo.saveItem(item); err != nil {
 		return item, fmt.Errorf("error saving item: %w", err)
@@ -110,6 +111,7 @@ func (u *itemUsecase) saveItem(item item) (item, error) {
 	return item, nil
 }
 
+// getAllItems retrieves all items from the repository
 func (u *itemUsecase) getAllItems() (mapRepo, error) {
 	items, err := u.repo.getAllItems()
 	if err != nil {
@@ -129,19 +131,19 @@ func (u *itemUsecase) getAllItems() (mapRepo, error) {
 
 type mapRepo map[int]item
 
-// Repository type creation
+// repository is a type representing an in-memory storage for items
 type repository struct {
 	items mapRepo
 }
 
-// Repository constructor
+// newRepository is a constructor for the repository
 func newRepository() *repository {
 	return &repository{
-		items: make(mapRepo), // ATTENTION, here the items field of Repository is satisfied.
+		items: make(mapRepo), // ATTENTION, here the items field of the repository is satisfied.
 	}
 }
 
-// This method is used to save an item in the database.
+// saveItem saves an item to the repository
 func (r *repository) saveItem(item item) error {
 	if item.ID == 0 {
 		return fmt.Errorf("item ID cannot be 0")
@@ -153,6 +155,7 @@ func (r *repository) saveItem(item item) error {
 	return nil
 }
 
+// getAllItems retrieves all items from the repository
 func (r *repository) getAllItems() (mapRepo, error) {
 	return r.items, nil
 }
@@ -161,7 +164,7 @@ func (r *repository) getAllItems() (mapRepo, error) {
 // Domain
 /////////////////////////////////////////////////////////////////////////////
 
-// Item entity.
+// item is an entity representing an item
 type item struct {
 	ID          int
 	Code        string

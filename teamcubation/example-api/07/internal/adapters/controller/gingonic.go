@@ -12,12 +12,12 @@ import (
 
 // ATENCION aqui se ultiliza la interface del usercase, no el tipo del usercase
 type ItemHandler struct {
-	usecase usecase.ItemUsecaseInterface
+	usecase usecase.ItemUsecasePort
 }
 
 // Constructor del tipo ItemHandler, en los parametros de entrada se inyecta el un usecase
 // como el campo usecase es de tipo interface, tiene sentido poner como paramtro de entrada tambien la misma interface
-func NewHandler(u usecase.ItemUsecaseInterface) *ItemHandler {
+func NewHandler(u usecase.ItemUsecasePort) *ItemHandler {
 	return &ItemHandler{
 		usecase: u, // Aquí se carga el usecase inyectado dentro del ItemHandler
 	}

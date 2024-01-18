@@ -11,54 +11,52 @@ import (
 )
 
 func main() {
-
-	// Se crea una instancia de `gin.Engine`
-	// `gin.Default()` crea un enrutador con los middleware Logger y Recovery por defecto.
 	router := gin.Default()
 
 	r := newRepository()
-
 	u := newItemUsecase(r)
-
-	// Creación instancia del handler
-	// es necesario inyectar en newHandler un usecase
 	h := newHandler(u)
 
-	// Se definen las rutas
+	// Define routes.
 	router.GET("/", h.helloWorld)
 	router.POST("/items", h.saveItemHandler)
 	router.GET("/items", h.getAllItemsHandler)
 
-	log.Println("Server started at http://localhost:80808080/")
+	log.Println("Server started at http://localhost:8080/")
 
-	// Se crea el servidor con el método `Run` de Gin:
+	// Create the server using Gin's `Run` method:
 	if err := router.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
 }
 
-// Error global
+/////////////////////////////////////////////////////////////////////////////
+// Global error
+/////////////////////////////////////////////////////////////////////////////
+
 var ErrNotFound = errors.New("not found")
 
+// ///////////////////////////////////////////////////////////////////////////
 // Handler
+// ///////////////////////////////////////////////////////////////////////////
 type handler struct {
-	usecase itemUsecaseInterface
+	usecase ItemUsecasePort
 }
 
-// Constructor del tipo handler, en los parametros de entrada se inyecta el un usecase
-func newHandler(u itemUsecaseInterface) *handler {
+// Constructor for the handler type, injecting a usecase in the input parameters.
+func newHandler(u ItemUsecasePort) *handler {
 	return &handler{
-		usecase: u, // Aquí se carga el usecase inyectado dentro del handler
+		usecase: u, // Inject the usecase into the handler here.
 	}
 }
 
-// La función helloWorld ahora es un método de handler
+// The helloWorld function is now a method of the handler.
 func (h *handler) helloWorld(c *gin.Context) {
-	c.String(http.StatusOK, "¡Hello World!")
+	c.String(http.StatusOK, "Hello World!")
 }
 
 func (h *handler) saveItemHandler(c *gin.Context) {
-	var item Item
+	var item item
 	err := c.BindJSON(&item)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -88,20 +86,7 @@ func (h *handler) getAllItemsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, items)
 }
 
-// Repositorio
-type Item struct {
-	ID          int
-	Code        string
-	Title       string
-	Description string
-	Price       float64
-	Stock       int
-	Status      string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-}
-
-type MapRepo map[int]Item
+type MapRepo map[int]item
 
 type Repository struct {
 	items MapRepo
@@ -113,7 +98,7 @@ func newRepository() *Repository {
 	}
 }
 
-func (r *Repository) saveItem(item Item) error {
+func (r *Repository) saveItem(item item) error {
 	if item.ID == 0 {
 		return fmt.Errorf("item ID cannot be 0")
 	}
@@ -132,9 +117,8 @@ func (r *Repository) getAllItems() (MapRepo, error) {
 // Usecases
 /////////////////////////////////////////////////////////////////////////////
 
-// Usecases
-type itemUsecaseInterface interface {
-	saveItem(Item) (Item, error)
+type ItemUsecasePort interface {
+	saveItem(item) (item, error)
 	getAllItems() (MapRepo, error)
 }
 
@@ -142,15 +126,15 @@ type itemUsecase struct {
 	repo *Repository
 }
 
-func newItemUsecase(repo *Repository) itemUsecaseInterface {
+func newItemUsecase(repo *Repository) ItemUsecasePort {
 	return &itemUsecase{
 		repo: repo,
 	}
 }
 
-func (u *itemUsecase) saveItem(item Item) (Item, error) {
+func (u *itemUsecase) saveItem(item item) (item, error) {
 	if err := u.repo.saveItem(item); err != nil {
-		return item, fmt.Errorf("error saving Item: %w", err)
+		return item, fmt.Errorf("error saving item: %w", err)
 	}
 
 	return item, nil
@@ -167,4 +151,21 @@ func (u *itemUsecase) getAllItems() (MapRepo, error) {
 	}
 
 	return items, nil
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Domain
+/////////////////////////////////////////////////////////////////////////////
+
+// item entity.
+type item struct {
+	ID          int
+	Code        string
+	Title       string
+	Description string
+	Price       float64
+	Stock       int
+	Status      string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }

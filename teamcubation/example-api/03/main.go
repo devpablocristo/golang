@@ -10,11 +10,10 @@ import (
 )
 
 func main() {
-
-	router := gin.Default()
-
 	u := newItemUsecase()
 	h := newHandler(u) // It is necessary to inject a itemUsecase into newHandler
+
+	router := gin.Default()
 
 	// Define the routes
 	router.GET("/", h.helloWorld)
