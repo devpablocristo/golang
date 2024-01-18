@@ -1,0 +1,60 @@
+package controller
+
+import (
+	"net/http"
+
+	// Se importa la librería Gin
+	gin "github.com/gin-gonic/gin"
+
+	entity "items/entity"
+	usecase "items/usecase"
+)
+
+// ATENCION aqui se ultiliza la interface del usercase, no el tipo del usercase
+type controller struct {
+	usecase usecase.ItemUsecaseInterface
+}
+
+// Constructor del tipo controller, en los parametros de entrada se inyecta el un usecase
+// como el campo usecase es de tipo interface, tiene sentido poner como paramtro de entrada tambien la misma interface
+func NewController(u usecase.ItemUsecaseInterface) *controller {
+	return &controller{
+		usecase: u, // Aquí se carga el usecase inyectado dentro del controller
+	}
+}
+
+// La función helloWorld ahora es un método de controller
+func (h *controller) HelloWorld(c *gin.Context) {
+	c.String(http.StatusOK, "¡Hello World!")
+}
+
+func (h *controller) SaveItem(c *gin.Context) {
+	var item entity.Item
+	err := c.BindJSON(&item)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	savedItem, err := h.usecase.SaveItem(item)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, savedItem)
+}
+
+func (h *controller) GetAllItems(c *gin.Context) {
+	items, err := h.usecase.GetAllItems()
+	if err != nil {
+		if err == entity.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, items)
+}

@@ -1,0 +1,24 @@
+FROM mysql:5.7
+# FROM mysql:8.0
+# FROM arm64v8/mysql:8.0
+ARG BUILDPLATFORM=linux/amd64
+
+# import data into container
+# All scripts in docker-entrypoint-initdb.d/ are automatically executed during container startup
+COPY ./db/schema.sql /docker-entrypoint-initdb.d/
+
+# Copy the custom configuration file to the container
+# COPY ./db/my.cnf /etc/mysql/conf.d/my.cnf
+
+# Set the character set and collation of the database
+ENV MYSQL_DATABASE meli_items
+ENV MYSQL_USER tester
+ENV MYSQL_PASSWORD secret
+ENV MYSQL_ROOT_PASSWORD secret
+ENV LANG en_US.utf8mb4
+
+# Expose the MySQL port
+EXPOSE 3306
+
+# Start the MySQL server
+CMD ["mysqld"]
