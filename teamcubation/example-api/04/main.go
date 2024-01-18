@@ -7,23 +7,16 @@ import (
 	"net/http"
 	"time"
 
-	// Import the Gin library
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
-	// Create an instance of `gin.Engine`
-	// `gin.Default()` creates a router with the default Logger and Recovery middleware.
 	router := gin.Default()
 
 	r := newRepository()
-
-	u := newItemUsecase(r)
-
-	// Create an instance of the handler
-	// It is necessary to inject a repository into newHandler
-	h := newHandler(u)
+	u := newItemUsecase(r) // It is necessary to inject a repository into newHandler
+	h := newHandler(u)     // It is necessary to inject a itemUsecase into newHandler
 
 	// Define the routes
 	router.GET("/", h.helloWorld)
@@ -38,9 +31,9 @@ func main() {
 	}
 }
 
-// ////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////
 // Global error
-// ////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////
 var ErrNotFound = errors.New("not found")
 
 //////////////////////////////////////////////////////////////////////////////
@@ -96,54 +89,6 @@ func (h *handler) getAllItems(c *gin.Context) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Repository
-/////////////////////////////////////////////////////////////////////////////
-
-// Item entity
-type item struct {
-	ID          int
-	Code        string
-	Title       string
-	Description string
-	Price       float64
-	Stock       int
-	Status      string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-}
-
-type mapRepo map[int]item
-
-// Repository type creation
-type repository struct {
-	items mapRepo
-}
-
-// Repository constructor
-func newRepository() *repository {
-	return &repository{
-		items: make(mapRepo), // ATTENTION, here the items field of Repository is satisfied.
-	}
-}
-
-// This method is used to save an item in the database.
-// Although this method is implemented, it is NOT YET USED.
-func (r *repository) saveItem(item item) error {
-	if item.ID == 0 {
-		return fmt.Errorf("item ID cannot be 0")
-	}
-	if _, exists := r.items[item.ID]; exists {
-		return fmt.Errorf("item with ID %d already exists", item.ID)
-	}
-	r.items[item.ID] = item
-	return nil
-}
-
-func (r *repository) getAllItems() (mapRepo, error) {
-	return r.items, nil
-}
-
-/////////////////////////////////////////////////////////////////////////////
 // Usecases
 /////////////////////////////////////////////////////////////////////////////
 
@@ -176,4 +121,55 @@ func (u *itemUsecase) getAllItems() (mapRepo, error) {
 	}
 
 	return items, nil
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Repository
+/////////////////////////////////////////////////////////////////////////////
+
+type mapRepo map[int]item
+
+// Repository type creation
+type repository struct {
+	items mapRepo
+}
+
+// Repository constructor
+func newRepository() *repository {
+	return &repository{
+		items: make(mapRepo), // ATTENTION, here the items field of Repository is satisfied.
+	}
+}
+
+// This method is used to save an item in the database.
+func (r *repository) saveItem(item item) error {
+	if item.ID == 0 {
+		return fmt.Errorf("item ID cannot be 0")
+	}
+	if _, exists := r.items[item.ID]; exists {
+		return fmt.Errorf("item with ID %d already exists", item.ID)
+	}
+	r.items[item.ID] = item
+	return nil
+}
+
+func (r *repository) getAllItems() (mapRepo, error) {
+	return r.items, nil
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Domain
+/////////////////////////////////////////////////////////////////////////////
+
+// Item entity.
+type item struct {
+	ID          int
+	Code        string
+	Title       string
+	Description string
+	Price       float64
+	Stock       int
+	Status      string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }

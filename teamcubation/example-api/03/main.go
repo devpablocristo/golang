@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -10,51 +10,110 @@ import (
 )
 
 func main() {
-	// Create an instance of `gin.Engine`.
+
 	router := gin.Default()
 
-	// Create an instance of the repository.
-	r := newRepository()
+	u := newItemUsecase()
+	h := newHandler(u) // It is necessary to inject a itemUsecase into newHandler
 
-	// Create an instance of the handler.
-	// It is necessary to inject a repository into newHandler.
-	h := newHandler(r)
-
-	// Define the routes.
+	// Define the routes
 	router.GET("/", h.helloWorld)
+	router.POST("/items", h.saveItem)
+	router.GET("/items", h.getAllItems)
 
 	log.Println("Server started at http://localhost:8080/")
 
-	// Create the server using Gin's `Run` method:
+	// Create the server using Gin's `Run` method
 	if err := router.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
 }
 
-// Create the type or struct handler.
-// It has a field of type repository.
+// /////////////////////////////////////////////////////////////////////////////
+// Global error
+// /////////////////////////////////////////////////////////////////////////////
+var ErrNotFound = errors.New("not found")
+
+//////////////////////////////////////////////////////////////////////////////
+// Handler
+//////////////////////////////////////////////////////////////////////////////
+
 type handler struct {
-	repo *repository
+	usecase *itemUsecase
 }
 
-// Constructor for the handler type.
-// The repository is injected as a parameter.
-func newHandler(r *repository) *handler {
+// Handler type constructor; a repository is injected into the parameters
+func newHandler(u *itemUsecase) *handler {
 	return &handler{
-		repo: r, // Here, the injected repository is loaded into the handler.
+		usecase: u, // Here, the injected repository is loaded into the handler
 	}
 }
 
 // As the previous helloWorld function now has a receiver of type handler,
-// it becomes a method of the handler.
-func (h handler) helloWorld(c *gin.Context) {
-	c.String(http.StatusOK, "Hello, World!")
+// it becomes a method of the handler
+func (h *handler) helloWorld(c *gin.Context) {
+	c.String(http.StatusOK, "Hello World!")
 }
 
-// Add an in-memory repository.
+func (h *handler) saveItem(c *gin.Context) {
+	var item item
+	err := c.BindJSON(&item)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	savedItem, err := h.usecase.saveItem(item)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, savedItem)
+}
+
+func (h *handler) getAllItems(c *gin.Context) {
+	items, err := h.usecase.getAllItems()
+	if err != nil {
+		if err == ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, items)
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Usecases
+/////////////////////////////////////////////////////////////////////////////
+
+type itemUsecase struct {
+}
+
+func newItemUsecase() *itemUsecase {
+	return &itemUsecase{}
+}
+
+func (u *itemUsecase) saveItem(item item) (item, error) {
+	// business logic
+	return item, nil
+}
+
+func (u *itemUsecase) getAllItems() (map[int]item, error) {
+	items := make(map[int]item)
+	// business logic
+	return items, nil
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Domain
+/////////////////////////////////////////////////////////////////////////////
 
 // Item entity.
-type Item struct {
+type item struct {
 	ID          int
 	Code        string
 	Title       string
@@ -64,31 +123,4 @@ type Item struct {
 	Status      string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-}
-
-type mapRepo map[int]Item
-
-// Create the Repository type.
-type repository struct {
-	items mapRepo
-}
-
-// Constructor for the repository.
-func newRepository() *repository {
-	return &repository{
-		items: make(mapRepo), // ATTENTION, here the items field of Repository is satisfied.
-	}
-}
-
-// This method is used to save an item in the database.
-// Although this method is implemented, it is NOT YET USED.
-func (r *repository) saveItem(item Item) error {
-	if item.ID == 0 {
-		return fmt.Errorf("item ID cannot be 0")
-	}
-	if _, exists := r.items[item.ID]; exists {
-		return fmt.Errorf("item with ID %d already exists", item.ID)
-	}
-	r.items[item.ID] = item
-	return nil
 }
