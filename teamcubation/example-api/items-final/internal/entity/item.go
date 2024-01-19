@@ -17,7 +17,7 @@ type Item struct {
 	UpdatedAt   time.Time
 }
 
-type ItemRepository interface {
+type ItemRepositoryPort interface {
 	GetAllItems() ([]Item, error)
 	GetItemByID(id uint) (Item, error)
 	CheckItemByCode(code string) (bool, error)

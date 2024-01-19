@@ -20,7 +20,7 @@ type Item struct {
 }
 
 // esta es la interface del repositorio, o sea, el conector del repositorio con el resto de la app
-type ItemRepository interface {
+type ItemRepositoryPort interface {
 	SaveItem(*Item) (*Item, error)
 	GetAllItems() (MapRepo, error)
 	CheckItemByCode(string) (bool, error)

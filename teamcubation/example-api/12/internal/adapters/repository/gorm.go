@@ -11,7 +11,7 @@ type itemsGormRepository struct {
 }
 
 // NewDatabase : intializes and returns mysql db
-func NewEventRepository(db *gorm.DB) entity.ItemRepository {
+func NewEventRepository(db *gorm.DB) entity.ItemRepositoryPort {
 	return &itemsGormRepository{
 		DB: db,
 	}

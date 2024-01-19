@@ -22,7 +22,7 @@ type itemDTO struct {
 	Status      string  `json:"status"`
 }
 
-func (dto *itemDTO) dto2Item() *entity.Item {
+func (dto *itemDTO) dtoToItem() *entity.Item {
 	return &entity.Item{
 		Code:        dto.Code,
 		Title:       dto.Title,

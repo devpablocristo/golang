@@ -26,11 +26,11 @@ type ItemUsecasePort interface {
 
 // el tipo de usecase es del tipo interface de repository
 type ItemUsecase struct {
-	repository entity.ItemRepository
+	repository entity.ItemRepositoryPort
 }
 
 // como parametro de salida se usar la interface de usecase
-func NewItemUsecase(repo entity.ItemRepository) ItemUsecasePort {
+func NewItemUsecase(repo entity.ItemRepositoryPort) ItemUsecasePort {
 	return &ItemUsecase{
 		repository: repo,
 	}

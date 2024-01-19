@@ -1,22 +1,23 @@
 package ctypes
 
+// Error messages constants.
 const (
-	ErrItemNotFound     = "Item not found"
-	ErrInvalidParameter = "Invalid parameter"
+	ErrItemNotFound     = "Item not found"    // Message for item not found error
+	ErrInvalidParameter = "Invalid parameter" // Message for invalid parameter error
 )
 
-// CustomError es un tipo de error personalizado que implementa la interfaz error.
+// CustomError is a custom error type that implements the error interface.
 type CustomError struct {
-	Code    int
-	Message string
+	Code    int    // Error code
+	Message string // Error message
 }
 
-// Error implementa la interfaz error, devolviendo el mensaje del error.
+// Error implements the error interface, returning the error message.
 func (e *CustomError) Error() string {
 	return e.Message
 }
 
-// NewCustomError crea una nueva instancia de CustomError con el código y mensaje proporcionados.
+// NewCustomError creates a new instance of CustomError with the provided code and message.
 func NewCustomError(code int, message string) *CustomError {
 	return &CustomError{
 		Code:    code,

@@ -4,25 +4,29 @@ import (
 	"time"
 )
 
+// ID defines a custom type for item identifiers.
 type ID uint
+
+// MapRepo is a map-based repository for storing items.
 type MapRepo map[ID]*Item
 
-// entidad Item
+// Item represents an item entity with various attributes.
 type Item struct {
-	Code        string
-	Title       string
-	Description string
-	Price       float64
-	Stock       int
-	Status      string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	Code        string    // Unique code for the item
+	Title       string    // Title of the item
+	Description string    // Description of the item
+	Price       float64   // Price of the item
+	Stock       int       // Stock quantity of the item
+	Status      string    // Current status of the item
+	CreatedAt   time.Time // Time when the item was created
+	UpdatedAt   time.Time // Time when the item was last updated
 }
 
-// esta es la interface del repositorio, o sea, el conector del repositorio con el resto de la app
-type ItemRepository interface {
-	SaveItem(*Item) (*Item, error)
-	GetAllItems() (MapRepo, error)
-	GetItemByCode(string) (*Item, error)
-	GetItemByID(ID) (*Item, error)
+// ItemRepositoryPort defines the interface for item repository operations.
+// It acts as a connector between the repository and the rest of the application.
+type ItemRepositoryPort interface {
+	SaveItem(*Item) (*Item, error)       // Save or update an item
+	GetAllItems() (MapRepo, error)       // Retrieve all items
+	GetItemByCode(string) (*Item, error) // Retrieve an item by its code
+	GetItemByID(ID) (*Item, error)       // Retrieve an item by its ID
 }

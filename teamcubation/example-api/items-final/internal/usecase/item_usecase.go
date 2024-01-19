@@ -13,10 +13,10 @@ type ItemUsecasee interface {
 }
 
 type sitemUsecase struct {
-	repo entity.ItemRepository
+	repo entity.ItemRepositoryPort
 }
 
-func NewItemUsecase(repo entity.ItemRepository) ItemUsecasee {
+func NewItemUsecase(repo entity.ItemRepositoryPort) ItemUsecasee {
 	return &itemUsecase{
 		repo: repo,
 	}

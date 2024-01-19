@@ -7,13 +7,11 @@ import (
 	domain "items/internal/domain"
 )
 
-// el campo items es del type que maneja el repositorio
 type Repository struct {
 	items domain.MapRepo
 }
 
-// de nuevo, aqui el tipo retornado utiliza una interface
-func NewRepository() domain.ItemRepository {
+func NewRepository() domain.ItemRepositoryPort {
 	return &Repository{
 		items: make(domain.MapRepo),
 	}

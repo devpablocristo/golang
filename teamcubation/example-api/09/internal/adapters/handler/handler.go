@@ -1,82 +1,89 @@
-// Para estar alineado con el naming de clean arch, se cambiar el nombre del directorio de handler a handler
 package handler
 
 import (
 	"net/http"
 	"strconv"
 
-	// Se importa la librería Gin
 	gin "github.com/gin-gonic/gin"
 
 	presenter "items/internal/adapters/handler/presenter"
 	domain "items/internal/domain"
+	ctypes "items/internal/platform/custom-types"
 	usecase "items/internal/usecase"
 )
 
-// ATENCION aqui se ultiliza la interface del usercase, no el tipo del usercase
-// interactor ques la estructura?????
 type ItemHandler struct {
 	usecase usecase.ItemUsecasePort
 }
 
-// Constructor del tipo ItemHandler, en los parametros de entrada se inyecta el un usecase
-// como el campo usecase es de tipo interface, tiene sentido poner como paramtro de entrada tambien la misma interface
+// NewHandler creates a new instance of ItemHandler with the given usecase.
 func NewHandler(u usecase.ItemUsecasePort) *ItemHandler {
 	return &ItemHandler{
-		usecase: u, // Aquí se carga el usecase inyectado dentro del ItemHandler
+		usecase: u,
 	}
 }
 
+// SaveItem handles the request to save an item.
 func (h *ItemHandler) SaveItem(c *gin.Context) {
-	var dto itemDTO         // Declarar una variable de tipo itemDTO
-	err := c.BindJSON(&dto) // Pasar la dirección de dto a BindJSON
+	var dto itemDTO
+	err := c.BindJSON(&dto)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error1": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	item := dto2Item(&dto) // Pasar la dirección de dto a dto2Item
+	item := dtoToItem(&dto)
 	savedItem, err := h.usecase.SaveItem(item)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, presenter.Item(savedItem))
 }
 
-// devuelve un array de items
+// GetAllItems returns all items.
 func (h *ItemHandler) GetAllItems(c *gin.Context) {
 	items, err := h.usecase.GetAllItems()
 	if err != nil {
-		if err == errNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		}
+		handleError(c, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, presenter.Items(items))
 }
 
+// GetItemsByID returns an item by its ID.
 func (h *ItemHandler) GetItemsByID(c *gin.Context) {
-	id := string2ID(c.Param("id"))
+	id, err := stringToID(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
+		return
+	}
+
 	item, err := h.usecase.GetItemByID(id)
 	if err != nil {
-		if err == errNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		}
+		handleError(c, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, presenter.Item(item))
 }
 
-func string2ID(s string) domain.ID {
-	id, _ := strconv.Atoi(s)
-	convID := domain.ID(id)
-	return convID
+// stringToID converts a string to domain.ID, handling any conversion errors.
+func stringToID(s string) (domain.ID, error) {
+	id, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, err
+	}
+	return domain.ID(id), nil
+}
+
+// handleError centralizes error handling for API responses.
+func handleError(c *gin.Context, err error) {
+	if err.Error() == ctypes.ErrItemNotFound {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+	} else {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
 }

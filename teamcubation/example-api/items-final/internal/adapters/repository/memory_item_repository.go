@@ -13,7 +13,7 @@ type itemRepository struct {
 	db []entity.Item
 }
 
-func NewItemRepository() entity.ItemRepository {
+func NewItemRepository() entity.ItemRepositoryPort {
 	return &itemRepository{}
 }
 

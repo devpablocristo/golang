@@ -10,27 +10,23 @@ import (
 
 const port = ":8080"
 
+// NewHTTPServer configures and starts an HTTP server using Gin.
+// It accepts an item handler and defines routes for item-related operations.
 func NewHTTPServer(h *handler.ItemHandler) error {
-	// Se crea una instancia de `gin.Engine`
-	// `gin.Default()` crea un enrutador con los middleware Logger y Recovery por defecto.
 	router := gin.Default()
 
-	// La función Group de Gin se utiliza para definir un grupo de rutas.
-	// Toma una cadena como primer argumento que especifica el prefijo común para todas las rutas en el grupo.
+	// Defines a route group with the prefix "/v1".
 	v1 := router.Group("/v1")
 
-	// Se definen las rutas
-	v1.POST("/items", h.SaveItem)
-	v1.GET("/items", h.GetAllItems)
-	v1.GET("/items/:id", h.GetItemsByID)
+	// Defines routes for item operations.
+	v1.POST("/items", h.SaveItem)        // Route to save an item
+	v1.GET("/items", h.GetAllItems)      // Route to get all items
+	v1.GET("/items/:id", h.GetItemsByID) // Route to get an item by ID
 
-	// PUT v1/items/{id}
-	// DELETE v1/items/{id}
-	// PATCH v1/items/{id}
-
+	// Logs the server start.
 	log.Println("Server started at http://localhost" + port)
 
-	// Se crea el servidor con el método `Run` de Gin:
+	// Starts the server on the specified port.
 	err := router.Run(port)
 	if err != nil {
 		return err

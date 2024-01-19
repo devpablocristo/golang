@@ -39,7 +39,7 @@ type mysqlItemRepository struct {
 	conn *sqlx.DB
 }
 
-func NewMySQLItemRepository(db *sqlx.DB) entity.ItemRepository {
+func NewMySQLItemRepository(db *sqlx.DB) entity.ItemRepositoryPort {
 	return &mysqlItemRepository{
 		conn: db,
 	}

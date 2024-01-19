@@ -13,7 +13,7 @@ type repository struct {
 }
 
 // de nuevo, aqui el tipo retornado utiliza una interface
-func NewRepository() entity.ItemRepository {
+func NewRepository() entity.ItemRepositoryPort {
 	return &repository{
 		items: make(entity.MapRepo),
 	}

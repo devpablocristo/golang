@@ -35,7 +35,7 @@ func (h *ItemHandler) SaveItem(c *gin.Context) {
 		return
 	}
 
-	item := dto.dto2Item() // Pasar la dirección de dto a dto2Item
+	item := dto.dtoToItem() // Pasar la dirección de dto a dtoToItem
 	savedItem, err := h.usecase.SaveItem(item)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error2": err.Error()})
@@ -61,7 +61,7 @@ func (h *ItemHandler) GetAllItems(c *gin.Context) {
 }
 
 func (h *ItemHandler) GetItemsByID(c *gin.Context) {
-	id := string2ID(c.Param("id"))
+	id := stringToID(c.Param("id"))
 	item, err := h.usecase.GetItemByID(id)
 	if err != nil {
 		if err == errNotFound {
@@ -75,7 +75,7 @@ func (h *ItemHandler) GetItemsByID(c *gin.Context) {
 	c.JSON(http.StatusOK, presenter.Item(item))
 }
 
-func string2ID(s string) entity.ID {
+func stringToID(s string) entity.ID {
 	id, _ := strconv.Atoi(s)
 	convID := entity.ID(id)
 	return convID

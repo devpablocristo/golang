@@ -8,39 +8,38 @@ import (
 )
 
 const (
-	noStock = iota
-	inStock
+	noStock = iota // Represent no stock for an item
+	inStock        // Represent in stock for an item
 )
 
 const (
-	activeStatus   = "ACTIVE"
-	inactiveStatus = "INACTIVE"
+	activeStatus   = "ACTIVE"   // Item status when it is active
+	inactiveStatus = "INACTIVE" // Item status when it is inactive
 )
 
-// Usecases
-// Esta es la inferface por donde se comunicara usescases con demas capas
+// ItemUsecasePort defines the interface for item use case operations.
 type ItemUsecasePort interface {
 	SaveItem(*domain.Item) (*domain.Item, error)
 	GetAllItems() (domain.MapRepo, error)
 	GetItemByID(domain.ID) (*domain.Item, error)
 }
 
-// el tipo de usecase es del tipo interface de repository
 type ItemUsecase struct {
-	repository domain.ItemRepository
+	repository domain.ItemRepositoryPort
 }
 
-// como parametro de salida se usar la interface de usecase
-func NewItemUsecase(repo domain.ItemRepository) ItemUsecasePort {
+// NewItemUsecase creates a new item use case with the given repository.
+func NewItemUsecase(repo domain.ItemRepositoryPort) ItemUsecasePort {
 	return &ItemUsecase{
 		repository: repo,
 	}
 }
 
+// SaveItem saves an item, ensuring unique code and setting its status based on stock.
 func (u *ItemUsecase) SaveItem(item *domain.Item) (*domain.Item, error) {
-	_, err := u.repository.GetItemByCode(item.Code)
-	if err != nil {
-		return nil, fmt.Errorf("codes must be unique %s: %s", err.Error(), item.Code)
+	if existingItem, err := u.repository.GetItemByCode(item.Code); err == nil && existingItem != nil {
+		// If an item with the same code already exists, return an error.
+		return nil, fmt.Errorf("code must be unique %s", item.Code)
 	}
 
 	item.Status = inactiveStatus
@@ -50,12 +49,13 @@ func (u *ItemUsecase) SaveItem(item *domain.Item) (*domain.Item, error) {
 
 	savedItem, err := u.repository.SaveItem(item)
 	if err != nil {
-		return nil, fmt.Errorf("error saving domain.domain.Item: %w", err)
+		return nil, fmt.Errorf("error saving domain.Item: %w", err)
 	}
 
 	return savedItem, nil
 }
 
+// GetAllItems retrieves all items, returning an error if none are found.
 func (u *ItemUsecase) GetAllItems() (domain.MapRepo, error) {
 	items, err := u.repository.GetAllItems()
 	if err != nil {
@@ -68,6 +68,7 @@ func (u *ItemUsecase) GetAllItems() (domain.MapRepo, error) {
 	return items, nil
 }
 
+// GetItemByID retrieves an item by its ID, returning a custom error if not found.
 func (u *ItemUsecase) GetItemByID(id domain.ID) (*domain.Item, error) {
 	item, err := u.repository.GetItemByID(id)
 	if err != nil {

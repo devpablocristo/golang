@@ -27,12 +27,12 @@ type ItemUsecasePort interface {
 
 // el tipo de usecase es del tipo interface de inmemory
 type ItemUsecase struct {
-	inmemory entity.ItemRepository
-	mysql    entity.ItemRepository
+	inmemory entity.ItemRepositoryPort
+	mysql    entity.ItemRepositoryPort
 }
 
 // como parametro de salida se usar la interface de usecase
-func NewItemUsecase(i entity.ItemRepository, m entity.ItemRepository) ItemUsecasePort {
+func NewItemUsecase(i entity.ItemRepositoryPort, m entity.ItemRepositoryPort) ItemUsecasePort {
 	return &ItemUsecase{
 		inmemory: i,
 		mysql:    m,
