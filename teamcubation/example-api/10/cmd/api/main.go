@@ -14,7 +14,6 @@ func main() {
 	u := usecase.NewItemUsecase(r)
 	h := handler.NewHandler(u)
 
-	// se mueven ls rutas a otro archivo
 	err := web.NewHTTPServer(h)
 	if err != nil {
 		log.Fatalln(err)
