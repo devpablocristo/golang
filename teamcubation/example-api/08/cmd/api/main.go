@@ -3,22 +3,19 @@ package main
 import (
 	"log"
 
-	// Se importa la librería Gin
-
-	handler "items/internal/adapters/handler"
-	repository "items/internal/adapters/repository"
-	web "items/internal/infra/web"
-	usecase "items/internal/usecase"
+	"items/internal/adapters/handler"
+	"items/internal/adapters/repository"
+	"items/internal/platform/web"
+	"items/internal/usecase"
 )
 
 func main() {
-	r := repository.NewRepository()
-	u := usecase.NewItemUsecase(r)
-	h := handler.NewHandler(u)
+	itemRepo := repository.NewRepository()
+	itemUsecase := usecase.NewItemUsecase(itemRepo)
+	itemHandler := handler.NewHandler(itemUsecase)
 
-	// se mueven ls rutas a otro archivo
-	err := web.NewHTTPServer(h)
+	err := web.NewHTTPServer(itemHandler)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Failed to start the HTTP server: %v", err)
 	}
 }
