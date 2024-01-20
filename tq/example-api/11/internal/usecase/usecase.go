@@ -2,95 +2,45 @@ package usecase
 
 import (
 	"fmt"
-	"log"
 
-	entity "items/internal/entity"
+	"items/internal/domain"
+
+	ctypes "items/internal/platform/custom-types"
 )
 
 const (
-	noStock = iota
-	inStock
+	noStock = iota // Represent no stock for an item
+	inStock        // Represent in stock for an item
 )
 
 const (
-	activeStatus   = "ACTIVE"
-	inactiveStatus = "INACTIVE"
+	activeStatus   = "ACTIVE"   // Item status when it is active
+	inactiveStatus = "INACTIVE" // Item status when it is inactive
 )
 
-// Usecases
-// Esta es la inferface por donde se comunicara usescases con demas capas
+// ItemUsecasePort defines the interface for item use case operations.
 type ItemUsecasePort interface {
-	SaveItem(*entity.Item) (*entity.Item, error)
-	GetAllItems() (entity.MapRepo, error)
-	GetItemByID(entity.ID) (*entity.Item, error)
+	SaveItem(*domain.Item) (*domain.Item, error)
+	GetAllItems() (domain.MapRepo, error)
+	GetItemByID(domain.ID) (*domain.Item, error)
 }
 
-// el tipo de usecase es del tipo interface de inmemory
 type ItemUsecase struct {
-	inmemory entity.ItemRepositoryPort
-	mysql    entity.ItemRepositoryPort
+	repository domain.ItemRepositoryPort
 }
 
-// como parametro de salida se usar la interface de usecase
-func NewItemUsecase(i entity.ItemRepositoryPort, m entity.ItemRepositoryPort) ItemUsecasePort {
+// NewItemUsecase creates a new item use case with the given repository.
+func NewItemUsecase(repo domain.ItemRepositoryPort) ItemUsecasePort {
 	return &ItemUsecase{
-		inmemory: i,
-		mysql:    m,
+		repository: repo,
 	}
 }
 
-// inmemory
-// func (u *ItemUsecase) SaveItem(item *entity.Item) (*entity.Item, error) {
-
-// 	exist, err := u.inmemory.CheckItemByCode(item.Code)
-// 	if exist {
-// 		log.Printf("codes must be unique %v: %s", err.Error(), item.Code)
-// 		return nil, fmt.Errorf("codes must be unique %v: %s", err.Error(), item.Code)
-// 	}
-
-// 	item.Status = inactiveStatus
-// 	if item.Stock > noStock {
-// 		item.Status = activeStatus
-// 	}
-
-// 	savedItem, err := u.inmemory.SaveItem(item)
-// 	if err != nil {
-// 		log.Printf("error saving entity.Item: %v", err)
-// 		return nil, fmt.Errorf("error saving entity.Item: %v", err)
-// 	}
-
-// 	return savedItem, nil
-// }
-
-// inmemory
-// func (u *ItemUsecase) GetAllItems() (entity.MapRepo, error) {
-// 	items, err := u.inmemory.GetAllItems()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error in inmemory: %w", err)
-// 	}
-
-// 	if len(items) == 0 {
-// 		return nil, errItemNotFound
-// 	}
-
-// 	return items, nil
-// }
-
-// inmemory
-// func (u *ItemUsecase) GetItemByID(id entity.ID) (*entity.Item, error) {
-// 	item, err := u.inmemory.GetItemByID(id)
-// 	if err != nil {
-// 		return nil, errItemNotFound
-// 	}
-// 	return item, nil
-// }
-
-// mysql
-func (u *ItemUsecase) SaveItem(item *entity.Item) (*entity.Item, error) {
-	exist, err := u.mysql.CheckItemByCode(item.Code)
-	if exist {
-		log.Printf("codes must be unique %v: %s", err.Error(), item.Code)
-		return nil, fmt.Errorf("codes must be unique %v: %s", err.Error(), item.Code)
+// SaveItem saves an item, ensuring unique code and setting its status based on stock.
+func (u *ItemUsecase) SaveItem(item *domain.Item) (*domain.Item, error) {
+	if existingItem, err := u.repository.GetItemByCode(item.Code); err == nil && existingItem != nil {
+		// If an item with the same code already exists, return an error.
+		return nil, fmt.Errorf("code must be unique %s", item.Code)
 	}
 
 	item.Status = inactiveStatus
@@ -98,34 +48,32 @@ func (u *ItemUsecase) SaveItem(item *entity.Item) (*entity.Item, error) {
 		item.Status = activeStatus
 	}
 
-	savedItem, err := u.mysql.SaveItem(item)
+	savedItem, err := u.repository.SaveItem(item)
 	if err != nil {
-		log.Printf("error saving entity.Item: %v", err)
-		return nil, fmt.Errorf("error saving entity.Item: %v", err)
+		return nil, fmt.Errorf("error saving domain.Item: %w", err)
 	}
 
 	return savedItem, nil
 }
 
-// mysql
-func (u *ItemUsecase) GetAllItems() (entity.MapRepo, error) {
-	items, err := u.mysql.GetAllItems()
+// GetAllItems retrieves all items, returning an error if none are found.
+func (u *ItemUsecase) GetAllItems() (domain.MapRepo, error) {
+	items, err := u.repository.GetAllItems()
 	if err != nil {
-		return nil, fmt.Errorf("error in mysql: %w", err)
+		return nil, fmt.Errorf("error in repository: %w", err)
 	}
 
 	if len(items) == 0 {
-		return nil, errItemNotFound
+		return nil, ctypes.NewCustomError(1, ctypes.ErrItemNotFound)
 	}
-
 	return items, nil
 }
 
-// mysql
-func (u *ItemUsecase) GetItemByID(id entity.ID) (*entity.Item, error) {
-	item, err := u.mysql.GetItemByID(id)
+// GetItemByID retrieves an item by its ID, returning a custom error if not found.
+func (u *ItemUsecase) GetItemByID(id domain.ID) (*domain.Item, error) {
+	item, err := u.repository.GetItemByID(id)
 	if err != nil {
-		return nil, errItemNotFound
+		return nil, ctypes.NewCustomError(1, ctypes.ErrItemNotFound)
 	}
 	return item, nil
 }

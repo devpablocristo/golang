@@ -1,31 +1,36 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
-	handler "items/internal/adapters/handler"
-	repository "items/internal/adapters/repository"
-	"items/internal/infra/mysql"
-	web "items/internal/infra/web"
-	usecase "items/internal/usecase"
+	//"items/internal/adapters/repository/inmemory"
+	//"items/internal/adapters/repository/mysqlr"
+
+	"items/internal/adapters/handler"
+	"items/internal/adapters/repository/mysqlr"
+	"items/internal/platform/mysql"
+	"items/internal/platform/web"
+	"items/internal/usecase"
 )
 
 func main() {
-
 	//MySQL
 	conn, err := mysql.GetConnectionDB()
 	if err != nil {
 		log.Fatalln(err)
 	}
+	r := mysqlr.NewMySQLRepository(conn)
+	//
 
-	m := repository.NewMySQLRepository(conn)
-	r := repository.NewRepository()
-	u := usecase.NewItemUsecase(r, m)
+	//r := inmemory.NewInMemory()
+	u := usecase.NewItemUsecase(r)
 	h := handler.NewHandler(u)
 
-	// se mueven ls rutas a otro archivo
-	err = web.NewHTTPServer(h)
-	if err != nil {
-		log.Fatalln(err)
+	fmt.Println("rep")
+
+	errSrv := web.NewHTTPServer(h)
+	if errSrv != nil {
+		log.Fatalln(errSrv)
 	}
 }

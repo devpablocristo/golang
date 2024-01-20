@@ -1,104 +1,91 @@
-version: '3.7'
+version: "3.7"
+
 services:
-  meli-items:
-    container_name: app-meli-items
-    build:
-      context: .
-      dockerfile: Dockerfile.api
-    ports:
-      - "9000:8080" # locat port : container port
+  mysql-local:
+    container_name: mysql-local
+    image: "mysql:8.2.0-oracle"
+    command: >
+      --default-authentication-plugin=caching_sha2_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
     restart: unless-stopped
-    depends_on:
-      - mysql
+    networks:
+      - default
+    ports:
+      - "${MYSQL_HOST_PORT:-3307}:${MYSQL_CONT_PORT:-3306}"
+    expose:
+      - "${MYSQL_HOST_PORT:-3307}"
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-root}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE:-meli-items}"
+      MYSQL_USER: "${MYSQL_USERNAME:-user}"
+      MYSQL_PASSWORD: "${MYSQL_USER_PASSWORD:-12345}"
+      MYSQL_ROOT_HOST: "%"
     volumes:
-      - .:/app/data
-    networks:
-      items_net:
-        ipv4_address: 192.168.1.1
+      - "./.docker-volumes/mysql:/var/lib/mysql" #por coherencia con dynamodb, uso el directorio definido
+      #- "mysql_data:/var/lib/mysql"
+      - "./infra/database/*.sql:/docker-entrypoint-initdb.d/" #all scripts in docker-entrypoint-initdb.d/ are automatically executed during container startup
 
-  mysql:
-    container_name: mysql-meli-items
-    # platform: linux/arm64/v8
-    # platform: linux/x86_64
-    image: mysql:5.7
-    # image: mysql:8.0
-    # image: arm64v8/mysql:8.0
+  dynamodb-local:
+   command: "-jar DynamoDBLocal.jar -port 8765 -sharedDb -dbPath /home/dynamodblocal/data"
+   image: "amazon/dynamodb-local:1.24.0"
+   container_name: dynamodb-local
+   restart: unless-stopped
+   networks:
+      - default
+   ports:
+     - 9876:8765
+   expose:
+     - 9876 # puerto para acceder desde afuera
+   volumes:
+     - "./.docker-volumes/dynamodb:/home/dynamodblocal/data" 
+     #- "dynamodb_data:/home/dynamodblocal/data" #por problemas permisos no puedo usar el volumen
+
+  api:
+    container_name: api-local
     build:
-      context: .
-      dockerfile: Dockerfile.mysql
-    # networks:
-    #   - default
-    restart: always
+      context: "."
+      dockerfile: Dockerfile
     ports:
-      - "3306:3306" # locat port : container port
-    # expose:
-    #   - "3306"  # Opens port 3306 on the container
-    environment:
-      MYSQL_DATABASE: meli_items
-      MYSQL_USER: tester
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: secret
-    volumes: # we mount a data volume to make sure we don't lose data
-      - mysql-data:/var/lib/mysql # Where our data will be persisted
-    command: --default-authentication-plugin=mysql_native_password
+      - 9999:8888  
+    expose:
+      - 9999 # Puerto para Postman
     networks:
-      items_net:
-        ipv4_address: 192.168.1.2
+      - default  
+    depends_on:
+      - mysql-local
+      - dynamodb-local
+    links:
+      - mysql-local
+      - dynamodb-local  
+    volumes:
+      - "./:/app"
+    environment:
+      - AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY:-fakeAccessKey}"
+      - AWS_SECRET_ACCESS_KEY="${AWS_SECRET_KEY:-fakeSecretKey}"
+      - REGION="${AWS_REGION:-local}"
 
-
-  # se agrega el servicio de phpMyAdmin
   phpmyadmin:
-    container_name: phpmyadmin
-    image: phpmyadmin/phpmyadmin:5.1.1
-    restart: always
-    ports:
-      - "9090:80"
-    environment:
-      PMA_HOST: mysql-meli-items
-      MYSQL_ROOT_PASSWORD: secret
+    image: phpmyadmin:5.2.1-apache
+    container_name: phpmyadmin-local
     networks:
-      items_net:
-        ipv4_address: 192.168.1.3
-
+      - default    
+    links:
+      - mysql-local
+    restart: always
+    environment:
+      - PMA_HOST="${MYSQL_CONT:-mysql-local}" #nombre del server "mysql-local" en este caso
+      - PMA_PORT="${MYSQL_HOST_PORT:-3307}"
+      - PMA_ARBITRARY=1
+      - MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-root}"
+    ports:
+      - "${PHPMYADMIN_HOST_PORT:-9090}:${PHPMYADMIN_CONT_PORT:-80}"
 
 networks:
-  items_net:
-    driver: bridge
-    ipam:
-      driver: default
-      config: 
-        - subnet: 192.168.1.0/24
+  default:
 
-
-volumes:
-  mysql-data:
-
-
-
-# networks:
-#   default:
-
-
-
-
-
-
-#   postgres:
-#     container_name: postgres_container
-#     image: postgres:14.4
-#     restart: unless-stopped
-#     environment:
-#       POSTGRES_USER: root
-#       POSTGRES_PASSWORD: rootroot
-#     ports:
-#       - "5432:5432"
-    
-#   mariadb:
-#     container_name: mariadb_container
-#     image: mariadb:10.7.4
-#     restart: unless-stopped
-#     environment:
-#       MARIADB_USER: root
-#       MARIADB_ROOT_PASSWORD: rootroot
-#     ports: 
-#       - "33060:33060" 
+# supuestamente, esta por revisar, si podria usar mysql_data, pero no dynamodb_data, no se porque.
+# por coherencia, hice ambos definidos
+#volumes:
+  #mysql_data:
+  #dynamodb_data: #por problemas permisos no puedo usar el volumen
