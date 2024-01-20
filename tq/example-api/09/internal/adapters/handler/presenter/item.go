@@ -6,6 +6,12 @@ import (
 	domain "items/internal/domain"
 )
 
+/*
+A DTO is used for transferring data without modification,
+Presenter adapts and formats data for its final presentation.
+The presenter adds an abstraction layer that separates business logic from the presentation layer, proving useful for maintaining a clear separation in the software architecture.
+*/
+
 type jsonItem struct {
 	Code        string    `json:"code"`
 	Title       string    `json:"title"`
