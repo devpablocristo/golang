@@ -24,7 +24,7 @@ services:
     volumes:
       - "./.docker-volumes/mysql:/var/lib/mysql" #por coherencia con dynamodb, uso el directorio definido
       #- "mysql_data:/var/lib/mysql"
-      - "./infra/database/*.sql:/docker-entrypoint-initdb.d/" #all scripts in docker-entrypoint-initdb.d/ are automatically executed during container startup
+      - "./platform/database/*.sql:/docker-entrypoint-initdb.d/" #all scripts in docker-entrypoint-initdb.d/ are automatically executed during container startup
 
   dynamodb-local:
    command: "-jar DynamoDBLocal.jar -port 8765 -sharedDb -dbPath /home/dynamodblocal/data"
