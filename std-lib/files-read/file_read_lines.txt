@@ -1,7 +1,0 @@
-hello word!
-hi golang!
-hello a
-hello b
-hello c
-hello d
-bye!

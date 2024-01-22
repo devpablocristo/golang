@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	//"items/internal/adapters/repository/inmemory"
+	//"items/internal/adapters/repository/inmemoryr"
 	//"items/internal/adapters/repository/mysqlr"
 
 	"items/internal/adapters/handler"
@@ -23,7 +23,7 @@ func main() {
 	r := mysqlr.NewMySQLRepository(conn)
 	//
 
-	//r := inmemory.NewInMemory()
+	//r := inmemoryr.NewInMemory()
 	u := usecase.NewItemUsecase(r)
 	h := handler.NewHandler(u)
 

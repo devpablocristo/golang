@@ -1,12 +1,13 @@
-package mysqlr
+package repodao
 
 import (
 	"time"
 
+	"items/internal/domain"
 	entity "items/internal/domain"
 )
 
-type itemDAO struct {
+type ItemDAO struct {
 	ID          uint      `db:"id"`
 	Code        string    `db:"code"`
 	Title       string    `db:"title"`
@@ -18,7 +19,7 @@ type itemDAO struct {
 	UpdatedAt   time.Time `db:"updated_at"`
 }
 
-func (dao *itemDAO) dao2Item() *entity.Item {
+func (dao *ItemDAO) DaoToItem() *entity.Item {
 	return &entity.Item{
 		Code:        dao.Code,
 		Description: dao.Description,
@@ -28,5 +29,22 @@ func (dao *itemDAO) dao2Item() *entity.Item {
 		Status:      dao.Status,
 		CreatedAt:   dao.CreatedAt,
 		UpdatedAt:   dao.UpdatedAt,
+	}
+}
+
+func ItemToDao(item *domain.Item) *ItemDAO {
+	if item == nil {
+		return nil
+	}
+
+	return &ItemDAO{
+		Code:        item.Code,
+		Description: item.Description,
+		Title:       item.Title,
+		Price:       item.Price,
+		Stock:       item.Stock,
+		Status:      item.Status,
+		CreatedAt:   item.CreatedAt,
+		UpdatedAt:   item.UpdatedAt,
 	}
 }

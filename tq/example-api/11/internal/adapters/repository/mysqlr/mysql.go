@@ -9,8 +9,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"items/internal/domain"
-
+	repodao "items/internal/adapters/repository"
+	domain "items/internal/domain"
 	ctypes "items/internal/platform/custom-types"
 )
 
@@ -26,7 +26,7 @@ func NewMySQLRepository(db *sqlx.DB) domain.ItemRepositoryPort {
 
 // Implementar GetItemByCode
 func (r *mysqlItemRepository) GetItemByCode(code string) (*domain.Item, error) {
-	var itemDB itemDAO
+	var itemDB repodao.ItemDAO
 	err := r.conn.Get(&itemDB, "SELECT * FROM item WHERE code=?", code)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -36,13 +36,13 @@ func (r *mysqlItemRepository) GetItemByCode(code string) (*domain.Item, error) {
 		log.Printf("error getting item by code: %v", err)
 		return nil, fmt.Errorf("error getting item by code: %v", err)
 	}
-	return itemDB.dao2Item(), nil
+	return itemDB.DaoToItem(), nil
 }
 
 // Los demás métodos se mantienen sin cambios
 
 func (r *mysqlItemRepository) GetItemByID(id domain.ID) (*domain.Item, error) {
-	var itemDB itemDAO
+	var itemDB repodao.ItemDAO
 	err := r.conn.Get(&itemDB, "SELECT * FROM item WHERE id=?", id)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -52,7 +52,7 @@ func (r *mysqlItemRepository) GetItemByID(id domain.ID) (*domain.Item, error) {
 		log.Printf("error getting item: %v", err)
 		return nil, fmt.Errorf("error getting item: %v", err)
 	}
-	return itemDB.dao2Item(), nil
+	return itemDB.DaoToItem(), nil
 }
 
 func (r *mysqlItemRepository) SaveItem(item *domain.Item) (*domain.Item, error) {
@@ -85,7 +85,7 @@ func (r *mysqlItemRepository) SaveItem(item *domain.Item) (*domain.Item, error) 
 
 func (r *mysqlItemRepository) GetAllItems() (domain.MapRepo, error) {
 	items := make(domain.MapRepo)
-	var itemsDB []itemDAO
+	var itemsDB []repodao.ItemDAO
 
 	err := r.conn.Select(&itemsDB, "SELECT * FROM item")
 	if err != nil {
@@ -93,7 +93,7 @@ func (r *mysqlItemRepository) GetAllItems() (domain.MapRepo, error) {
 	}
 
 	for _, dao := range itemsDB {
-		items[domain.ID(dao.ID)] = dao.dao2Item()
+		items[domain.ID(dao.ID)] = dao.DaoToItem()
 	}
 
 	return items, nil

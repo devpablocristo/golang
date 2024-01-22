@@ -2,8 +2,8 @@ package ctypes
 
 // Error messages constants.
 const (
-	ErrItemNotFound     = "Item not found"    // Message for item not found error
-	ErrInvalidParameter = "Invalid parameter" // Message for invalid parameter error
+	ErrItemNotFound     = "item not found"    // Message for item not found error
+	ErrInvalidParameter = "invalid parameter" // Message for invalid parameter error
 )
 
 // CustomError is a custom error type that implements the error interface.

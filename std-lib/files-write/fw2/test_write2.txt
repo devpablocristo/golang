@@ -1,3 +1,0 @@
-Writing string
-Hello Golang dev
-Writting buffered
