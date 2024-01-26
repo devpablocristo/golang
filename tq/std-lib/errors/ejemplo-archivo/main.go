@@ -30,9 +30,7 @@ func archivo() {
 	_, err := os.Open("no-file.txt")
 	if err != nil {
 		log.Println("log.Println - Ocurrió un error: ", err)
-
 		return
-
 	}
 
 }
