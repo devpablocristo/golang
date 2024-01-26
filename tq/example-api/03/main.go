@@ -54,20 +54,37 @@ func (h *handler) helloWorld(c *gin.Context) {
 	c.String(http.StatusOK, "Hello World!")
 }
 
+// saveItem is a method on the 'handler' type.
 func (h *handler) saveItem(c *gin.Context) {
+
+	// Define a variable 'item' of the type 'item'.
 	var item item
+
+	// Bind the JSON payload from the request body into the 'item' variable.
+	// If there's an error during binding, it will be stored in 'err'.
 	err := c.BindJSON(&item)
+
+	// Check if there was an error during JSON binding.
 	if err != nil {
+		// If an error occurred, send a Bad Request (400) response with the error message.
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		// Return from the function, preventing further execution.
 		return
 	}
 
+	// Call the 'saveItem' method on the 'usecase' field of the handler struct, passing the 'item'.
+	// The result is stored in 'savedItem', and any error encountered is stored in 'err'.
 	savedItem, err := h.usecase.saveItem(item)
+
+	// Check if there was an error while saving the item.
 	if err != nil {
+		// If an error occurred, send an Internal Server Error (500) response with the error message.
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		// Return from the function, preventing further execution.
 		return
 	}
 
+	// If everything went well, send an OK (200) response with the saved item.
 	c.JSON(http.StatusOK, savedItem)
 }
 
