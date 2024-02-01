@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	//"items/internal/adapters/repository/inmemoryr"
@@ -26,8 +25,6 @@ func main() {
 	//r := inmemoryr.NewInMemory()
 	u := usecase.NewItemUsecase(r)
 	h := handler.NewHandler(u)
-
-	fmt.Println("rep")
 
 	errSrv := web.NewHTTPServer(h)
 	if errSrv != nil {

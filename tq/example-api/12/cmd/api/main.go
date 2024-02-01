@@ -3,11 +3,14 @@ package main
 import (
 	"log"
 
-	ctrl "github.com/devpablocristo/golang/06-projects/items/gin/items-final/internal/adapters/handler"
-	repository "github.com/devpablocristo/golang/06-projects/items/gin/items-final/internal/adapters/repository"
-	mysql "github.com/devpablocristo/golang/06-projects/items/gin/items-final/internal/infra/mysql"
-	web "github.com/devpablocristo/golang/06-projects/items/gin/items-final/internal/infra/web"
-	usecase "github.com/devpablocristo/golang/06-projects/items/gin/items-final/internal/usecase"
+	//"items/internal/adapters/repository/inmemoryr"
+	//"items/internal/adapters/repository/mysqlr"
+
+	"items/internal/adapters/handler"
+	"items/internal/adapters/repository/mysqlr"
+	"items/internal/platform/mysql"
+	"items/internal/platform/web"
+	"items/internal/usecase"
 )
 
 func main() {
@@ -16,14 +19,12 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	r := mysqlr.NewMySQLRepository(conn)
+	//
 
-	itemRepository := repository.NewMySQLRepository(conn)
-	//itemRepository := repository.NewItemRepository()
-	itemUsecase := usecase.NewItemUsecase(itemRepository)
-	itemHandler := ctrl.NewItemHandler(itemUsecase)
+	//r := inmemoryr.NewInMemory()
+	u := usecase.NewItemUsecase(r)
+	h := handler.NewHandler(u)
 
-	if err := web.NewHTTPServer(itemHandler); err != nil {
-
-		log.Fatalln(err)
-	}
+	web.NewHTTPServer(h)
 }
