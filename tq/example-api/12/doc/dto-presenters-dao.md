@@ -1,35 +1,35 @@
 ### Data Transfer Object (DTO)
 
-El DTO (Objeto de Transferencia de Datos) es un patrón de diseño utilizado para transferir datos entre sistemas o capas de una aplicación de manera simplificada. Los DTOs encapsulan datos y se utilizan comúnmente para transferir información relevante entre cliente y servidor, o entre distintas partes de un sistema, sin exponer detalles internos de cómo se almacenan o manejan esos datos. Esto promueve una mayor flexibilidad y desacoplamiento entre las capas de una aplicación, siendo especialmente útiles en el desarrollo de APIs para modelar tanto las solicitudes entrantes como las respuestas salientes, permitiendo controlar exactamente qué datos se exponen a través de la API.
+A Data Transfer Object (DTO) is a design pattern used to transfer data between systems or layers of an application in a simplified manner. DTOs encapsulate data and are commonly used to transfer relevant information between client and server, or between different parts of a system, without exposing internal details of how those data are stored or managed. This promotes greater flexibility and decoupling between the layers of an application, being especially useful in the development of APIs to model both incoming requests and outgoing responses, allowing to control exactly what data is exposed through the API.
 
-#### Ejemplo de DTO en Go para una aplicación de gestión de libros:
+#### Example of DTO in Go for a book management application:
 
 ```go
 package dto
 
-// LibroCreateDTO se utiliza para la creación de libros, definiendo lo necesario para añadir un nuevo libro.
+// LibroCreateDTO is used for creating books, defining what is necessary to add a new book.
 type LibroCreateDTO struct {
-    Titulo  string `json:"titulo"`
-    Autor   string `json:"autor"`
-    Resumen string `json:"resumen,omitempty"` // Opcional
-    Anio    int    `json:"anio"`
+    Title  string `json:"title"`
+    Author string `json:"author"`
+    Summary string `json:"summary,omitempty"` // Optional
+    Year    int    `json:"year"`
 }
 
-// LibroResponseDTO se utiliza para enviar datos del libro al cliente, definiendo cómo se presenta un libro en las respuestas.
+// LibroResponseDTO is used to send book data to the client, defining how a book is presented in responses.
 type LibroResponseDTO struct {
     ID      int64  `json:"id"`
-    Titulo  string `json:"titulo"`
-    Autor   string `json:"autor"`
-    Resumen string `json:"resumen,omitempty"` // Opcional
-    Anio    int    `json:"anio"`
+    Title  string `json:"title"`
+    Author string `json:"author"`
+    Summary string `json:"summary,omitempty"` // Optional
+    Year    int    `json:"year"`
 }
 ```
 
 ### Presenter
 
-El Presenter forma parte del patrón Modelo-Vista-Presentador (MVP), actuando como intermediario entre la vista (UI) y el modelo (datos de negocio). Su objetivo principal es preparar los datos del modelo para su presentación en la vista, conteniendo lógica específica de presentación que decide cómo se deben mostrar los datos al usuario.
+The Presenter is part of the Model-View-Presenter (MVP) pattern, acting as an intermediary between the view (UI) and the model (business data). Its main goal is to prepare the model data for presentation in the view, containing specific presentation logic that decides how the data should be shown to the user.
 
-#### Ejemplo de Presenter en Go:
+#### Example of Presenter in Go:
 
 ```go
 package presenter
@@ -37,58 +37,58 @@ package presenter
 import (
     "fmt"
     "strings"
-    "tuProyecto/dto"
+    "yourProject/dto"
 )
 
-// LibroPresenter es responsable de preparar los datos del libro para la vista.
+// LibroPresenter is responsible for preparing book data for the view.
 type LibroPresenter struct {
-    Libro dto.LibroDTO
+    Book dto.LibroDTO
 }
 
-// FormatearTitulo convierte el título del libro a mayúsculas.
-func (lp *LibroPresenter) FormatearTitulo() string {
-    return strings.ToUpper(lp.Libro.Titulo)
+// FormatTitle converts the book title to uppercase.
+func (lp *LibroPresenter) FormatTitle() string {
+    return strings.ToUpper(lp.Book.Title)
 }
 
-// DetallesDelLibro compone una cadena con los detalles formateados del libro para la presentación.
-func (lp *LibroPresenter) DetallesDelLibro() string {
-    return fmt.Sprintf("Título: %s, Autor: %s, Año de Publicación: %d",
-        lp.FormatearTitulo(), lp.Libro.Autor, lp.Libro.Publicacion)
+// BookDetails composes a string with the formatted details of the book for presentation.
+func (lp *LibroPresenter) BookDetails() string {
+    return fmt.Sprintf("Title: %s, Author: %s, Publication Year: %d",
+        lp.FormatTitle(), lp.Book.Author, lp.Book.Publication)
 }
 ```
 
 ### Data Access Object (DAO)
 
-El DAO (Objeto de Acceso a Datos) es un patrón de diseño que proporciona una interfaz abstracta para acceder a datos almacenados en una base de datos, archivo, o cualquier otro medio de persistencia. Su propósito es separar la lógica de acceso a datos de la lógica de negocio de la aplicación, permitiendo que esta última sea independiente del mecanismo de almacenamiento subyacente.
+The DAO (Data Access Object) is a design pattern that provides an abstract interface to access data stored in a database, file, or any other persistence medium. Its purpose is to separate the data access logic from the business logic of the application, allowing the latter to be independent of the underlying storage mechanism.
 
-#### Ejemplo de DAO en Go para la entidad Libro:
+#### Example of DAO in Go for the Book entity:
 
 ```go
 package dao
 
 import (
     "errors"
-    "tuProyecto/models"
+    "yourProject/models"
 )
 
-// LibroDAO define las operaciones de acceso a datos para los libros.
+// LibroDAO defines the data access operations for books.
 type LibroDAO interface {
-    Crear(libro models.Libro) error
-    ObtenerPorID(id string) (models.Libro, error)
-    Actualizar(libro models.Libro) error
-    Eliminar(id string) error
+    Create(book models.Libro) error
+    GetById(id string) (models.Libro, error)
+    Update(book models.Libro) error
+    Delete(id string) error
 }
 
-// LibroDAOImpl implementa LibroDAO usando un mapa como almacenamiento en memoria.
+// LibroDAOImpl implements LibroDAO using a map as in-memory storage.
 type LibroDAOImpl struct {
-    libros map[string]models.Libro
+    books map[string]models.Libro
 }
 
-func NuevoLibroDAOImpl() *LibroDAOImpl {
-    return &LibroDAOImpl{libros: make(map[string]models.Libro)}
+func NewLibroDAOImpl() *LibroDAOImpl {
+    return &LibroDAOImpl{books: make(map[string]models.Libro)}
 }
 
-// Implementación de los métodos Crear, ObtenerPorID, Actualizar y Eliminar...
+// Implementation of the Create, GetById, Update, and Delete methods...
 ```
 
-Estos ejemplos ilustran cómo el DTO se utiliza para la transferencia eficiente de datos entre capas o servicios, el Presenter para adaptar y formatear datos para la presentación, y el DAO para encapsular el acceso y manipulación de datos, demostrando la importancia de cada patrón en el diseño y arquitectura de software.
+These examples illustrate how the DTO is used for efficient data transfer between layers or services, the Presenter to adapt and format data for presentation, and the DAO to encapsulate access and manipulation of data, demonstrating the importance of each pattern in software design and architecture.
