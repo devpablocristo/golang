@@ -1,4 +1,4 @@
-package cmsenv
+package env
 
 import (
 	"log"
