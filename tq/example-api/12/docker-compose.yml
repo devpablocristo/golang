@@ -26,20 +26,20 @@ services:
       #- "mysql_data:/var/lib/mysql"
       - "./platform/database/*.sql:/docker-entrypoint-initdb.d/" #all scripts in docker-entrypoint-initdb.d/ are automatically executed during container startup
 
-  # dynamodb-local:
-  #  command: "-jar DynamoDBLocal.jar -port 8765 -sharedDb -dbPath /home/dynamodblocal/data"
-  #  image: "amazon/dynamodb-local:1.24.0"
-  #  container_name: dynamodb-local
-  #  restart: unless-stopped
-  #  networks:
-  #     - default
-  #  ports:
-  #    - 9876:8765
-  #  expose:
-  #    - 9876 # puerto para acceder desde afuera
-  #  volumes:
-  #    - "./.docker-volumes/dynamodb:/home/dynamodblocal/data" 
-  #    #- "dynamodb_data:/home/dynamodblocal/data" #por problemas permisos no puedo usar el volumen
+  dynamodb-local:
+   command: "-jar DynamoDBLocal.jar -port 8765 -sharedDb -dbPath /home/dynamodblocal/data"
+   image: "amazon/dynamodb-local:1.24.0"
+   container_name: dynamodb-local
+   restart: unless-stopped
+   networks:
+      - default
+   ports:
+     - 9876:8765
+   expose:
+     - 9876 # puerto para acceder desde afuera
+   volumes:
+     - "./.docker-volumes/dynamodb:/home/dynamodblocal/data" 
+     #- "dynamodb_data:/home/dynamodblocal/data" #por problemas permisos no puedo usar el volumen
 
   api:
     container_name: api-local
