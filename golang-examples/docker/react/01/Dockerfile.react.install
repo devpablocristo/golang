@@ -1,0 +1,17 @@
+# FROM node:15.3.0-alpine3.11
+
+# WORKDIR /app
+
+# RUN npm install -g create-react-app@4.0.1
+# RUN npm install -g firebase@8.0.0  
+# RUN npm install -g react-redux@4.0.5
+# RUN npm install -g bootstrap@4.5.3 react-bootstrap@1.4.0
+
+FROM node:current-alpine
+
+WORKDIR /app
+
+RUN npm install -g create-react-app
+RUN npm install -g firebase
+RUN npm install -g react-redux
+RUN npm install -g bootstrap react-bootstrap

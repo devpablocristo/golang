@@ -1,0 +1,36 @@
+
+
+  mysql:
+    image: mysql:5.7
+    container_name: "golang-mysql"
+    restart: always
+    tty: true
+    environment:
+      TZ: 'Asia/Tokyo'
+      MYSQL_DATABASE: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_database
+    ports:
+      - 13306:3306
+    volumes:
+      - ./docker/mysql/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/db/sql/:/docker-entrypoint-initdb.d
+      - golang-mysql-db:/var/lib/mysql
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    tty: true
+    environment:
+    - PMA_ARBITRARY=1
+    - PMA_HOSTS=golang-mysql
+    - PMA_USER=root
+    - PMA_PASSWORD=root
+    ports:
+    - 8081:80
+
+volumes:
+  golang-mysql-db:
+    driver: local

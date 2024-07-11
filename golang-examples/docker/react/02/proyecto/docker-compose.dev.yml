@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  app_react:
+    container_name: react_app
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    working_dir: /app 
+    ports:
+      - '3000:3000'
+    volumes:
+      - /app/node_modules
+      - .:/app:cached
+    tty: true

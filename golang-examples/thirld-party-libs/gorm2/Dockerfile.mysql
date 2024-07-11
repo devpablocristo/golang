@@ -1,0 +1,21 @@
+FROM mysql:8.0.23
+
+# import data into container
+# All scripts in docker-entrypoint-initdb.d/ are automatically executed during container startup
+COPY ./db/event-service/schema.sql /docker-entrypoint-initdb.d/
+
+# Copy the custom configuration file to the container
+COPY ./db/my.cnf /etc/mysql/conf.d/my.cnf
+
+# Set the character set and collation of the database
+ENV MYSQL_DATABASE events
+ENV MYSQL_USER tester
+ENV MYSQL_PASSWORD secret
+ENV MYSQL_ROOT_PASSWORD secret
+ENV LANG en_US.utf8
+
+# Expose the MySQL port
+EXPOSE 3306
+
+# Start the MySQL server
+CMD ["mysqld"]

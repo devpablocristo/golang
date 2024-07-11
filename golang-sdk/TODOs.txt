@@ -1,0 +1,24 @@
+TODO: dtos
+TODO: stage a base de datos y mas
+TODO: crear docker-compose prod (no dev)
+TODO: grafana
+TODO: mysql
+TODO: circuit breacker
+TODO: api gateway
+TODO: crear lanzador unico de todos los "handlers" grpc, rest, cli 
+TODO: pasar todo a wire
+TODO: cambiar denombre la app
+TODO: hacer documentacion (swagger y mas)
+TODO: agregar context a todo el control flow
+TODO: unit tests
+TODO: nginx
+TODO: pprof
+TODO: k8s
+TODO: hysterix
+TODO: jaeger
+TODO: opentelemetry4
+TODO: graph QL
+TODO: WebSocket
+TODO: MongoDB
+TODO: Migrar TODAS las apis del repo "golang"
+TODO: Sacar y configurar correctamente el crawler de cli

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package grpcbook;
+
+option go_package = "github.com/devpablocristo/golang-examples/grpc/bookstore/book";
+
+
+message NewBook {
+    string title = 1;
+    string author = 2;
+}
+
+message Book {
+    string title = 1;
+    string author = 2;
+    int32 id = 3;
+}
+
+service BookstoreInventory {
+    rpc CreateNewBook(NewBook) returns (Book) {}
+}

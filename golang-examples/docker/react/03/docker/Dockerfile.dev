@@ -1,0 +1,59 @@
+# Version current
+# FROM node:current-alpine AS dev
+# WORKDIR /app
+# RUN npm install -g create-react-app
+
+###
+
+# Los stages pueden agregarse asi o en distintos dockerfiles
+# Con scratch se puede hacer imagenes todavia menores
+
+#### DEV ####
+FROM node:15.0.1-alpine3.11 AS dev
+WORKDIR /app
+COPY package.json .
+RUN npm install
+# RUN npm i firebase@8.0.0  
+# RUN npm i react-redux@4.0.5
+# RUN npm i npm@7.0.6
+# RUN npm i bootstrap@4.5.3 react-bootstrap@1.4.0
+COPY . .
+CMD ["npm", "run", "dev"]
+
+###############################################
+###############################################
+###############################################
+################     TEST      ################
+###############################################
+###############################################
+###############################################
+# FROM node:15.0.1-alpine3.11 AS test
+# WORKDIR /app
+# COPY package.json .
+# RUN npm install
+# COPY . .
+# CMD ["npm", "run", "start"]
+
+###############################################
+###############################################
+###############################################
+################     PROD      ################
+###############################################
+###############################################
+###############################################
+# FROM node:15.0.1-alpine3.11 AS prod
+# WORKDIR /app
+# COPY package.json .
+# RUN npm install
+# COPY . .
+# CMD ["npm", "run", "start"]
+
+##############################################
+##############################################
+##############################################
+################    NGNIX     ################
+##############################################
+##############################################
+##############################################
+# FROM nginx AS nginx-server
+# COPY --from=dev /app/build /usr/share/nginx/html

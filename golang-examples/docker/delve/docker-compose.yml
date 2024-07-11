@@ -1,0 +1,19 @@
+version: "3.5"
+services:
+  golang:
+    container_name: server
+    image: testing/golang:0.1 
+    build:
+      context: ./ 
+      dockerfile: rec/dkr/golang/Dockerfile
+      target: debug
+    volumes: 
+        - ./src:/app
+    restart: always
+    ports: 
+      - 6001:8080 #el puerto del container esel 8080 
+      - 2345:2345 #puertos para debugging
+    security_opt:
+      - "seccomp:unconfined" #para que funcione el debbuger
+  
+    
