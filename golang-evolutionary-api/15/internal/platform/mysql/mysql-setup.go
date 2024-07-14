@@ -6,11 +6,11 @@ import (
 
 func NewMySQLSetup() (*gosqldriver.MySQLClient, error) {
 	config := gosqldriver.MySQLClientConfig{
-		User:     "DB_USER",
-		Password: "DB_PASSWORD",
-		Host:     "DB_HOST",
-		Port:     "DB_PORT",
-		Database: "DB_NAME",
+		User:     "user",
+		Password: "password",
+		Host:     "mysql",
+		Port:     "3306",
+		Database: "inventory",
 	}
 	return gosqldriver.NewMySQLClient(config)
 }
