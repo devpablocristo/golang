@@ -10,19 +10,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AuthUseCase struct {
+type authUseCase struct {
 	userRepo  user.RepositoryPort
 	secretKey string
 }
 
 func NewAuthUseCase(ur user.RepositoryPort, sk string) AuthUseCasePort {
-	return &AuthUseCase{
+	return &authUseCase{
 		userRepo:  ur,
 		secretKey: sk,
 	}
 }
 
-func (s *AuthUseCase) Login(ctx context.Context, username, password string) (string, error) {
+func (s *authUseCase) Login(ctx context.Context, username, password string) (string, error) {
 	user, err := s.userRepo.GetUserByUsername(ctx, username)
 	if err != nil {
 		return "", errors.New("invalid credentials")

@@ -12,10 +12,10 @@ import (
 )
 
 type ItemHandler struct {
-	ucs ucs.UseCasePort
+	ucs ucs.EventUseCasePort
 }
 
-func NewItemHandler(ucs ucs.UseCasePort) *ItemHandler {
+func NewItemHandler(ucs ucs.EventUseCasePort) *ItemHandler {
 	return &ItemHandler{
 		ucs: ucs,
 	}

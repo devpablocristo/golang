@@ -19,8 +19,6 @@ import (
 	stg "github.com/devpablocristo/qh/events/internal/platform/stage"
 )
 
-
-
 func main() {
 	if err := is.InitSetup(); err != nil {
 		log.Fatalf("Error setting up configurations: %v", err)
@@ -101,4 +99,12 @@ func main() {
 	if err := ginInst.RunServer(); err != nil {
 		is.MicroLogError("error starting Gin server: %v", err)
 	}
+
+	//nimble-c7 integration
+
+	// r := gin.Default()
+	// config.LoadConfig()
+	// wire.SetupRoutes(r)
+	// r.Run()
+
 }

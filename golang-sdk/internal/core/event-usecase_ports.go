@@ -6,6 +6,6 @@ import (
 	eve "github.com/devpablocristo/qh/events/internal/core/event"
 )
 
-type UseCasePort interface {
+type EventUseCasePort interface {
 	CreateEvent(context.Context, *eve.Event) error
 }

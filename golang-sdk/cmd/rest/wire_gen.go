@@ -11,7 +11,7 @@ import (
 	"github.com/devpablocristo/qh/events/internal/core"
 	"github.com/devpablocristo/qh/events/internal/core/user"
 	"github.com/devpablocristo/qh/events/internal/platform/cassandra"
-	"github.com/devpablocristo/qh/events/pkg/initial-setup"
+	"github.com/devpablocristo/qh/events/pkg/init-setup"
 )
 
 // Injectors from wire.go:

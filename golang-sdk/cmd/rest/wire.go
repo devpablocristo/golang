@@ -33,3 +33,18 @@ func InitializeAuthHandler() (*hdl.AuthHandler, error) {
 	)
 	return &hdl.AuthHandler{}, nil
 }
+
+// integration
+// func SetupRoutes(r *gin.Engine) {
+//     nimbleRepo := repository.NewNimbleRepository()
+//     cin7Repo := cin7repository.NewCin7Repository(config.RedisClient)
+
+//     cin7UseCase := cin7usecase.NewCin7UseCase(cin7Repo)
+//     nimbleUseCase := usecase.NewNimbleUseCase(nimbleRepo, cin7UseCase)
+
+//     nimbleHandler := handler.NewNimbleHandler(nimbleUseCase)
+//     cin7Handler := cin7handler.NewCin7Handler(cin7UseCase)
+
+//     r.POST("/nimble/orders", nimbleHandler.HandleOrderShipment)
+//     r.POST("/cin7/shipments", cin7Handler.HandleShipmentUpdate)
+// }
