@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	core "github.com/devpablocristo/qh/events/internal/core/integration-nimble-c7"
+	core "github.com/devpablocristo/qh/events/internal/core/integration-nimble-cin7"
 )
 
 type NimbleHandler struct {
@@ -16,18 +16,14 @@ func NewNimbleHandler(uc core.NimbleUseCasePort) *NimbleHandler {
 	return &NimbleHandler{useCase: uc}
 }
 
-func (h *NimbleHandler) HandleOrderShipment(c *gin.Context) {
-	var orderDTO order
-	if err := c.ShouldBindJSON(&orderDTO); err != nil {
+func (h *NimbleHandler) OrderShipment(c *gin.Context) {
+	var dto OrderReq
+	if err := c.ShouldBindJSON(&dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	order := order{
-		OrderID:      orderDTO.OrderID,
-		CustomerName: orderDTO.CustomerName,
-		Items:        toItems(orderDTO.Items),
-	}
+	order := ToNimbleOrder(dto)
 
 	if err := h.useCase.ProcessOrder(order); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
