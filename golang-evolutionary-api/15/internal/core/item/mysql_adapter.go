@@ -4,22 +4,26 @@ import (
 	"database/sql"
 )
 
+// mysqlRepository es una implementación del repositorio de elementos utilizando MySQL
 type mysqlRepository struct {
-	db *sql.DB
+	db *sql.DB // Conexión a la base de datos MySQL
 }
 
-func NewMySqlRepository(instance *sql.DB) ItemRepositoryPort {
+// NewMySqlRepository crea una nueva instancia de mysqlRepository
+func NewMySqlRepository(db *sql.DB) ItemRepositoryPort {
 	return &mysqlRepository{
-		db: instance,
+		db: db,
 	}
 }
 
+// SaveItem guarda un nuevo elemento en la base de datos MySQL
 func (r *mysqlRepository) SaveItem(it *Item) error {
 	query := `INSERT INTO items (code, title, description, price, stock, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 	_, err := r.db.Exec(query, it.Code, it.Title, it.Description, it.Price, it.Stock, it.Status, it.CreatedAt, it.UpdatedAt)
 	return err
 }
 
+// ListItems lista todos los elementos de la base de datos MySQL
 func (r *mysqlRepository) ListItems() (MapRepo, error) {
 	query := `SELECT id, code, title, description, price, stock, status, created_at, updated_at FROM items`
 	rows, err := r.db.Query(query)

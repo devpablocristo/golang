@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// Item representa un elemento en el sistema
 type Item struct {
 	ID          int       `json:"id"`
 	Code        string    `json:"code"`
@@ -16,4 +17,5 @@ type Item struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
+// MapRepo representa un repositorio de elementos
 type MapRepo map[int]Item

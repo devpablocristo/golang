@@ -3,36 +3,27 @@ package gosqldriver
 import (
 	"database/sql"
 	"fmt"
-	"sync"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var (
-	instance *MySQLClient
-	once     sync.Once
-)
-
+// MySQLClient representa un cliente para interactuar con una base de datos MySQL
 type MySQLClient struct {
-	config MySQLClientConfig
-	db     *sql.DB
+	config MySQLClientConfig // Configuración del cliente MySQL
+	db     *sql.DB           // Conexión a la base de datos
 }
 
+// NewMySQLClient crea una nueva instancia de MySQLClient y establece la conexión a la base de datos
 func NewMySQLClient(config MySQLClientConfig) (*MySQLClient, error) {
-	var err error
-	once.Do(func() {
-		instance = &MySQLClient{config: config}
-		err = instance.connect()
-		if err != nil {
-			instance = nil
-		}
-	})
-	if instance == nil {
+	client := &MySQLClient{config: config}
+	err := client.connect()
+	if err != nil {
 		return nil, fmt.Errorf("failed to initialize MySQLClient: %v", err)
 	}
-	return instance, nil
+	return client, nil
 }
 
+// connect establece la conexión a la base de datos MySQL utilizando la configuración proporcionada
 func (client *MySQLClient) connect() error {
 	dsn := client.config.dsn()
 	conn, err := sql.Open("mysql", dsn)
@@ -46,12 +37,14 @@ func (client *MySQLClient) connect() error {
 	return nil
 }
 
+// Close cierra la conexión a la base de datos MySQL
 func (client *MySQLClient) Close() {
 	if client.db != nil {
 		client.db.Close()
 	}
 }
 
+// DB devuelve la conexión a la base de datos MySQL
 func (client *MySQLClient) DB() *sql.DB {
 	return client.db
 }

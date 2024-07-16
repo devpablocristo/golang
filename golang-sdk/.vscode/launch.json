@@ -22,7 +22,7 @@
                 "to": "/app"
             }
         ],
-        "trace": "verbose",
+        "trace": "verbose", 
         "logOutput": "debugger",
         "showLog": true
     }

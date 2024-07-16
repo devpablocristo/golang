@@ -1,6 +1,7 @@
 package item
 
+// ItemRepositoryPort define la interfaz para el repositorio de elementos
 type ItemRepositoryPort interface {
-	SaveItem(Item *Item) error
+	SaveItem(*Item) error
 	ListItems() (MapRepo, error)
 }
