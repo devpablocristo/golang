@@ -22,3 +22,5 @@ TODO: WebSocket
 TODO: MongoDB
 TODO: Migrar TODAS las apis del repo "golang"
 TODO: Sacar y configurar correctamente el crawler de cli
+TODO: Mover el entrypoint.sh a scripts
+TODO: Configurar wait-for-it.sh

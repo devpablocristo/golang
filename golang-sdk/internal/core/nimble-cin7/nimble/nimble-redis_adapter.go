@@ -3,7 +3,7 @@ package nimble
 import (
 	"time"
 
-	cin7 "github.com/devpablocristo/qh/events/internal/core/integration-nimble-cin7/cin7"
+	cin7 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/cin7"
 )
 
 type Redis struct{}

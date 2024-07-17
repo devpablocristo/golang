@@ -1,7 +1,7 @@
 package core
 
 import (
-	nimble "github.com/devpablocristo/qh/events/internal/core/integration-nimble-cin7/nimble"
+	nimble "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/nimble"
 )
 
 type NimbleUseCase struct {

@@ -7,9 +7,13 @@ import (
 	"github.com/google/wire"
 
 	hdl "github.com/devpablocristo/qh/events/cmd/rest/handlers"
+	hnc7 "github.com/devpablocristo/qh/events/cmd/rest/handlers/nimble-cin7"
 	core "github.com/devpablocristo/qh/events/internal/core"
+	nc7 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7"
+	nim "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/nimble"
 	usr "github.com/devpablocristo/qh/events/internal/core/user"
 	cass "github.com/devpablocristo/qh/events/internal/platform/cassandra"
+	rd "github.com/devpablocristo/qh/events/internal/platform/redis"
 	is "github.com/devpablocristo/qh/events/pkg/init-setup"
 )
 
@@ -32,6 +36,16 @@ func InitializeAuthHandler() (*hdl.AuthHandler, error) {
 		hdl.NewAuthHandler,
 	)
 	return &hdl.AuthHandler{}, nil
+}
+
+func InitializeNimbleHandler() (*hnc7.NimbleHandler, error) {
+	wire.Build(
+		rd.NewRedisInstance,
+		nim.NewNimbleRepository,
+		nc7.NewNimbleUseCase,
+		hnc7.NewNimbleHandler,
+	)
+	return &hnc7.NimbleHandler{}, nil
 }
 
 // integration

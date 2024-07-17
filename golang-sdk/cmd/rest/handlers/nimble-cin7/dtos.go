@@ -1,8 +1,8 @@
 package handler
 
 import (
-	cin7 "github.com/devpablocristo/qh/events/internal/core/integration-nimble-cin7/cin7"
-	nimble "github.com/devpablocristo/qh/events/internal/core/integration-nimble-cin7/nimble"
+	cin7 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/cin7"
+	nimble "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/nimble"
 )
 
 type OrderReq struct {
