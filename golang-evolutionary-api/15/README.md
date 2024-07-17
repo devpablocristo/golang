@@ -1,4 +1,6 @@
-# Manual de Usuario para la API de Inventario
+# API Evolutiva
+
+### Manual de Usuario para la API de Inventario
 
 Este manual proporciona instrucciones detalladas sobre cómo configurar y ejecutar la API de Inventario, desarrollada en Golang utilizando MySQL como base de datos y gestionada mediante Docker. Asegúrese de seguir cada paso cuidadosamente para garantizar una correcta configuración y funcionamiento de la aplicación.
 
@@ -60,16 +62,19 @@ Una vez que todos los contenedores estén en funcionamiento y la base de datos e
 
 - **POST /items**: Crear un nuevo ítem en el inventario.
   - Body JSON:
-    ```json
-    {
-      "code": "1234",
-      "title": "Sample Item",
-      "description": "This is a sample item",
-      "price": 19.99,
-      "stock": 100,
-      "status": "available"
-    }
-    ```
+   ```json
+   {
+      "id   ": 1,
+      "code": "ITEM001",
+      "title": "Example Item",
+      "description": "This is an example item",
+      "price": 29.99,
+      "stock": 50,
+      "status": "available",
+      "created_at": "2024-07-17T15:04:05Z",
+      "updated_at": "2024-07-17T15:04:05Z"
+   }
+   ```
 
 - **GET /items**: Obtener una lista de todos los ítems en el inventario.
 
@@ -79,12 +84,15 @@ Una vez que todos los contenedores estén en funcionamiento y la base de datos e
 
 ```sh
 curl -X POST http://localhost:8080/items -H "Content-Type: application/json" -d '{
-  "code": "1234",
-  "title": "Sample Item",
-  "description": "This is a sample item",
-  "price": 19.99,
-  "stock": 100,
-  "status": "available"
+  "id": 1,
+  "code": "ITEM001",
+  "title": "Example Item",
+  "description": "This is an example item",
+  "price": 29.99,
+  "stock": 50,
+  "status": "available",
+  "created_at": "2024-07-17T15:04:05Z",
+  "updated_at": "2024-07-17T15:04:05Z"
 }'
 ```
 
@@ -113,6 +121,8 @@ docker-compose logs app
 docker-compose logs mysql
 docker-compose logs phpmyadmin
 ```
+
+
 
 ## Conclusión
 

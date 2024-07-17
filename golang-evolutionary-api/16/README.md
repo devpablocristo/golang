@@ -62,12 +62,15 @@ Una vez que todos los contenedores estén en funcionamiento y la base de datos e
   - Body JSON:
     ```json
     {
-      "code": "1234",
-      "title": "Sample Item",
-      "description": "This is a sample item",
-      "price": 19.99,
-      "stock": 100,
-      "status": "available"
+      "id": 1,
+      "code": "ITEM001",
+      "title": "Example Item",
+      "description": "This is an example item",
+      "price": 29.99,
+      "stock": 50,
+      "status": "available",
+      "created_at": "2024-07-17T15:04:05Z",
+      "updated_at": "2024-07-17T15:04:05Z"
     }
     ```
 
@@ -79,12 +82,15 @@ Una vez que todos los contenedores estén en funcionamiento y la base de datos e
 
 ```sh
 curl -X POST http://localhost:8080/items -H "Content-Type: application/json" -d '{
-  "code": "1234",
-  "title": "Sample Item",
-  "description": "This is a sample item",
-  "price": 19.99,
-  "stock": 100,
-  "status": "available"
+  "id": 1,
+  "code": "ITEM001",
+  "title": "Example Item",
+  "description": "This is an example item",
+  "price": 29.99,
+  "stock": 50,
+  "status": "available",
+  "created_at": "2024-07-17T15:04:05Z",
+  "updated_at": "2024-07-17T15:04:05Z"
 }'
 ```
 
