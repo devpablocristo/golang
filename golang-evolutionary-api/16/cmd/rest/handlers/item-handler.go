@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -52,4 +53,37 @@ func (h *handler) ListItems(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, its)
+}
+
+// UpdateItem maneja la solicitud para actualizar un elemento existente
+func (h *handler) UpdateItem(c *gin.Context) {
+	var it item.Item
+	err := c.BindJSON(&it)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.core.UpdateItem(it); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, "item updated successfully")
+}
+
+// DeleteItem maneja la solicitud para eliminar un elemento
+func (h *handler) DeleteItem(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid item ID"})
+		return
+	}
+
+	if err := h.core.DeleteItem(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, "item deleted successfully")
 }

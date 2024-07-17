@@ -43,3 +43,17 @@ func (r *mysqlRepository) ListItems() (MapRepo, error) {
 
 	return items, nil
 }
+
+// UpdateItem actualiza un elemento existente en la base de datos MySQL
+func (r *mysqlRepository) UpdateItem(it *Item) error {
+	query := `UPDATE items SET code=?, title=?, description=?, price=?, stock=?, status=?, updated_at=? WHERE id=?`
+	_, err := r.db.Exec(query, it.Code, it.Title, it.Description, it.Price, it.Stock, it.Status, it.UpdatedAt, it.ID)
+	return err
+}
+
+// DeleteItem elimina un elemento de la base de datos MySQL
+func (r *mysqlRepository) DeleteItem(id int) error {
+	query := `DELETE FROM items WHERE id=?`
+	_, err := r.db.Exec(query, id)
+	return err
+}

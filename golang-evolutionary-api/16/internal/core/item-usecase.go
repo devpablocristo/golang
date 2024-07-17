@@ -38,3 +38,19 @@ func (u *ItemUsecase) ListItems() (item.MapRepo, error) {
 	}
 	return its, nil
 }
+
+// UpdateItem actualiza un elemento existente en el repositorio
+func (u *ItemUsecase) UpdateItem(it item.Item) error {
+	if err := u.repo.UpdateItem(&it); err != nil {
+		return fmt.Errorf("error updating item: %w", err)
+	}
+	return nil
+}
+
+// DeleteItem elimina un elemento del repositorio
+func (u *ItemUsecase) DeleteItem(id int) error {
+	if err := u.repo.DeleteItem(id); err != nil {
+		return fmt.Errorf("error deleting item: %w", err)
+	}
+	return nil
+}

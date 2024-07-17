@@ -32,3 +32,27 @@ func (r *Repository) SaveItem(it *Item) error {
 func (r *Repository) ListItems() (MapRepo, error) {
 	return r.items, nil
 }
+
+// UpdateItem actualiza un elemento existente en el repositorio
+func (r *Repository) UpdateItem(it *Item) error {
+	if it.ID == 0 {
+		return fmt.Errorf("item ID cannot be 0")
+	}
+	if _, exists := r.items[it.ID]; !exists {
+		return fmt.Errorf("item with ID %d does not exist", it.ID)
+	}
+	r.items[it.ID] = *it
+	return nil
+}
+
+// DeleteItem elimina un elemento del repositorio
+func (r *Repository) DeleteItem(id int) error {
+	if id == 0 {
+		return fmt.Errorf("item ID cannot be 0")
+	}
+	if _, exists := r.items[id]; !exists {
+		return fmt.Errorf("item with ID %d does not exist", id)
+	}
+	delete(r.items, id)
+	return nil
+}

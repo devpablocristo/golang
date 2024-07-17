@@ -32,6 +32,8 @@ func main() {
 	router := gin.Default()
 	router.POST("/items", handler.SaveItem)
 	router.GET("/items", handler.ListItems)
+	router.PUT("/items/:id", handler.UpdateItem)
+	router.DELETE("/items/:id", handler.DeleteItem)
 
 	// Iniciar servidor
 	log.Println("Server started at http://localhost:8080")

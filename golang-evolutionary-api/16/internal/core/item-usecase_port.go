@@ -6,4 +6,6 @@ import "api/internal/core/item"
 type ItemUsecasePort interface {
 	SaveItem(item.Item) error
 	ListItems() (item.MapRepo, error)
+	UpdateItem(item.Item) error
+	DeleteItem(int) error
 }
