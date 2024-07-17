@@ -8,9 +8,14 @@ package wire
 
 import (
 	"github.com/devpablocristo/qh/events/cmd/rest/handlers"
+	handler2 "github.com/devpablocristo/qh/events/cmd/rest/handlers/nimble-cin7"
 	"github.com/devpablocristo/qh/events/internal/core"
+	core2 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7"
+	"github.com/devpablocristo/qh/events/internal/core/nimble-cin7/cin7"
+	"github.com/devpablocristo/qh/events/internal/core/nimble-cin7/nimble"
 	"github.com/devpablocristo/qh/events/internal/core/user"
 	"github.com/devpablocristo/qh/events/internal/platform/cassandra"
+	"github.com/devpablocristo/qh/events/internal/platform/redis"
 	"github.com/devpablocristo/qh/events/pkg/init-setup"
 )
 
@@ -37,4 +42,28 @@ func InitializeAuthHandler() (*handler.AuthHandler, error) {
 	authUseCasePort := core.NewAuthUseCase(repositoryPort, string2)
 	authHandler := handler.NewAuthHandler(authUseCasePort)
 	return authHandler, nil
+}
+
+func InitializeNimbleHandler() (*handler2.NimbleHandler, error) {
+	redisClientPort, err := redissetup.NewRedisInstance()
+	if err != nil {
+		return nil, err
+	}
+	redisPort := nimble.NewRedisRepository(redisClientPort)
+	cin7RedisPort := cin7.NewRedisRepository(redisClientPort)
+	cin7UseCasePort := core2.NewCin7UseCase(cin7RedisPort)
+	nimbleUseCasePort := core2.NewNimbleUseCase(redisPort, cin7UseCasePort)
+	nimbleHandler := handler2.NewNimbleHandler(nimbleUseCasePort)
+	return nimbleHandler, nil
+}
+
+func InitializeCin7NimbleHandler() (*handler2.Cin7Handler, error) {
+	redisClientPort, err := redissetup.NewRedisInstance()
+	if err != nil {
+		return nil, err
+	}
+	redisPort := cin7.NewRedisRepository(redisClientPort)
+	cin7UseCasePort := core2.NewCin7UseCase(redisPort)
+	cin7Handler := handler2.NewCin7Handler(cin7UseCasePort)
+	return cin7Handler, nil
 }

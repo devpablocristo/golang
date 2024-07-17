@@ -3,16 +3,22 @@ package nimble
 import (
 	"time"
 
+	redisv8 "github.com/devpablocristo/qh/events/pkg/redis/v8"
+
 	cin7 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/cin7"
 )
 
-type Redis struct{}
-
-func NewNimbleRepository() RedisPort {
-	return &Redis{}
+type RedisRepository struct {
+	redisInst redisv8.RedisClientPort
 }
 
-func (r *Redis) CreateShipment(order Order) (cin7.Shipment, error) {
+func NewRedisRepository(inst redisv8.RedisClientPort) RedisPort {
+	return &RedisRepository{
+		redisInst: inst,
+	}
+}
+
+func (r *RedisRepository) CreateShipment(order Order) (cin7.Shipment, error) {
 	shmnt := toCin7Shipment(order)
 	shmnt.ShippedDate = time.Now().Format("2006-01-02")
 	return shmnt, nil

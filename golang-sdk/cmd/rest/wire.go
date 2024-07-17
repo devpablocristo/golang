@@ -10,6 +10,7 @@ import (
 	hnc7 "github.com/devpablocristo/qh/events/cmd/rest/handlers/nimble-cin7"
 	core "github.com/devpablocristo/qh/events/internal/core"
 	nc7 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7"
+	cin7 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/cin7"
 	nim "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/nimble"
 	usr "github.com/devpablocristo/qh/events/internal/core/user"
 	cass "github.com/devpablocristo/qh/events/internal/platform/cassandra"
@@ -41,11 +42,23 @@ func InitializeAuthHandler() (*hdl.AuthHandler, error) {
 func InitializeNimbleHandler() (*hnc7.NimbleHandler, error) {
 	wire.Build(
 		rd.NewRedisInstance,
-		nim.NewNimbleRepository,
+		nim.NewRedisRepository,
+		cin7.NewRedisRepository,
+		nc7.NewCin7UseCase,
 		nc7.NewNimbleUseCase,
 		hnc7.NewNimbleHandler,
 	)
 	return &hnc7.NimbleHandler{}, nil
+}
+
+func InitializeCin7NimbleHandler() (*hnc7.Cin7Handler, error) {
+	wire.Build(
+		rd.NewRedisInstance,
+		cin7.NewRedisRepository,
+		nc7.NewCin7UseCase,
+		hnc7.NewCin7Handler,
+	)
+	return &hnc7.Cin7Handler{}, nil
 }
 
 // integration
