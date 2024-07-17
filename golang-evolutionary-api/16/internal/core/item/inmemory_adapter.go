@@ -4,20 +4,20 @@ import (
 	"fmt"
 )
 
-// Repository es una implementación en memoria del repositorio de elementos
-type Repository struct {
+// MapRepository es una implementación en memoria del repositorio de elementos
+type MapRepository struct {
 	items MapRepo // Mapa de elementos
 }
 
-// NewRepository crea una nueva instancia de Repository
-func NewRepository() ItemRepositoryPort {
-	return &Repository{
+// NewMapRepository crea una nueva instancia de MapRepository
+func NewMapRepository() ItemRepositoryPort {
+	return &MapRepository{
 		items: make(MapRepo),
 	}
 }
 
 // SaveItem guarda un nuevo elemento en el repositorio
-func (r *Repository) SaveItem(it *Item) error {
+func (r *MapRepository) SaveItem(it *Item) error {
 	if it.ID == 0 {
 		return fmt.Errorf("item ID cannot be 0")
 	}
@@ -29,12 +29,12 @@ func (r *Repository) SaveItem(it *Item) error {
 }
 
 // ListItems lista todos los elementos en el repositorio
-func (r *Repository) ListItems() (MapRepo, error) {
+func (r *MapRepository) ListItems() (MapRepo, error) {
 	return r.items, nil
 }
 
 // UpdateItem actualiza un elemento existente en el repositorio
-func (r *Repository) UpdateItem(it *Item) error {
+func (r *MapRepository) UpdateItem(it *Item) error {
 	if it.ID == 0 {
 		return fmt.Errorf("item ID cannot be 0")
 	}
@@ -46,7 +46,7 @@ func (r *Repository) UpdateItem(it *Item) error {
 }
 
 // DeleteItem elimina un elemento del repositorio
-func (r *Repository) DeleteItem(id int) error {
+func (r *MapRepository) DeleteItem(id int) error {
 	if id == 0 {
 		return fmt.Errorf("item ID cannot be 0")
 	}

@@ -22,6 +22,10 @@ func main() {
 	// Inicializar repositorio con conexión a MySQL
 	repo := item.NewMySqlRepository(mysqlClient.DB())
 
+	// Inicializar repositorio inMemory
+	// Es intercambiable, por el polimorfismo con MySQL
+	// repo := item.NewMapRepository()
+
 	// Inicializar caso de uso
 	usecase := core.NewItemUsecase(repo)
 
