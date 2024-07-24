@@ -58,7 +58,7 @@ func InitializeNimbleHandler() (*handler3.NimbleHandler, error) {
 	return nimbleHandler, nil
 }
 
-func InitializeCin7NimbleHandler() (*handler3.Cin7Handler, error) {
+func InitializeCin7Handler() (*handler3.Cin7Handler, error) {
 	redisClientPort, err := redissetup.NewRedisInstance()
 	if err != nil {
 		return nil, err

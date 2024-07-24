@@ -1,8 +1,6 @@
 package mongodbdriver
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // MongoDBClientConfig contém a configuração necessária para se conectar a um banco de dados MongoDB
 type MongoDBClientConfig struct {
@@ -14,11 +12,16 @@ type MongoDBClientConfig struct {
 }
 
 // dsn gera o Data Source Name (DSN) a partir da configuração fornecida
+
 func (config MongoDBClientConfig) dsn() string {
-	if config.User != "" && config.Password != "" {
-		return fmt.Sprintf("mongodb://%s:%s@%s:%s/%s",
-			config.User, config.Password, config.Host, config.Port, config.Database)
-	}
-	return fmt.Sprintf("mongodb://%s:%s/%s",
-		config.Host, config.Port, config.Database)
+
+	dns := fmt.Sprintf("mongodb://%s:%s@%s:%s/%s?authMechanism=SCRAM-SHA-256",
+		config.User, config.Password, config.Host, config.Port, config.Database)
+
+	fmt.Println(dns)
+
+	return fmt.Sprintf("mongodb://%s:%s@%s:%s/%s?authMechanism=SCRAM-SHA-256",
+		config.User, config.Password, config.Host, config.Port, config.Database)
+
+	//return "mongodb://root:root@mongodb:27017"
 }

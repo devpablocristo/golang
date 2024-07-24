@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
 	is "github.com/devpablocristo/qh/events/pkg/init-setup"
-	mdhw "github.com/devpablocristo/qh/events/pkg/middleware"
 
-	wire "github.com/devpablocristo/qh/events/cmd/rest"
+	authroutes "github.com/devpablocristo/qh/events/cmd/rest/auth/routes"
+	monitoring "github.com/devpablocristo/qh/events/cmd/rest/monitoring"
+	nimroutes "github.com/devpablocristo/qh/events/cmd/rest/nimble-cin7/routes"
+	userroutes "github.com/devpablocristo/qh/events/cmd/rest/user/routes"
 	csd "github.com/devpablocristo/qh/events/internal/platform/cassandra"
 	cnsl "github.com/devpablocristo/qh/events/internal/platform/consul"
 	gin "github.com/devpablocristo/qh/events/internal/platform/gin"
@@ -25,15 +25,6 @@ func main() {
 	}
 	is.LogInfo("Application started with JWT secret key: %s", is.GetJWTSecretKey())
 	is.MicroLogInfo("Starting application...")
-
-	userHandler, err := wire.InitializeUserHandler()
-	if err != nil {
-		is.MicroLogError("userHandler error: %v", err)
-	}
-	authHandler, err := wire.InitializeAuthHandler()
-	if err != nil {
-		is.MicroLogError("authHandler error: %v", err)
-	}
 
 	// TODO: Probar stage
 	// stage
@@ -74,45 +65,18 @@ func main() {
 
 	r := ginInst.GetRouter()
 
-	api := r.Group("/api/v1")
-	{
-		api.POST("/login", authHandler.Login)
-	}
+	nimroutes.NimRoutes(r)
+	userroutes.UserRoutes(r)
+	authroutes.UserRoutes(r)
 
-	secret := "secret"
-	user := r.Group("/api/v1/user")
-	user.Use(mdhw.AuthMiddleware(secret))
-	{
-		user.GET(":id", userHandler.GetUser)
-	}
-
-	// TODO: Probar prometheus
-	// Ruta de Prometheus
-	r.GET("/metrics", ginInst.WrapH(promhttp.Handler()))
-
-	// Ruta de Salud
-	r.GET("/health", userHandler.Health)
-
-	// Integrar Go Micro y Gin
-	ms.GetService().Handle("/", r)
+	monitoring.MonitoringRestAPI(ginInst, ms)
 
 	if err := ginInst.RunServer(); err != nil {
 		is.MicroLogError("error starting Gin server: %v", err)
 	}
 
-	// TODO: handler nc7
 	// TODO: pyroscope
-	// TODO: config todo en wire
 	// TODO: probar pprof
-	// TODO: poner en el lugar correcto los rutas y normalizarlas
 	// TODO: implmentar multi-tenancy
-
-
-	//nimble-c7 integration
-
-	// r := gin.Default()
-	// config.LoadConfig()
-	// wire.SetupRoutes(r)
-	// r.Run()
 
 }
