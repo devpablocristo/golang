@@ -59,7 +59,7 @@ En esta configuración:
 
 ### Acceso a Mongo Express
 
-Puedes ver los usuarios en Mongo Express accediendo a: [http://localhost:8082/db/admin/system.users](http://localhost:8082/db/admin/system.users)
+Puedes ver los usuarios en Mongo Express accediendo a: [http://localhost:8083/db/admin/system.users](http://localhost:8083/db/admin/system.users)
 
 ### Acceso a la línea de comandos de MongoDB
 
@@ -82,7 +82,9 @@ db.createUser({
 })
 ```
 
-**Nota:** Probablmente sea necesario reiniciar el contenedor de la api (`app` en este caso).
+**Notas:** 
+- Probablmente sea necesario reiniciar el contenedor de la api (`app` en este caso).
+- Si hay problemas, eliminar los volumenes `docker volume rm $(docker volume ls -q)`.
 
 #### Paso 2: Definición de Configuración
 

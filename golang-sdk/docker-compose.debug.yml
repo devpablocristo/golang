@@ -28,7 +28,7 @@ services:
       - CONSUL_ID=${CONSUL_ID:-rest}
       - CONSUL_NAME=${CONSUL_NAME:-rest}
       - CONSUL_SERVICE_NAME=${CONSUL_SERVICE_NAME:-rest}
-      - CONSUL_HEALTH_CHECK=${CONSUL_HEALTH_CHECK:-http://rest:8080/health}
+      - CONSUL_HEALTH_CHECK=${CONSUL_HEALTH_CHECK:-http://rest:8080}/health}
       - CONSUL_CHECK_INTERVAL=${CONSUL_CHECK_INTERVAL:-10s}
       - CONSUL_CHECK_TIMEOUT=${CONSUL_CHECK_TIMEOUT:-1s}
       - CONSUL_PORT=${CONSUL_PORT:-8500}
@@ -68,12 +68,13 @@ services:
       - mongodb
     networks:
       - app-network
+    restart: on-failure
 
   postgres:
     image: postgres:16.3
     container_name: postgres
     ports:
-      - "${POSTGRES_HOST_PORT:-5432}:${POSTGRES_HOST_PORT:-5432}"
+      - "${POSTGRES_HOST_PORT:-5432}:${POSTGRES_TARGET_PORT:-5432}"
     environment:
       POSTGRES_DB: ${POSTGRES_DATABASE:-dev_events_db}
       POSTGRES_USER: ${POSTGRES_USERNAME:-postgres}
@@ -83,6 +84,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+    restart: on-failure
 
   pgadmin:
     image: dpage/pgadmin4:8.8
@@ -100,20 +102,22 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     networks:
       - app-network
+    restart: on-failure
 
   consul:
     image: consul:1.15.4
     container_name: consul
     ports:
-      - "${CONSUL_PORT:-8500}:${CONSUL_PORT:-8500}"
+      - "${CONSUL_PORT:-8500}:${CONSUL_TARGET_PORT:-8500}"
     networks:
       - app-network
+    restart: on-failure
 
   cassandra:
     image: cassandra:4.1
     container_name: cassandra
     ports:
-      - "${CASSANDRA_PORT:-9042}:${CASSANDRA_PORT:-9042}"
+      - "${CASSANDRA_PORT:-9042}:${CASSANDRA_TARGET_PORT:-9042}"
     environment:
       - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME:-CassandraCluster}
       - CASSANDRA_DC=${CASSANDRA_DC:-datacenter1}
@@ -126,6 +130,7 @@ services:
       - cassandra_data:/var/lib/cassandra
     networks:
       - app-network
+    restart: on-failure
 
   datastax-studio:
     image: datastax/dse-studio:6.8.32
@@ -138,20 +143,22 @@ services:
       - DS_LICENSE=accept  
     networks:
       - app-network    
+    restart: on-failure
 
   redis:
     image: redis:7.0
     container_name: redis
     ports:
-      - "${REDIS_PORT:-6379}:${REDIS_PORT:-6379}"
+      - "${REDIS_PORT:-6379}:${REDIS_TARGET_PORT:-6379}"
     networks:
       - app-network
+    restart: on-failure
 
   mysql:
     image: mysql:8.0
     container_name: mysql
     ports:
-      - "${MYSQL_PORT:-3306}:${MYSQL_PORT:-3306}"
+      - "${MYSQL_PORT:-3306}:${MYSQL_TARGET_PORT:-3306}"
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
       - MYSQL_DATABASE=${MYSQL_DATABASE:-dev_events_db}
@@ -159,12 +166,13 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - app-network
+    restart: on-failure
 
   phpmyadmin:
     image: phpmyadmin:5.2.1-apache
     container_name: phpmyadmin
     ports:
-      - "${PHPMYADMIN_PORT:-8082}:${PHPMYADMIN_PORT:-80}"
+      - "${PHPMYADMIN_PORT:-8082}:${PHPMYADMIN_TARGET_PORT:-80}"
     environment:
       - PMA_HOST=${PMA_HOST:-mysql}
       - PMA_USER=${MYSQL_USER:-root}
@@ -173,6 +181,7 @@ services:
       - mysql
     networks:
       - app-network
+    restart: on-failure
 
   prometheus:
     image: prom/prometheus:v2.45.6
@@ -180,29 +189,32 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "${PROMETHEUS_PORT:-9090}:${PROMETHEUS_PORT:-9090}"
+      - "${PROMETHEUS_PORT:-9090}:${PROMETHEUS_TARGET_PORT:-9090}"
     networks:
       - app-network
+    restart: on-failure
 
   grafana:
     image: grafana/grafana:10.2.8
     container_name: grafana
     ports:
-      - "${GRAFANA_PORT:-3000}:${GRAFANA_PORT:-3000}"
+      - "${GRAFANA_PORT:-3000}:${GRAFANA_TARGET_PORT:-3000}"
     depends_on:
       - prometheus
     networks:
       - app-network
+    restart: on-failure
 
   pyroscope:
     image: grafana/pyroscope:weekly-f76-feefa815b
     container_name: pyroscope
     ports:
-      - "${PYROSCOPE_PORT:-4040}:${PYROSCOPE_PORT:-4040}"
+      - "${PYROSCOPE_PORT:-4040}:${PYROSCOPE_TARGET_PORT:-4040}"
     volumes:
       - pyroscope_data:/var/lib/pyroscope
     networks:
       - app-network
+    restart: on-failure
 
   mongodb:
     image: mongo:5.0.28
@@ -211,11 +223,12 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-rootpassword}
     ports:
-      - "${MONGO_PORT:-27017}:${MONGO_PORT:-27017}"
+      - "${MONGO_PORT:-27017}:${MONGO_TARGET_PORT:-27017}"
     volumes:
       - mongodb_data:/data/db
     networks:
       - app-network
+    restart: on-failure
 
   mongo-express:
     image: mongo-express:1.0.2-20-alpine3.19
@@ -224,12 +237,14 @@ services:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
       - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-rootpassword}
       - ME_CONFIG_MONGODB_SERVER=${MONGO_HOST:-mongodb}
+      - ME_CONFIG_MONGODB_URL=${ME_CONFIG_MONGODB_URL:-mongodb://root:rootpassword@mongodb:27017}/}
     ports:
-      - "${MONGO_EXPRESS_PORT:-8083}:${MONGO_EXPRESS_PORT:-8081}"
+      - "${ME_PORT:-8083}:${ME_TARGET_PORT:-8081}"
     depends_on:
       - mongodb
     networks:
       - app-network
+    restart: on-failure
 
 networks:
   app-network:
