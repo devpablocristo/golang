@@ -100,6 +100,14 @@ func main() {
 		is.MicroLogError("error starting Gin server: %v", err)
 	}
 
+	// TODO: handler nc7
+	// TODO: pyroscope
+	// TODO: config todo en wire
+	// TODO: probar pprof
+	// TODO: poner en el lugar correcto los rutas y normalizarlas
+	// TODO: implmentar multi-tenancy
+
+
 	//nimble-c7 integration
 
 	// r := gin.Default()

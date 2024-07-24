@@ -7,8 +7,9 @@
 package wire
 
 import (
-	"github.com/devpablocristo/qh/events/cmd/rest/handlers"
-	handler2 "github.com/devpablocristo/qh/events/cmd/rest/handlers/nimble-cin7"
+	handler2 "github.com/devpablocristo/qh/events/cmd/rest/auth/handlers"
+	handler3 "github.com/devpablocristo/qh/events/cmd/rest/nimble-cin7/handlers"
+	"github.com/devpablocristo/qh/events/cmd/rest/user/handlers"
 	"github.com/devpablocristo/qh/events/internal/core"
 	core2 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7"
 	"github.com/devpablocristo/qh/events/internal/core/nimble-cin7/cin7"
@@ -32,7 +33,7 @@ func InitializeUserHandler() (*handler.UserHandler, error) {
 	return userHandler, nil
 }
 
-func InitializeAuthHandler() (*handler.AuthHandler, error) {
+func InitializeAuthHandler() (*handler2.AuthHandler, error) {
 	cassandraClientPort, err := cassandrasetup.NewCassandraInstance()
 	if err != nil {
 		return nil, err
@@ -40,11 +41,11 @@ func InitializeAuthHandler() (*handler.AuthHandler, error) {
 	repositoryPort := user.NewUserRepository(cassandraClientPort)
 	string2 := initsetup.GetJWTSecretKey()
 	authUseCasePort := core.NewAuthUseCase(repositoryPort, string2)
-	authHandler := handler.NewAuthHandler(authUseCasePort)
+	authHandler := handler2.NewAuthHandler(authUseCasePort)
 	return authHandler, nil
 }
 
-func InitializeNimbleHandler() (*handler2.NimbleHandler, error) {
+func InitializeNimbleHandler() (*handler3.NimbleHandler, error) {
 	redisClientPort, err := redissetup.NewRedisInstance()
 	if err != nil {
 		return nil, err
@@ -53,17 +54,17 @@ func InitializeNimbleHandler() (*handler2.NimbleHandler, error) {
 	cin7RedisPort := cin7.NewRedisRepository(redisClientPort)
 	cin7UseCasePort := core2.NewCin7UseCase(cin7RedisPort)
 	nimbleUseCasePort := core2.NewNimbleUseCase(redisPort, cin7UseCasePort)
-	nimbleHandler := handler2.NewNimbleHandler(nimbleUseCasePort)
+	nimbleHandler := handler3.NewNimbleHandler(nimbleUseCasePort)
 	return nimbleHandler, nil
 }
 
-func InitializeCin7NimbleHandler() (*handler2.Cin7Handler, error) {
+func InitializeCin7NimbleHandler() (*handler3.Cin7Handler, error) {
 	redisClientPort, err := redissetup.NewRedisInstance()
 	if err != nil {
 		return nil, err
 	}
 	redisPort := cin7.NewRedisRepository(redisClientPort)
 	cin7UseCasePort := core2.NewCin7UseCase(redisPort)
-	cin7Handler := handler2.NewCin7Handler(cin7UseCasePort)
+	cin7Handler := handler3.NewCin7Handler(cin7UseCasePort)
 	return cin7Handler, nil
 }

@@ -6,37 +6,42 @@ package wire
 import (
 	"github.com/google/wire"
 
-	hdl "github.com/devpablocristo/qh/events/cmd/rest/handlers"
-	hnc7 "github.com/devpablocristo/qh/events/cmd/rest/handlers/nimble-cin7"
+	hauth "github.com/devpablocristo/qh/events/cmd/rest/auth/handlers"
+	hnc7 "github.com/devpablocristo/qh/events/cmd/rest/nimble-cin7/handlers"
+	husr "github.com/devpablocristo/qh/events/cmd/rest/user/handlers"
+
 	core "github.com/devpablocristo/qh/events/internal/core"
+
 	nc7 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7"
 	cin7 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/cin7"
 	nim "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/nimble"
+
 	usr "github.com/devpablocristo/qh/events/internal/core/user"
+
 	cass "github.com/devpablocristo/qh/events/internal/platform/cassandra"
 	rd "github.com/devpablocristo/qh/events/internal/platform/redis"
 	is "github.com/devpablocristo/qh/events/pkg/init-setup"
 )
 
-func InitializeUserHandler() (*hdl.UserHandler, error) {
+func InitializeUserHandler() (*husr.UserHandler, error) {
 	wire.Build(
 		cass.NewCassandraInstance,
 		usr.NewUserRepository,
 		core.NewUserUseCase,
-		hdl.NewUserHandler,
+		husr.NewUserHandler,
 	)
-	return &hdl.UserHandler{}, nil
+	return &husr.UserHandler{}, nil
 }
 
-func InitializeAuthHandler() (*hdl.AuthHandler, error) {
+func InitializeAuthHandler() (*hauth.AuthHandler, error) {
 	wire.Build(
 		cass.NewCassandraInstance,
 		usr.NewUserRepository,
 		core.NewAuthUseCase,
 		is.GetJWTSecretKey,
-		hdl.NewAuthHandler,
+		hauth.NewAuthHandler,
 	)
-	return &hdl.AuthHandler{}, nil
+	return &hauth.AuthHandler{}, nil
 }
 
 func InitializeNimbleHandler() (*hnc7.NimbleHandler, error) {
