@@ -15,5 +15,4 @@ func MonitoringRestAPI(ginInst gingonic.GinClientPort, ms gmw.GoMicroClientPort)
 
 	// Integrar Go Micro y Gin
 	ms.GetService().Handle("/", r)
-
 }
