@@ -3,11 +3,11 @@ package monitoring
 import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	gingonic "github.com/devpablocristo/qh/events/pkg/gin-gonic/gin"
+	gnic "github.com/devpablocristo/qh/events/pkg/gin-gonic/gin"
 	gmw "github.com/devpablocristo/qh/events/pkg/go-micro-web"
 )
 
-func MonitoringRestAPI(ginInst gingonic.GinClientPort, ms gmw.GoMicroClientPort) {
+func MonitoringRestAPI(ginInst gnic.GinClientPort, ms gmw.GoMicroClientPort) {
 	r := ginInst.GetRouter()
 
 	// TODO: Probar prometheus

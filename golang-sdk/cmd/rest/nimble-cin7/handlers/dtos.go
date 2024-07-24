@@ -2,7 +2,7 @@ package handler
 
 import (
 	cin7 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/cin7"
-	nimble "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/nimble"
+	nim "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/nimble"
 )
 
 type OrderReq struct {
@@ -23,16 +23,16 @@ type ShipmentReq struct {
 	Items       []ItemReq `json:"items"`
 }
 
-func ToNimbleOrder(orderReq OrderReq) nimble.Order {
-	items := make([]nimble.Item, len(orderReq.Items))
+func ToNimbleOrder(orderReq OrderReq) nim.Order {
+	items := make([]nim.Item, len(orderReq.Items))
 	for i, itemReq := range orderReq.Items {
-		items[i] = nimble.Item{
+		items[i] = nim.Item{
 			ItemID:   itemReq.ItemID,
 			Quantity: itemReq.Quantity,
 		}
 	}
 
-	return nimble.Order{
+	return nim.Order{
 		OrderID:      orderReq.OrderID,
 		CustomerName: orderReq.CustomerName,
 		Items:        items,

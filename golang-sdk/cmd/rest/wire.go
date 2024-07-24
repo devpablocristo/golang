@@ -16,7 +16,7 @@ import (
 	usr "github.com/devpablocristo/qh/events/internal/core/user"
 	cass "github.com/devpablocristo/qh/events/internal/platform/cassandra"
 	rd "github.com/devpablocristo/qh/events/internal/platform/redis"
-	is "github.com/devpablocristo/qh/events/pkg/init-setup"
+	is "github.com/devpablocristo/qh/events/pkg/init-setup"  
 )
 
 func InitializeUserHandler() (*husr.UserHandler, error) {

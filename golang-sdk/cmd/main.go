@@ -5,10 +5,10 @@ import (
 
 	is "github.com/devpablocristo/qh/events/pkg/init-setup"
 
-	authroutes "github.com/devpablocristo/qh/events/cmd/rest/auth/routes"
-	monitoring "github.com/devpablocristo/qh/events/cmd/rest/monitoring"
-	nimroutes "github.com/devpablocristo/qh/events/cmd/rest/nimble-cin7/routes"
-	userroutes "github.com/devpablocristo/qh/events/cmd/rest/user/routes"
+	arts "github.com/devpablocristo/qh/events/cmd/rest/auth/routes"
+	mon "github.com/devpablocristo/qh/events/cmd/rest/monitoring"
+	nrts "github.com/devpablocristo/qh/events/cmd/rest/nimble-cin7/routes"
+	urts "github.com/devpablocristo/qh/events/cmd/rest/user/routes"
 	csd "github.com/devpablocristo/qh/events/internal/platform/cassandra"
 	cnsl "github.com/devpablocristo/qh/events/internal/platform/consul"
 	gin "github.com/devpablocristo/qh/events/internal/platform/gin"
@@ -65,11 +65,11 @@ func main() {
 
 	r := ginInst.GetRouter()
 
-	nimroutes.NimRoutes(r)
-	userroutes.UserRoutes(r)
-	authroutes.UserRoutes(r)
+	nrts.NimRoutes(r)
+	urts.UserRoutes(r)
+	arts.UserRoutes(r)
 
-	monitoring.MonitoringRestAPI(ginInst, ms)
+	mon.MonitoringRestAPI(ginInst, ms)
 
 	if err := ginInst.RunServer(); err != nil {
 		is.MicroLogError("error starting Gin server: %v", err)
