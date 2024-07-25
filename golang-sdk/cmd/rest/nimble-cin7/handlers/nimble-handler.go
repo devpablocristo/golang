@@ -32,6 +32,6 @@ func (h *NimbleHandler) OrderShipment(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success"})
 }
 
-func (h *NimbleHandler) NimPing(c *gin.Context) {
-	c.String(http.StatusOK, "pong")
+func (h *NimbleHandler) NimblePing(c *gin.Context) {
+	c.String(http.StatusOK, "nimble pong")
 }
