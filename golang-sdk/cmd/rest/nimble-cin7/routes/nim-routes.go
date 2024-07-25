@@ -13,6 +13,6 @@ func NimRoutes(r *gin.Engine) {
 		is.MicroLogError("nimHandler error: %v", err)
 	}
 
+	r.GET("/nim-ping", nimHandler.NimPing)
 	r.POST("/order-shipment", nimHandler.OrderShipment)
-
 }

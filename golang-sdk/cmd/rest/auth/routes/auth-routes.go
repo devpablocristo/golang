@@ -7,7 +7,7 @@ import (
 	is "github.com/devpablocristo/qh/events/pkg/init-setup"
 )
 
-func UserRoutes(r *gin.Engine) {
+func AuthRoutes(r *gin.Engine) {
 	authHandler, err := wire.InitializeAuthHandler()
 	if err != nil {
 		is.MicroLogError("authHandler error: %v", err)

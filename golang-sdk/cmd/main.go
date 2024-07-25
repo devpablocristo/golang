@@ -67,7 +67,7 @@ func main() {
 
 	nrts.NimRoutes(r)
 	urts.UserRoutes(r)
-	arts.UserRoutes(r)
+	arts.AuthRoutes(r)
 
 	mon.MonitoringRestAPI(ginInst, ms)
 
