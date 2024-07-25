@@ -245,6 +245,20 @@ services:
     networks:
       - app-network
     restart: on-failure
+  
+  ngrok:
+    image: ngrok/ngrok:3.13.0-alpine-91be825
+    container_name: ngrok
+    command: ["start", "--all", "--config", "/etc/ngrok.yml"]
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - "${NGROK_PORT:-5050}:${NGROK_TARGET_PORT:-5050}"
+    networks:
+      - app-network
+    depends_on:  
+      - rest
+    restart: on-failure
 
 networks:
   app-network:
