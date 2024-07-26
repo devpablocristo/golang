@@ -1,4 +1,4 @@
-## Documentación Postgres
+## Documentación PostgreSQL
 
 En PostgreSQL, no hay un nombre de usuario y contraseña por defecto. Sin embargo, cuando instalas PostgreSQL, suele crearse un usuario administrador llamado postgres sin contraseña, o bien con una contraseña que el usuario debe definir durante la instalación. En esta API se configura la contraseña
 "root" para el super usuario "postgres".
