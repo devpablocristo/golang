@@ -1,4 +1,3 @@
-
 # Protocol buffers
  # A little example about protobuf and Golang
 
