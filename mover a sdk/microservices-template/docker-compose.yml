@@ -1,0 +1,55 @@
+version: "3.7"
+services:
+  postgres:
+    image: "postgres:13.2"
+  redis:
+    image: "redis:6.2.3"
+  nginx:
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - "8080:80"
+  mysql:
+    image: "mysql:8.0.2"
+  mongodb:
+    image: "mongo:4.4.6"
+  express:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./express
+    volumes:
+      - /app/node_modules
+      - ./express:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  gin-gonic:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./gin-gonic
+    volumes:
+      - ./gin-gonic:/app
+  react:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./react
+    volumes:
+      - /app/node_modules
+      - ./react:/app
+  worker:
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
