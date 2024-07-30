@@ -14,7 +14,7 @@ import (
 	gin "github.com/devpablocristo/qh/events/internal/platform/gin"
 	gmw "github.com/devpablocristo/qh/events/internal/platform/go-micro-web"
 	mysql "github.com/devpablocristo/qh/events/internal/platform/mysql"
-	pgts "github.com/devpablocristo/qh/events/internal/platform/postgres"
+	pgts "github.com/devpablocristo/qh/events/internal/platform/postgresql/pqxpool"
 	redis "github.com/devpablocristo/qh/events/internal/platform/redis"
 	stg "github.com/devpablocristo/qh/events/internal/platform/stage"
 )
