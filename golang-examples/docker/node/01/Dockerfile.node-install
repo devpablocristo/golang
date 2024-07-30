@@ -1,8 +1,0 @@
-FROM node:15.0.1-alpine3.11
-
-#crea la app básica
-RUN npm install -g create-react-app@4.0.0
-
-RUN mkdir /app
-WORKDIR /app
-ADD . /app
