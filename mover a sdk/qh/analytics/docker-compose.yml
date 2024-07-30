@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  api:
+    container_name: ${APP_NAME:-analytics}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - ${ROUTER_PORT:-8080}:${ROUTER_PORT:-8080}
+    volumes:
+      - type: bind
+        source: ./
+        target: /app
+    environment:
+      - APP_NAME=${APP_NAME:-analytics}
+      - DEBUG=false
+
+networks:
+  default:
+

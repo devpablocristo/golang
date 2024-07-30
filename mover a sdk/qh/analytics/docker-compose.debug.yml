@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  api:
+    container_name: ${APP_NAME:-analytics}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - ${ROUTER_PORT:-8080}:${ROUTER_PORT:-8080}
+      - ${DELVE_PORT:-2345}:${DELVE_PORT:-2345}
+    volumes:
+      - type: bind
+        source: ./
+        target: /app
+    environment:
+      - APP_NAME=${APP_NAME:-analytics}
+      - DEBUG=true
+
+networks:
+  default:

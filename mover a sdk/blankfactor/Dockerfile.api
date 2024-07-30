@@ -1,0 +1,30 @@
+# build stage
+FROM golang:1.19.2-alpine3.16 AS builder 
+RUN apk update
+
+WORKDIR /app
+
+RUN apk add --no-cache git upx
+
+COPY ["go.mod", "go.sum", "./"]
+RUN go mod download && go mod verify
+
+COPY . .
+    
+RUN go build \
+    -ldflags="-s -w" \
+    -o ./eve-srv -v ./cmd
+
+RUN upx eve-srv
+
+# final stage
+FROM alpine:3.16 
+LABEL Name=eve-srv Version=0.1
+RUN apk update
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /app
+
+COPY --from=builder /app .
+
+ENTRYPOINT ["./eve-srv"]

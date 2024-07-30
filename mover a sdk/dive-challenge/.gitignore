@@ -1,0 +1,33 @@
+# Ignore binaries and compiled files
+bin/
+pkg/
+app/main/bin/
+
+# Ignore local configuration files
+# .env
+
+# Ignore system-generated files and directories
+**/.DS_Store
+**/Thumbs.db
+
+# Ignore dependency directories
+vendor/
+node_modules/
+
+# Ignore temporary editor files
+*~
+*.swp
+*.swo
+
+# Ignore log files
+*.log
+
+# Ignore coverage test files
+*.out
+
+# Ignore build files
+build/
+dist/
+
+# History
+.history

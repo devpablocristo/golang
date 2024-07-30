@@ -1,0 +1,21 @@
+# Ignore unnecessary files and directories
+.git
+.gitignore
+.dockerignore
+.env
+Dockerfile*
+docker-compose*.yml
+README.md
+
+# Go-specific directories
+bin/
+pkg/
+app/main/bin/
+
+# Ignore system-generated files and directories
+**/.DS_Store
+**/Thumbs.db
+
+# Ignore dependency directories
+vendor/
+node_modules/
