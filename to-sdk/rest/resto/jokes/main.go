@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
-	jwt "github.com/dgrijalva/jwt-go"
+	jwt "github.com/form3tech-oss/jwt-go"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
@@ -38,20 +38,19 @@ type Joke struct {
 	Joke  string `json:"joke" binding:"required"`
 }
 
-/** we'll create a list of jokes */
 var jokes = []Joke{
-	Joke{1, 0, "Did you hear about the restaurant on the moon? Great food, no atmosphere."},
-	Joke{2, 0, "What do you call a fake noodle? An Impasta."},
-	Joke{3, 0, "How many apples grow on a tree? All of them."},
-	Joke{4, 0, "Want to hear a joke about paper? Nevermind it's tearable."},
-	Joke{5, 0, "I just watched a program about beavers. It was the best dam program I've ever seen."},
-	Joke{6, 0, "Why did the coffee file a police report? It got mugged."},
-	Joke{7, 0, "How does a penguin build it's house? Igloos it together."},
-	Joke{8, 0, "Dad, did you get a haircut? No I got them all cut."},
-	Joke{9, 0, "What do you call a Mexican who has lost his car? Carlos."},
-	Joke{10, 0, "Dad, can you put my shoes on? No, I don't think they'll fit me."},
-	Joke{11, 0, "Why did the scarecrow win an award? Because he was outstanding in his field."},
-	Joke{12, 0, "Why don't skeletons ever go trick or treating? Because they have no body to go with."},
+	{ID: 1, Likes: 0, Joke: "Did you hear about the restaurant on the moon? Great food, no atmosphere."},
+	{ID: 2, Likes: 0, Joke: "What do you call a fake noodle? An Impasta."},
+	{ID: 3, Likes: 0, Joke: "How many apples grow on a tree? All of them."},
+	{ID: 4, Likes: 0, Joke: "Want to hear a joke about paper? Nevermind it's tearable."},
+	{ID: 5, Likes: 0, Joke: "I just watched a program about beavers. It was the best dam program I've ever seen."},
+	{ID: 6, Likes: 0, Joke: "Why did the coffee file a police report? It got mugged."},
+	{ID: 7, Likes: 0, Joke: "How does a penguin build its house? Igloos it together."},
+	{ID: 8, Likes: 0, Joke: "Dad, did you get a haircut? No I got them all cut."},
+	{ID: 9, Likes: 0, Joke: "What do you call a Mexican who has lost his car? Carlos."},
+	{ID: 10, Likes: 0, Joke: "Dad, can you put my shoes on? No, I don't think they'll fit me."},
+	{ID: 11, Likes: 0, Joke: "Why did the scarecrow win an award? Because he was outstanding in his field."},
+	{ID: 12, Likes: 0, Joke: "Why don't skeletons ever go trick or treating? Because they have no body to go with."},
 }
 
 var jwtMiddleWare *jwtmiddleware.JWTMiddleware
@@ -62,31 +61,27 @@ func main() {
 			aud := os.Getenv("AUTH0_API_AUDIENCE")
 			checkAudience := token.Claims.(jwt.MapClaims).VerifyAudience(aud, false)
 			if !checkAudience {
-				return token, errors.New("Invalid audience.")
+				return nil, errors.New("invalid audience")
 			}
-			// verify iss claim
 			iss := os.Getenv("AUTH0_DOMAIN")
 			checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, false)
 			if !checkIss {
-				return token, errors.New("Invalid issuer.")
+				return nil, errors.New("invalid issuer")
 			}
 
 			cert, err := getPemCert(token)
 			if err != nil {
-				log.Fatalf("could not get cert: %+v", err)
+				return nil, fmt.Errorf("could not get cert: %v", err)
 			}
 
-			result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
-			return result, nil
+			return jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
 		},
 		SigningMethod: jwt.SigningMethodRS256,
 	})
 
 	jwtMiddleWare = jwtMiddleware
-	// Set the router as the default one shipped with Gin
-	router := gin.Default()
 
-	// Serve the frontend
+	router := gin.Default()
 	router.Use(static.Serve("/", static.LocalFile("./views", true)))
 
 	api := router.Group("/api")
@@ -99,8 +94,8 @@ func main() {
 		api.GET("/jokes", authMiddleware(), JokeHandler)
 		api.POST("/jokes/like/:jokeID", authMiddleware(), LikeJoke)
 	}
-	// Start the app
-	router.Run(":3000")
+
+	log.Fatal(router.Run(":3000"))
 }
 
 func getPemCert(token *jwt.Token) (string, error) {
@@ -111,72 +106,59 @@ func getPemCert(token *jwt.Token) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	var jwks = Jwks{}
-	err = json.NewDecoder(resp.Body).Decode(&jwks)
-
-	if err != nil {
+	var jwks Jwks
+	if err := json.NewDecoder(resp.Body).Decode(&jwks); err != nil {
 		return cert, err
 	}
 
-	x5c := jwks.Keys[0].X5c
-	for k, v := range x5c {
-		if token.Header["kid"] == jwks.Keys[k].Kid {
-			cert = "-----BEGIN CERTIFICATE-----\n" + v + "\n-----END CERTIFICATE-----"
+	for _, key := range jwks.Keys {
+		if token.Header["kid"] == key.Kid {
+			return fmt.Sprintf("-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----", key.X5c[0]), nil
 		}
 	}
 
-	if cert == "" {
-		return cert, errors.New("unable to find appropriate key")
-	}
-
-	return cert, nil
+	return cert, errors.New("unable to find appropriate key")
 }
 
-// authMiddleware intercepts the requests, and check for a valid jwt token
 func authMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Get the client secret key
 		err := jwtMiddleWare.CheckJWT(c.Writer, c.Request)
 		if err != nil {
-			// Token not found
-			fmt.Println(err)
-			c.Abort()
-			c.Writer.WriteHeader(http.StatusUnauthorized)
-			c.Writer.Write([]byte("Unauthorized"))
+			c.AbortWithStatusJSON(http.StatusUnauthorized, Response{Message: "Unauthorized"})
 			return
 		}
+		c.Next()
 	}
 }
 
-// JokeHandler returns a list of jokes available (in memory)
 func JokeHandler(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
-
 	c.JSON(http.StatusOK, jokes)
 }
 
 func LikeJoke(c *gin.Context) {
-	// Check joke ID is valid
-	if jokeid, err := strconv.Atoi(c.Param("jokeID")); err == nil {
-		// find joke and increment likes
-		for i := 0; i < len(jokes); i++ {
-			if jokes[i].ID == jokeid {
-				jokes[i].Likes = jokes[i].Likes + 1
-			}
-		}
-		c.JSON(http.StatusOK, &jokes)
-	} else {
-		// the jokes ID is invalid
+	jokeID, err := strconv.Atoi(c.Param("jokeID"))
+	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
+		return
 	}
+
+	for i := range jokes {
+		if jokes[i].ID == jokeID {
+			jokes[i].Likes++
+			c.JSON(http.StatusOK, jokes[i])
+			return
+		}
+	}
+
+	c.AbortWithStatus(http.StatusNotFound)
 }
 
-// getJokesByID returns a single joke
-func getJokesByID(id int) (*Joke, error) {
+func getJokeByID(id int) (*Joke, error) {
 	for _, joke := range jokes {
 		if joke.ID == id {
 			return &joke, nil
 		}
 	}
-	return nil, errors.New("Joke not found")
+	return nil, errors.New("joke not found")
 }

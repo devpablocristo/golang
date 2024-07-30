@@ -1,1 +1,0 @@
-Aqui se actualiza el schema de la bbdd.

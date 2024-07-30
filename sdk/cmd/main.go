@@ -79,4 +79,12 @@ func main() {
 	// TODO: probar pprof
 	// TODO: implmentar multi-tenancy
 
+	// TODO: implementar context, como este ejemplo:
+	// Crea un contexto con un tiempo de espera de 50 segundos.
+	// El contexto se utiliza para definir cuánto tiempo debe esperar el programa
+	// antes de que una operación de MongoDB se considere fallida. defer cancel()
+	// garantiza que el contexto se cancele cuando la función main termine.
+	// ctx, cancel := context.WithTimeout(context.Background(), 50*time.Second)
+	// defer cancel()
+
 }
