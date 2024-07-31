@@ -1,4 +1,5 @@
-package application
+// TODO: REHACER!!!!! CAMBIAR!!! NORMALIZAR!!!!
+package initsetup
 
 import (
 	"fmt"
