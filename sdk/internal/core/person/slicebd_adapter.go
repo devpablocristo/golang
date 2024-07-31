@@ -1,4 +1,4 @@
-package slicedb
+package person
 
 import (
 	"context"

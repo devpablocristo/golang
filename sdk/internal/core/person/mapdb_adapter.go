@@ -1,34 +1,32 @@
-package mapdb
+package person
 
 import (
 	"context"
-
-	domain "github.com/devpablocristo/golang/06-projects/qh/person/domain"
 )
 
 type MapDB struct {
-	mDB map[string]*domain.Person
+	mDB map[string]*Person
 }
 
 func NewMapDB() *MapDB {
-	m := make(map[string]*domain.Person)
+	m := make(map[string]*Person)
 	return &MapDB{
 		mDB: m,
 	}
 }
 
-func (m *MapDB) SavePerson(ctx context.Context, p *domain.Person) error {
+func (m *MapDB) SavePerson(ctx context.Context, p *Person) error {
 	m.mDB[p.UUID] = p
 	return nil
 }
 
-func (m *MapDB) GetPerson(ctx context.Context, UUID string) (*domain.Person, error) {
+func (m *MapDB) GetPerson(ctx context.Context, UUID string) (*Person, error) {
 	p := m.mDB[UUID]
 	return p, nil
 }
 
-func (m *MapDB) ListPersons(ctx context.Context) map[string]*domain.Person {
-	// var results []domain.Person
+func (m *MapDB) ListPersons(ctx context.Context) map[string]*Person {
+	// var results []Person
 	// for _, person := range m.mDB {
 	// 	results = append(results, *person)
 	// }

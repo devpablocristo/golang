@@ -1,11 +1,22 @@
-package application
+package core
 
 import (
 	"context"
 
-	"github.com/devpablocristo/golang/06-projects/qh/person/application/port"
-	"github.com/devpablocristo/golang/06-projects/qh/person/domain"
+	"github.com/devpablocristo/golang/06-apps/qh/person/domain"
+	"github.com/devpablocristo/qh/events/internal/core/person"
+	"github.com/devpablocristo/qh/events/internal/core/user FIX/application/port"
 )
+
+type UseCasePort interface {
+	CreatePerson(context.Context, person.Person) error
+	// DeletePerson(context.Context, string) error
+	// HardDeletePerson(context.Context, string) (person.Person, error)
+	// UpdatePerson(context.Context, person.Person, string) (person.Person, error)
+	// RevivePerson(context.Context, string) (person.Person, error)
+	// GetPerson(context.Context, string) (*person.Person, error)
+	// ListPersons(context.Context) ([]person.Person, error)
+}
 
 type PersonService struct {
 	storage port.Storage

@@ -1,4 +1,4 @@
-package ctypes
+package event
 
 import (
 	"fmt"

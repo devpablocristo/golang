@@ -10,6 +10,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type AuthUseCasePort interface {
+	Login(context.Context, string, string) (string, error)
+}
+
 type authUseCase struct {
 	userRepo  user.RepositoryPort
 	secretKey string

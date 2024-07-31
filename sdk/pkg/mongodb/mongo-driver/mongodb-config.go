@@ -2,18 +2,25 @@ package mongodbdriver
 
 import "fmt"
 
-// MongoDBClientConfig contém a configuração necessária para se conectar a um banco de dados MongoDB
+// MongoDBClientConfig representa a configuração necessária para conectar ao MongoDB
 type MongoDBClientConfig struct {
-	User     string // Usuário do banco de dados
-	Password string // Senha do usuário
-	Host     string // Host onde o banco de dados está localizado
-	Port     string // Porta na qual o banco de dados está ouvindo
-	Database string // Nome do banco de dados
+	User     string
+	Password string
+	Host     string
+	Port     string
+	Database string
 }
 
-// dsn gera o Data Source Name (DSN) a partir da configuração fornecida
-
+// dsn retorna a string de conexão para o MongoDB
 func (config MongoDBClientConfig) dsn() string {
-	return fmt.Sprintf("mongodb://%s:%s@%s:%s/%s?authMechanism=SCRAM-SHA-256",
+	return fmt.Sprintf("mongodb://%s:%s@%s:%s/%s",
 		config.User, config.Password, config.Host, config.Port, config.Database)
+}
+
+// Validate verifica se a configuração do MongoDB está completa
+func (config MongoDBClientConfig) Validate() error {
+	if config.User == "" || config.Password == "" || config.Host == "" || config.Port == "" || config.Database == "" {
+		return fmt.Errorf("incomplete MongoDB configuration")
+	}
+	return nil
 }

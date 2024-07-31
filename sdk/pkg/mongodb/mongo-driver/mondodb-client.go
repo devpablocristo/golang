@@ -3,31 +3,49 @@ package mongodbdriver
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var (
+	instance MongoDBClientPort
+	once     sync.Once
+	errInit  error
+)
+
 // MongoDBClient representa um cliente para interagir com um banco de dados MongoDB
 type MongoDBClient struct {
-	config MongoDBClientConfig // Configuração do cliente MongoDB
-	db     *mongo.Database     // Conexão com o banco de dados
+	db *mongo.Database
 }
 
-// NewMongoDBClient cria uma nova instância de MongoDBClient e estabelece a conexão com o banco de dados
-func NewMongoDBClient(config MongoDBClientConfig) (*MongoDBClient, error) {
-	client := &MongoDBClient{config: config}
-	err := client.connect()
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize MongoDBClient: %v", err)
+// InitializeMongoDBClient inicializa o cliente MongoDB usando o padrão singleton
+func InitializeMongoDBClient(config MongoDBClientConfig) error {
+	once.Do(func() {
+		client := &MongoDBClient{}
+		errInit = client.connect(config)
+		if errInit != nil {
+			instance = nil
+		} else {
+			instance = client
+		}
+	})
+	return errInit
+}
+
+// GetMongoDBInstance retorna a instância do cliente MongoDB
+func GetMongoDBInstance() (MongoDBClientPort, error) {
+	if instance == nil {
+		return nil, fmt.Errorf("MongoDB client is not initialized")
 	}
-	return client, nil
+	return instance, nil
 }
 
-// connect establece la conexión con la base de datos MongoDB utilizando la configuración proporcionada
-func (client *MongoDBClient) connect() error {
-	dsn := client.config.dsn()
+// connect estabelece a conexão com o banco de dados MongoDB utilizando a configuração fornecida
+func (client *MongoDBClient) connect(config MongoDBClientConfig) error {
+	dsn := config.dsn()
 	clientOptions := options.Client().ApplyURI(dsn)
 
 	conn, err := mongo.Connect(context.TODO(), clientOptions)
@@ -35,7 +53,7 @@ func (client *MongoDBClient) connect() error {
 		return fmt.Errorf("failed to connect to MongoDB: %w", err)
 	}
 
-	// Verificar la conexión
+	// Verificar a conexão
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -44,18 +62,19 @@ func (client *MongoDBClient) connect() error {
 		return fmt.Errorf("failed to ping MongoDB: %w", err)
 	}
 
-	client.db = conn.Database(client.config.Database)
+	client.db = conn.Database(config.Database)
 	return nil
 }
 
-// Close cierra la conexión con la base de datos MongoDB
+// Close fecha a conexão com o banco de dados MongoDB
 func (client *MongoDBClient) Close() {
 	if client.db != nil {
 		client.db.Client().Disconnect(context.TODO())
 	}
 }
 
-// DB retorna la conexión con la base de datos MongoDB
+// DB retorna a conexão com o banco de dados MongoDB
 func (client *MongoDBClient) DB() *mongo.Database {
 	return client.db
 }
+
