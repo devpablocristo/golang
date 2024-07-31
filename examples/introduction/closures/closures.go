@@ -2,10 +2,6 @@ package main
 
 import "fmt"
 
-func nonono(i int) error {
-	return nil
-}
-
 func sayHello() func(string) string {
 	h := "YYY"
 	return func(b string) string {
