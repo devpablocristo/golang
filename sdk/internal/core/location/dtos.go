@@ -1,6 +1,6 @@
 package location
 
-type LocationDAO struct {
+type LocationDB struct {
 	Address    string `bson:"address"`
 	City       string `bson:"city"`
 	State      string `bson:"state"`

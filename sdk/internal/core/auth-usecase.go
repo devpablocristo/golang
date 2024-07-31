@@ -38,7 +38,7 @@ func (s *authUseCase) Login(ctx context.Context, username, password string) (str
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID": user.ID,
+		"userID": user.UUID,
 		"exp":    time.Now().Add(time.Hour * 72).Unix(),
 	})
 

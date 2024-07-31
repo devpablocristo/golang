@@ -22,7 +22,7 @@ func NewUserRepository(inst csdgocsl.CassandraClientPort) RepositoryPort {
 func (r *repository) Save(user User) error {
 	return r.csdInst.GetSession().Query(
 		"INSERT INTO users (id, username, password, created_at) VALUES (?, ?, ?, ?)",
-		user.ID, user.Username, user.Password, user.CreatedAt,
+		user.UUID, user.Username, user.Password, user.CreatedAt,
 	).Exec()
 }
 
@@ -31,13 +31,13 @@ func (r *repository) FindByUsername(username string) (User, error) {
 	err := r.csdInst.GetSession().Query(
 		"SELECT id, username, password, created_at FROM users WHERE username = ?",
 		username,
-	).Consistency(gocql.One).Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt)
+	).Consistency(gocql.One).Scan(&user.UUID, &user.Username, &user.Password, &user.CreatedAt)
 	return user, err
 }
 
 func (r *repository) GetUser(ctx context.Context, id string) (User, error) {
 	return User{
-		ID:        id,
+		UUID:      id,
 		Username:  "sample_user",
 		Password:  "hashed_password",
 		CreatedAt: time.Now(),
@@ -49,6 +49,6 @@ func (r *repository) GetUserByUsername(ctx context.Context, username string) (Us
 	err := r.csdInst.GetSession().Query(
 		"SELECT id, username, password, created_at FROM users WHERE username = ?",
 		username,
-	).Consistency(gocql.One).Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt)
+	).Consistency(gocql.One).Scan(&user.UUID, &user.Username, &user.Password, &user.CreatedAt)
 	return user, err
 }

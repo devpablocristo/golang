@@ -1,10 +1,10 @@
-package person
+package handler
 
-type PersonDTO struct {
-	Name          string
-	Email         string
-	Qualification int `validate:"gte=1,lte=10"`
-}
+// type PersonDTO struct {
+// 	Name          string
+// 	Email         string
+// 	Qualification int `validate:"gte=1,lte=10"`
+// }
 
 func dtoToDomain(u *PersonDTO) Person {
 	return Person{

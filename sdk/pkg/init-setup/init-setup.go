@@ -9,6 +9,10 @@ func InitSetup(configPaths ...string) error {
 		configPaths = append(configPaths, ".")
 	}
 
+	// if err := SetupDotEnvConfig(configPaths...); err != nil {
+	// 	return fmt.Errorf("error setting up Viper: %w", err)
+	// }
+
 	if err := SetupViperConfig(configPaths...); err != nil {
 		return fmt.Errorf("error setting up Viper: %w", err)
 	}
