@@ -43,3 +43,14 @@ func AuthMiddleware(secretKey string) gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+// import (
+//     "github.com/gin-gonic/gin"
+// )
+
+// func AuthMiddleware() gin.HandlerFunc {
+//     return func(c *gin.Context) {
+//         // Authentication logic here
+//         c.Next()
+//     }
+// }

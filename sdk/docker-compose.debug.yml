@@ -298,7 +298,90 @@ services:
     depends_on:
       - kong-migrations
     networks:
-      - app-network  
+      - app-network
+
+  # dynamodb-local:
+  #   image: "amazon/dynamodb-local:1.24.0"
+  #   container_name: dynamodb-local
+  #   command: "-jar DynamoDBLocal.jar -port 8765 -sharedDb -dbPath /home/dynamodblocal/data"
+  #   restart: unless-stopped
+  #   networks:
+  #     - default
+  #   ports:
+  #     - target: 8765
+  #       published: 9876
+  #       protocol: tcp
+  #       mode: host
+  #   expose:
+  #     - 8765
+  #   volumes:
+  #     - type: bind
+  #       source: ./.docker-volumes/dynamodb
+  #       target: /home/dynamodblocal/data
+
+  # api:
+  #   container_name: api-local
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - target: 8080
+  #       published: 8080
+  #       protocol: tcp
+  #       mode: host
+  #     - target: 2345  # Puerto para Delve
+  #       published: 2345
+  #       protocol: tcp
+  #       mode: host
+  #   expose:
+  #     - 8080
+  #     - 2345
+  #   networks:
+  #     - default
+  #   depends_on:
+  #     mysql-local:
+  #       condition: service_healthy
+  #     dynamodb-local:
+  #       condition: service_started
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   links:
+  #     - mysql-local
+  #     - dynamodb-local
+  #   volumes:
+  #     - type: bind
+  #       source: ./
+  #       target: /app
+  #   environment:
+  #     AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY:-fakeAccessKey}"
+  #     AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_KEY:-fakeSecretKey}"
+  #     REGION: "${AWS_REGION:-local}"
+  #     RABBITMQ_URI: "${RABBITMQ_URI:-amqp://user:password@rabbitmq:5672/}"
+
+  # rabbitmq:
+  #   image: "rabbitmq:3-management"
+  #   container_name: rabbitmq
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: "${RABBITMQ_DEFAULT_USER:-user}"
+  #     RABBITMQ_DEFAULT_PASS: "${RABBITMQ_DEFAULT_PASS:-password}"
+  #   ports:
+  #     - target: 5672
+  #       published: 5672
+  #       protocol: tcp
+  #       mode: host
+  #     - target: 15672
+  #       published: 15672
+  #       protocol: tcp
+  #       mode: host
+  #   volumes:
+  #     - type: bind
+  #       source: ./rabbitmq.conf
+  #       target: /etc/rabbitmq/rabbitmq.conf
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "rabbitmqctl status"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
 
 networks:
   app-network:

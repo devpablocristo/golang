@@ -10,3 +10,5 @@ type User struct {
 	Password  string
 	CreatedAt time.Time
 }
+
+type InMemDB map[string]*User
