@@ -87,7 +87,7 @@ func main() {
 	// ctx, cancel := context.WithTimeout(context.Background(), 50*time.Second)
 	// defer cancel()
 
-	// TODO: implementar rabbitmq
+	// TODO: implementar rabbitmq users
 	// rabbitmqURI := os.Getenv("RABBITMQ_URI")
 	// if rabbitmqURI == "" {
 	// 	log.Fatal("RABBITMQ_URI no está definido en las variables de entorno")
@@ -136,5 +136,23 @@ func main() {
 	// signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	// <-quit
 	// log.Println("Shutting down server...")
+
+	// TODO: rating
+	// usecase := ucs.NewUseCase(dep.Repository, dep.ApiClient)
+	// handler := hdl.NewRestHandler(usecase)
+
+	// r := gin.Default()
+
+	// v1 := r.Group("/api/v1")
+	// {
+	// 	v1.GET("/ltp", handler.GetLTP)
+	// }
+
+	// log.Println("Running server on port " + dep.RouterPort + "...")
+	// if err := r.Run(":" + dep.RouterPort); err != nil {
+	// 	log.Fatalf("Failed to run server: %s", err)
+	// }
+
+	// return r
 
 }

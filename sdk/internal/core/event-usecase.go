@@ -7,6 +7,25 @@ import (
 	eve "github.com/devpablocristo/qh/events/internal/core/event"
 )
 
+// type UseCasePort interface {
+// 	CreateEvent(context.Context, *eve.Event) error
+// }
+
+// type UseCase struct {
+// 	eve eve.RepositoryPort
+// }
+
+// func NewUseCase(r eve.RepositoryPort) UseCasePort {
+// 	return &UseCase{
+// 		eve: r,
+// 	}
+// }
+
+// func (u *UseCase) CreateEvent(ctx context.Context, event *eve.Event) error {
+// 	u.eve.CreateEvent(ctx, event)
+// 	return nil
+// }
+
 type EventUseCasePort interface {
 	CreateEvent(context.Context, *eve.Event) error
 	// DeleteEvent(context.Context, string) (*eve.Event, error)

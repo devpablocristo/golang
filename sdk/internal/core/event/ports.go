@@ -4,6 +4,10 @@ import (
 	"context"
 )
 
+// type RepositoryPort interface {
+// 	CreateEvent(context.Context, *Event) error
+// }
+
 type RepositoryPort interface {
 	CreateEvent(context.Context, *Event) error
 	// DeleteEvent(context.Context, string) (*Event, error)

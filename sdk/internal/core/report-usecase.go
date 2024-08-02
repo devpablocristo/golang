@@ -7,6 +7,10 @@ import (
 	"github.com/devpablocristo/qh/analytics/internal/core/report"
 )
 
+type UseCasePort interface {
+	CreateReport(context.Context, *report.Report) error
+}
+
 type UseCase struct {
 	report report.RepositoryPort
 }
