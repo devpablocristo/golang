@@ -1,12 +1,13 @@
-package controllers
+package ambassador
 
 import (
 	"ambassador/src/database"
 	"ambassador/src/middlewares"
 	"ambassador/src/models"
-	"github.com/gofiber/fiber/v2"
 	"strings"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func Register(c *fiber.Ctx) error {

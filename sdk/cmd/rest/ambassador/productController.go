@@ -1,15 +1,16 @@
-package controllers
+package ambassador
 
 import (
 	"ambassador/src/database"
 	"ambassador/src/models"
 	"context"
 	"encoding/json"
-	"github.com/gofiber/fiber/v2"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func Products(c *fiber.Ctx) error {

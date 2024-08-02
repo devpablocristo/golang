@@ -1,8 +1,9 @@
-package routes
+package ambassador
 
 import (
 	"ambassador/src/controllers"
 	"ambassador/src/middlewares"
+
 	"github.com/gofiber/fiber/v2"
 )
 

@@ -1,4 +1,4 @@
-package controllers
+package ambassador
 
 import (
 	"ambassador/src/database"

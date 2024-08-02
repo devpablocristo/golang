@@ -1,12 +1,13 @@
-package controllers
+package ambassador
 
 import (
 	"ambassador/src/database"
 	"ambassador/src/middlewares"
 	"ambassador/src/models"
+	"strconv"
+
 	"github.com/bxcodec/faker/v3"
 	"github.com/gofiber/fiber/v2"
-	"strconv"
 )
 
 func Link(c *fiber.Ctx) error {

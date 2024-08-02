@@ -1,9 +1,10 @@
-package controllers
+package ambassador
 
 import (
 	"ambassador/src/database"
 	"ambassador/src/models"
 	"context"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v2"
 )
