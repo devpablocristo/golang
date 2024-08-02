@@ -5,18 +5,18 @@ import (
 
 	is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
 
-	arts "github.com/devpablocristo/golang/sdk/cmd/rest/auth/routes"
+	//arts "github.com/devpablocristo/golang/sdk/cmd/rest/auth/routes"
 	mon "github.com/devpablocristo/golang/sdk/cmd/rest/monitoring"
-	nrts "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/routes"
+	//nrts "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/routes"
 	urts "github.com/devpablocristo/golang/sdk/cmd/rest/user/routes"
-	csd "github.com/devpablocristo/golang/sdk/internal/platform/cassandra"
-	cnsl "github.com/devpablocristo/golang/sdk/internal/platform/consul"
+	//csd "github.com/devpablocristo/golang/sdk/internal/platform/cassandra"
+	//cnsl "github.com/devpablocristo/golang/sdk/internal/platform/consul"
 	gin "github.com/devpablocristo/golang/sdk/internal/platform/gin"
 	gmw "github.com/devpablocristo/golang/sdk/internal/platform/go-micro-web"
-	mysql "github.com/devpablocristo/golang/sdk/internal/platform/mysql"
-	pgts "github.com/devpablocristo/golang/sdk/internal/platform/postgresql/pqxpool"
-	redis "github.com/devpablocristo/golang/sdk/internal/platform/redis"
-	stg "github.com/devpablocristo/golang/sdk/internal/platform/stage"
+	//mysql "github.com/devpablocristo/golang/sdk/internal/platform/mysql"
+	//pgts "github.com/devpablocristo/golang/sdk/internal/platform/postgresql/pqxpool"
+	//redis "github.com/devpablocristo/golang/sdk/internal/platform/redis"
+	//stg "github.com/devpablocristo/golang/sdk/internal/platform/stage"
 )
 
 func main() {
@@ -28,13 +28,13 @@ func main() {
 
 	// TODO: Probar stage
 	// stage
-	if _, err := stg.NewStageInstance(); err != nil {
-		is.MicroLogError("error initializing Stage: %v", err)
-	}
+	// if _, err := stg.NewStageInstance(); err != nil {
+	// 	is.MicroLogError("error initializing Stage: %v", err)
+	// }
 
-	if _, err := cnsl.NewConsulInstance(); err != nil {
-		is.MicroLogError("error initializing Consul: %v", err)
-	}
+	// if _, err := cnsl.NewConsulInstance(); err != nil {
+	// 	is.MicroLogError("error initializing Consul: %v", err)
+	// }
 
 	// TODO: Probar go micro
 	ms, err := gmw.NewGoMicroInstance()
@@ -42,21 +42,21 @@ func main() {
 		is.MicroLogError("error initializing Go Micro: %v", err)
 	}
 
-	if _, err = pgts.NewPostgreSQLInstance(); err != nil {
-		is.MicroLogError("error initializing PostgresSQL: %v", err)
-	}
+	// if _, err = pgts.NewPostgreSQLInstance(); err != nil {
+	// 	is.MicroLogError("error initializing PostgresSQL: %v", err)
+	// }
 
-	if _, err = csd.NewCassandraInstance(); err != nil {
-		is.MicroLogError("error initializing Canssandra: %v", err)
-	}
+	// if _, err = csd.NewCassandraInstance(); err != nil {
+	// 	is.MicroLogError("error initializing Canssandra: %v", err)
+	// }
 
-	if _, err = redis.NewRedisInstance(); err != nil {
-		is.MicroLogError("error initializing Redis: %v", err)
-	}
+	// if _, err = redis.NewRedisInstance(); err != nil {
+	// 	is.MicroLogError("error initializing Redis: %v", err)
+	// }
 
-	if _, err = mysql.NewMySQLInstance(); err != nil {
-		is.MicroLogError("error initializing MySQL: %v", err)
-	}
+	// if _, err = mysql.NewMySQLInstance(); err != nil {
+	// 	is.MicroLogError("error initializing MySQL: %v", err)
+	// }
 
 	ginInst, err := gin.NewGinInstance()
 	if err != nil {
@@ -65,9 +65,9 @@ func main() {
 
 	r := ginInst.GetRouter()
 
-	nrts.NimRoutes(r)
+	//nrts.NimRoutes(r)
 	urts.UserRoutes(r)
-	arts.AuthRoutes(r)
+	//arts.AuthRoutes(r)
 
 	mon.MonitoringRestAPI(ginInst, ms)
 

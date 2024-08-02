@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"net/http"
@@ -8,17 +8,17 @@ import (
 	"github.com/devpablocristo/golang/sdk/internal/core"
 )
 
-type UserHandler struct {
+type Handler struct {
 	userUseCase core.UserUseCasePort
 }
 
-func NewUserHandler(userUseCase core.UserUseCasePort) *UserHandler {
-	return &UserHandler{
+func NewHandler(userUseCase core.UserUseCasePort) *Handler {
+	return &Handler{
 		userUseCase: userUseCase,
 	}
 }
 
-func (h *UserHandler) GetUser(c *gin.Context) {
+func (h *Handler) GetUser(c *gin.Context) {
 	id := c.Param("id")
 
 	user, err := h.userUseCase.GetUser(c.Request.Context(), id)
@@ -30,7 +30,7 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (h *UserHandler) Health(c *gin.Context) {
+func (h *Handler) Health(c *gin.Context) {
 	// TODO implemntar
 	// dbErr := h.ucs.CheckDatabaseConnection()
 	// if dbErr != nil {
@@ -45,7 +45,7 @@ func (h *UserHandler) Health(c *gin.Context) {
 	})
 }
 
-func (h *UserHandler) Ping(c *gin.Context) {
+func (h *Handler) Ping(c *gin.Context) {
 	c.String(http.StatusOK, "pong")
 }
 
@@ -55,11 +55,6 @@ func (h *UserHandler) Ping(c *gin.Context) {
 
 // func NewRestHandler(ucs ucs.UseCasePort) *RestHandler {
 // 	return &RestHandler{ucs: ucs}
-// }
-
-// func (h *RestHandler) HelloWorld(c *gin.Context) {
-// 	str := "Hello, World!!! Olá Mundo!!! Hola Mundo!!!"
-// 	c.JSON(http.StatusOK, str)
 // }
 
 // func (h *RestHandler) GetUser(c *gin.Context) {

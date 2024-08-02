@@ -1,4 +1,4 @@
-package userroutes
+package user
 
 import (
 	"github.com/gin-gonic/gin"
@@ -8,8 +8,8 @@ import (
 	mdhw "github.com/devpablocristo/golang/sdk/pkg/middleware"
 )
 
-func UserRoutes(r *gin.Engine) {
-	userHandler, err := wire.InitializeUserHandler()
+func Routes(r *gin.Engine) {
+	handler, err := wire.InitializeUserHandler()
 	if err != nil {
 		is.MicroLogError("userHandler error: %v", err)
 	}
@@ -18,10 +18,10 @@ func UserRoutes(r *gin.Engine) {
 	user := r.Group("/api/v1/user")
 	user.Use(mdhw.AuthMiddleware(secret))
 	{
-		user.GET(":id", userHandler.GetUser)
+		user.GET(":id", handler.GetUser)
 	}
 
 	// Ruta de Salud
-	r.GET("/health", userHandler.Health)
-	r.GET("/ping", userHandler.Ping)
+	r.GET("/health", handler.Health)
+	r.GET("/ping", handler.Ping)
 }

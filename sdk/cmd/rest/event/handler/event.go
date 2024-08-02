@@ -188,7 +188,6 @@ func (h *ItemHandler) Health(c *gin.Context) {
 
 // // }
 
-
 // type RestHandler struct {
 // 	ucs ucs.UseCasePort
 // }
@@ -229,4 +228,3 @@ func (h *ItemHandler) Health(c *gin.Context) {
 // 		"status": "UP",
 // 	})
 // }
-

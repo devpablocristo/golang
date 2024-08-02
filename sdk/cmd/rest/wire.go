@@ -8,7 +8,7 @@ import (
 
 	hauth "github.com/devpablocristo/golang/sdk/cmd/rest/auth/handlers"
 	hnc7 "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/handlers"
-	husr "github.com/devpablocristo/golang/sdk/cmd/rest/user/handlers"
+	restuser "github.com/devpablocristo/golang/sdk/cmd/rest/user/handler"
 	core "github.com/devpablocristo/golang/sdk/internal/core"
 	nc7 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7"
 	cin7 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/cin7"
@@ -19,14 +19,14 @@ import (
 	is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
 )
 
-func InitializeUserHandler() (*husr.UserHandler, error) {
+func InitializeUserHandler() (*restuser.Handler, error) {
 	wire.Build(
 		cass.NewCassandraInstance,
 		usr.NewUserRepository,
 		core.NewUserUseCase,
-		husr.NewUserHandler,
+		restuser.NewHandler,
 	)
-	return &husr.UserHandler{}, nil
+	return &restuser.Handler{}, nil
 }
 
 func InitializeAuthHandler() (*hauth.AuthHandler, error) {
