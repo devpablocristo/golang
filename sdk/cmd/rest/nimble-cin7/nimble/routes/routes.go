@@ -1,4 +1,4 @@
-package nimroutes
+package nimble
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,12 +7,12 @@ import (
 	is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
 )
 
-func NimRoutes(r *gin.Engine) {
-	nimHandler, err := wire.InitializeNimbleHandler()
+func Routes(r *gin.Engine) {
+	handler, err := wire.InitializeNimbleHandler()
 	if err != nil {
 		is.MicroLogError("nimHandler error: %v", err)
 	}
 
-	r.GET("/nimble-ping", nimHandler.NimblePing)
-	r.POST("/order-shipment", nimHandler.OrderShipment)
+	r.GET("/nimble-ping", handler.NimblePing)
+	r.POST("/order-shipment", handler.OrderShipment)
 }

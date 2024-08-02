@@ -8,15 +8,15 @@ import (
 	core "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7"
 )
 
-type NimbleHandler struct {
+type Handler struct {
 	useCase core.NimbleUseCasePort
 }
 
-func NewNimbleHandler(uc core.NimbleUseCasePort) *NimbleHandler {
-	return &NimbleHandler{useCase: uc}
+func NewNimbleHandler(uc core.NimbleUseCasePort) *Handler {
+	return &Handler{useCase: uc}
 }
 
-func (h *NimbleHandler) OrderShipment(c *gin.Context) {
+func (h *Handler) OrderShipment(c *gin.Context) {
 	var dto OrderReq
 	if err := c.ShouldBindJSON(&dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -32,6 +32,6 @@ func (h *NimbleHandler) OrderShipment(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success"})
 }
 
-func (h *NimbleHandler) NimblePing(c *gin.Context) {
+func (h *Handler) NimblePing(c *gin.Context) {
 	c.String(http.StatusOK, "nimble pong")
 }
