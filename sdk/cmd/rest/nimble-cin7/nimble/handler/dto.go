@@ -1,4 +1,4 @@
-package handler
+package nimble
 
 import (
 	nimblecin7 "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7"

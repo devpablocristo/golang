@@ -4,19 +4,23 @@ import (
 	nimble "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/nimble"
 )
 
-type NimbleUseCase struct {
-	repo        nimble.RedisPort
+type NimbleUseCasePort interface {
+	ProcessOrder(nimble.Order) error
+}
+
+type nimbleUseCase struct {
+	repo        nimble.CachePort
 	cin7UseCase Cin7UseCasePort
 }
 
-func NewNimbleUseCase(repo nimble.RedisPort, cin7UseCase Cin7UseCasePort) NimbleUseCasePort {
-	return &NimbleUseCase{
+func NewNimbleUseCase(repo nimble.CachePort, cin7UseCase Cin7UseCasePort) NimbleUseCasePort {
+	return &nimbleUseCase{
 		repo:        repo,
 		cin7UseCase: cin7UseCase,
 	}
 }
 
-func (uc *NimbleUseCase) ProcessOrder(order nimble.Order) error {
+func (uc *nimbleUseCase) ProcessOrder(order nimble.Order) error {
 	// Transforma la orden de Nimble a un formato de envío de Cin7
 	shipment, err := uc.repo.CreateShipment(order)
 	if err != nil {

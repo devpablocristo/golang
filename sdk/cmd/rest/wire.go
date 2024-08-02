@@ -7,11 +7,11 @@ import (
 	"github.com/google/wire"
 
 	hauth "github.com/devpablocristo/golang/sdk/cmd/rest/auth/handlers"
-	hnc7 "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/handlers"
+	cin7 "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/cin7/handler"
+	nimble "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/nimble/handler"
 	restuser "github.com/devpablocristo/golang/sdk/cmd/rest/user/handler"
 	core "github.com/devpablocristo/golang/sdk/internal/core"
 	nc7 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7"
-	cin7 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/cin7"
 	nim "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/nimble"
 	usr "github.com/devpablocristo/golang/sdk/internal/core/user"
 	cass "github.com/devpablocristo/golang/sdk/internal/platform/cassandra"
@@ -40,14 +40,14 @@ func InitializeAuthHandler() (*hauth.AuthHandler, error) {
 	return &hauth.AuthHandler{}, nil
 }
 
-func InitializeNimbleHandler() (*hnc7.NimbleHandler, error) {
+func InitializeNimbleHandler() (*nimble.Handler, error) {
 	wire.Build(
 		rd.NewRedisInstance,
 		nim.NewRedisRepository,
 		cin7.NewRedisRepository,
 		nc7.NewCin7UseCase,
 		nc7.NewNimbleUseCase,
-		hnc7.NewNimbleHandler,
+		cin7.NewCin7Handler,
 	)
 	return &hnc7.NimbleHandler{}, nil
 }

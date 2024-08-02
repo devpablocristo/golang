@@ -1,4 +1,4 @@
-package handler
+package cin7
 
 import (
 	"net/http"

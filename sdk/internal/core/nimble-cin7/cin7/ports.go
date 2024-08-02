@@ -1,5 +1,5 @@
 package cin7
 
-type RedisPort interface {
+type CachePort interface {
 	SaveShipment(Shipment) error
 }
