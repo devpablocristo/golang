@@ -1,6 +1,6 @@
 # Golang Developer Assignment
 
-This project provides a service that retrieves the Last Traded Price (LTP) of Bitcoin for the following currency pairs:
+This project provides a service that retrieves the Last Traded Price> (LTP) of Bitcoin for the following currency pairs:
 
 - BTC/USD
 - BTC/CHF

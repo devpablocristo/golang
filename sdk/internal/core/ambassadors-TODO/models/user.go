@@ -1,4 +1,4 @@
-package models
+package ambassador
 
 import (
 	"golang.org/x/crypto/bcrypt"

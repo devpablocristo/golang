@@ -1,4 +1,4 @@
-package middlewares
+package ambassador
 
 import (
 	"github.com/dgrijalva/jwt-go"

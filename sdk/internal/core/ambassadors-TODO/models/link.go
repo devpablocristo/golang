@@ -1,4 +1,4 @@
-package models
+package ambassador
 
 type Link struct {
 	Model
