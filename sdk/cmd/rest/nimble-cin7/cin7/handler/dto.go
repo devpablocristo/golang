@@ -3,6 +3,7 @@ package cin7
 import (
 	nimblecin7 "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7"
 	cin7 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/cin7"
+	"github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/shared"
 )
 
 type ShipmentReq struct {
@@ -12,10 +13,11 @@ type ShipmentReq struct {
 	Items       []nimblecin7.ItemReq `json:"items"`
 }
 
+// ToCin7Shipment convierte un ShipmentReq en un cin7.Shipment
 func ToCin7Shipment(shipmentReq ShipmentReq) cin7.Shipment {
-	items := make([]cin7.Item, len(shipmentReq.Items))
+	items := make([]shared.Item, len(shipmentReq.Items)) // Usa shared.Item
 	for i, itemReq := range shipmentReq.Items {
-		items[i] = cin7.Item{
+		items[i] = shared.Item{ // Usa el tipo shared.Item
 			ItemID:   itemReq.ItemID,
 			Quantity: itemReq.Quantity,
 		}
@@ -25,6 +27,6 @@ func ToCin7Shipment(shipmentReq ShipmentReq) cin7.Shipment {
 		ShipmentID:  shipmentReq.ShipmentID,
 		OrderID:     shipmentReq.OrderID,
 		ShippedDate: shipmentReq.ShippedDate,
-		Items:       items,
+		Items:       items, // Usa el slice de shared.Item
 	}
 }

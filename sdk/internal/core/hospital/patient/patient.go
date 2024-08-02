@@ -1,9 +1,13 @@
 package patients
 
-import "time"
+import (
+	"time"
+
+	"github.com/devpablocristo/golang/sdk/internal/core/person"
+)
 
 type Patient struct {
-	ID string
-	//PersonalInfo person.Person
-	CreatedAt time.Time
+	ID           string
+	PersonalInfo person.Person
+	CreatedAt    time.Time
 }
