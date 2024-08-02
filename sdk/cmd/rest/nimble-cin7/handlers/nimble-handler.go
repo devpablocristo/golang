@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	core "github.com/devpablocristo/qh/events/internal/core/nimble-cin7"
+	core "github.com/devpablocristo/golang-sdk/internal/core/nimble-cin7"
 )
 
 type NimbleHandler struct {

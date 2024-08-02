@@ -3,7 +3,7 @@ package redissetup
 import (
 	"github.com/spf13/viper"
 
-	redisv8 "github.com/devpablocristo/qh/events/pkg/redis/v8"
+	redisv8 "github.com/devpablocristo/golang-sdk/pkg/redis/v8"
 )
 
 func NewRedisInstance() (redisv8.RedisClientPort, error) {

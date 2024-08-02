@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	event "github.com/devpablocristo/qh/internal/event-manager/event"
-	ctypes "github.com/devpablocristo/qh/internal/platform/custom-types"
+	event "github.com/devpablocristo/golang-sdk/internal/event-manager/event"
+	ctypes "github.com/devpablocristo/golang-sdk/internal/platform/custom-types"
 )
 
 type EventHandler struct {

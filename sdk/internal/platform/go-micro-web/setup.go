@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/viper"
 	"go-micro.dev/v4/registry"
 
-	gmw "github.com/devpablocristo/qh/events/pkg/go-micro-web"
+	gmw "github.com/devpablocristo/golang-sdk/pkg/go-micro-web"
 )
 
 func NewGoMicroInstance() (gmw.GoMicroClientPort, error) {

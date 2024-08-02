@@ -3,7 +3,7 @@ package mongodb
 import (
 	"github.com/spf13/viper"
 
-	mongodbdriver "github.com/devpablocristo/qh/events/pkg/mongodb/mongo-driver"
+	mongodbdriver "github.com/devpablocristo/golang-sdk/pkg/mongodb/mongo-driver"
 )
 
 func NewMongoDBSetup() (mongodbdriver.MongoDBClientPort, error) {

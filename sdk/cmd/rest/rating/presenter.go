@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/devpablocristo/qh/rating/internal/core/ltp"
+	"github.com/devpablocristo/golang-sdk/rating/internal/core/ltp"
 )
 
 type responseLTP struct {

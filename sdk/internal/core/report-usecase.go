@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/devpablocristo/qh/analytics/internal/core/report"
+	"github.com/devpablocristo/golang-sdk/internal/core/report"
 )
 
 type UseCasePort interface {

@@ -1,7 +1,7 @@
 package message
 
 import (
-	csdgocsl "github.com/devpablocristo/qh/events/pkg/cassandra/gocql"
+	csdgocsl "github.com/devpablocristo/golang-sdk/pkg/cassandra/gocql"
 )
 
 type MessageRepository struct {

@@ -1,6 +1,6 @@
 package handler
 
-import "github.com/devpablocristo/qh/rating/internal/core/rating"
+import "github.com/devpablocristo/golang-sdk/rating/internal/core/rating"
 
 type RatingDTO struct {
 	ID       int    `json:"id"`

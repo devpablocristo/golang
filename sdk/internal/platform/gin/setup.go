@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/viper"
 
-	gin "github.com/devpablocristo/qh/events/pkg/gin-gonic/gin"
+	gin "github.com/devpablocristo/golang-sdk/pkg/gin-gonic/gin"
 )
 
 func NewGinInstance() (gin.GinClientPort, error) {

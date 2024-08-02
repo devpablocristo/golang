@@ -3,9 +3,9 @@ package nimble
 import (
 	"time"
 
-	redisv8 "github.com/devpablocristo/qh/events/pkg/redis/v8"
+	redisv8 "github.com/devpablocristo/golang-sdk/pkg/redis/v8"
 
-	cin7 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7/cin7"
+	cin7 "github.com/devpablocristo/golang-sdk/internal/core/nimble-cin7/cin7"
 )
 
 type RedisRepository struct {

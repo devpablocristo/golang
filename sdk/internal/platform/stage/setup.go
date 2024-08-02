@@ -1,7 +1,7 @@
 package stagesetup
 
 import (
-	stage "github.com/devpablocristo/qh/events/pkg/stage"
+	stage "github.com/devpablocristo/golang-sdk/pkg/stage"
 )
 
 func NewStageInstance() (stage.StageClientPort, error) {

@@ -4,8 +4,8 @@ import (
 	"os/user"
 	"time"
 
-	"github.com/devpablocristo/qh/events/internal/core/event"
-	eve "github.com/devpablocristo/qh/events/internal/core/event"
+	"github.com/devpablocristo/golang-sdk/internal/core/event"
+	eve "github.com/devpablocristo/golang-sdk/internal/core/event"
 )
 
 type EventRequest struct {

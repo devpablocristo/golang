@@ -5,26 +5,26 @@ import (
 	"fmt"
 	"time"
 
-	ltp "github.com/devpablocristo/qh/rating/internal/core/ltp"
+	ltp "github.com/devpablocristo/golang-sdk/internal/core/ltp"
 )
 
-type UseCasePort interface {
+type LtpUseCasePort interface {
 	GetLTP(context.Context, []string) ([]ltp.LTP, error)
 }
 
-type UseCase struct {
+type LtpUseCase struct {
 	ltp ltp.RepositoryPort
 	acl ltp.APIClientPort
 }
 
-func NewUseCase(r ltp.RepositoryPort, a ltp.APIClientPort) UseCasePort {
-	return &UseCase{
+func NewLtpUseCase(r ltp.RepositoryPort, a ltp.APIClientPort) LtpUseCasePort {
+	return &LtpUseCase{
 		ltp: r,
 		acl: a,
 	}
 }
 
-func (u *UseCase) GetLTP(ctx context.Context, pairs []string) ([]ltp.LTP, error) {
+func (u *LtpUseCase) GetLTP(ctx context.Context, pairs []string) ([]ltp.LTP, error) {
 	lp, timestamp, err := u.acl.GetKrakenLTPs(ctx, pairs)
 	if err != nil {
 		return nil, err

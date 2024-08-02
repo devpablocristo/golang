@@ -7,17 +7,17 @@
 package wire
 
 import (
-	handler2 "github.com/devpablocristo/qh/events/cmd/rest/auth/handlers"
-	handler3 "github.com/devpablocristo/qh/events/cmd/rest/nimble-cin7/handlers"
-	"github.com/devpablocristo/qh/events/cmd/rest/user/handlers"
-	"github.com/devpablocristo/qh/events/internal/core"
-	core2 "github.com/devpablocristo/qh/events/internal/core/nimble-cin7"
-	"github.com/devpablocristo/qh/events/internal/core/nimble-cin7/cin7"
-	"github.com/devpablocristo/qh/events/internal/core/nimble-cin7/nimble"
-	"github.com/devpablocristo/qh/events/internal/core/user"
-	"github.com/devpablocristo/qh/events/internal/platform/cassandra"
-	"github.com/devpablocristo/qh/events/internal/platform/redis"
-	"github.com/devpablocristo/qh/events/pkg/init-setup"
+	handler2 "github.com/devpablocristo/golang-sdk/cmd/rest/auth/handlers"
+	handler3 "github.com/devpablocristo/golang-sdk/cmd/rest/nimble-cin7/handlers"
+	"github.com/devpablocristo/golang-sdk/cmd/rest/user/handlers"
+	"github.com/devpablocristo/golang-sdk/internal/core"
+	core2 "github.com/devpablocristo/golang-sdk/internal/core/nimble-cin7"
+	"github.com/devpablocristo/golang-sdk/internal/core/nimble-cin7/cin7"
+	"github.com/devpablocristo/golang-sdk/internal/core/nimble-cin7/nimble"
+	"github.com/devpablocristo/golang-sdk/internal/core/user"
+	"github.com/devpablocristo/golang-sdk/internal/platform/cassandra"
+	"github.com/devpablocristo/golang-sdk/internal/platform/redis"
+	"github.com/devpablocristo/golang-sdk/pkg/init-setup"
 )
 
 // Injectors from wire.go:

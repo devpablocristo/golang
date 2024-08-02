@@ -1,4 +1,4 @@
-module github.com/devpablocristo/qh/events
+module github.com/devpablocristo/golang-sdk
 
 go 1.22.3
 

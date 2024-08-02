@@ -4,27 +4,8 @@ import (
 	"context"
 	"log"
 
-	eve "github.com/devpablocristo/qh/events/internal/core/event"
+	eve "github.com/devpablocristo/golang-sdk/internal/core/event"
 )
-
-// type UseCasePort interface {
-// 	CreateEvent(context.Context, *eve.Event) error
-// }
-
-// type UseCase struct {
-// 	eve eve.RepositoryPort
-// }
-
-// func NewUseCase(r eve.RepositoryPort) UseCasePort {
-// 	return &UseCase{
-// 		eve: r,
-// 	}
-// }
-
-// func (u *UseCase) CreateEvent(ctx context.Context, event *eve.Event) error {
-// 	u.eve.CreateEvent(ctx, event)
-// 	return nil
-// }
 
 type EventUseCasePort interface {
 	CreateEvent(context.Context, *eve.Event) error
@@ -41,7 +22,7 @@ type eventUsecase struct {
 	eve eve.RepositoryPort
 }
 
-func NewUseCase(r eve.RepositoryPort) EventUseCasePort {
+func NewEventseCase(r eve.RepositoryPort) EventUseCasePort {
 	return &eventUsecase{
 		eve: r,
 	}

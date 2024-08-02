@@ -3,7 +3,7 @@ package hystrixconfig
 import (
 	"github.com/spf13/viper"
 
-	htx "github.com/devpablocristo/qh/events/pkg/hystrix/hystrix-go"
+	htx "github.com/devpablocristo/golang-sdk/pkg/hystrix/hystrix-go"
 )
 
 func NewHystrixInstance() (htx.HystrixClientPort, error) {

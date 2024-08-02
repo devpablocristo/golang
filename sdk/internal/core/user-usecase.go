@@ -3,7 +3,7 @@ package core
 import (
 	"context"
 
-	usr "github.com/devpablocristo/qh/events/internal/core/user"
+	usr "github.com/devpablocristo/golang-sdk/internal/core/user"
 )
 
 // type UseCasePort interface {

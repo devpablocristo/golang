@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	tst "github.com/devpablocristo/qh/events/cmd/rest/tests"
-	ucs "github.com/devpablocristo/qh/events/internal/core"
+	tst "github.com/devpablocristo/golang-sdk/cmd/rest/tests"
+	ucs "github.com/devpablocristo/golang-sdk/internal/core"
 )
 
 type ItemHandler struct {

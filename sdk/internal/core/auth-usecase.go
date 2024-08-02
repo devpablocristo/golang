@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/devpablocristo/qh/events/internal/core/user"
+	"github.com/devpablocristo/golang-sdk/internal/core/user"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )

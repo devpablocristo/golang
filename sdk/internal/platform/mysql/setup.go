@@ -3,7 +3,7 @@ package mysqlsetup
 import (
 	"github.com/spf13/viper"
 
-	gosqldriver "github.com/devpablocristo/qh/events/pkg/mysql/go-sql-driver"
+	gosqldriver "github.com/devpablocristo/golang-sdk/pkg/mysql/go-sql-driver"
 )
 
 func NewMySQLInstance() (gosqldriver.MySQLClientPort, error) {
