@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	ltp "github.com/devpablocristo/golang-sdk/internal/core/ltp"
+	ltp "github.com/devpablocristo/golang/sdk/internal/core/ltp"
 )
 
 type LtpUseCasePort interface {

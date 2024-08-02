@@ -3,7 +3,7 @@ package cin7
 import (
 	"context"
 
-	redisv8 "github.com/devpablocristo/golang-sdk/pkg/redis/v8"
+	redisv8 "github.com/devpablocristo/golang/sdk/pkg/redis/v8"
 )
 
 type RedisRepository struct {

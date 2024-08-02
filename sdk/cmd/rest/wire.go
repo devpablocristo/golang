@@ -6,17 +6,17 @@ package wire
 import (
 	"github.com/google/wire"
 
-	hauth "github.com/devpablocristo/golang-sdk/cmd/rest/auth/handlers"
-	hnc7 "github.com/devpablocristo/golang-sdk/cmd/rest/nimble-cin7/handlers"
-	husr "github.com/devpablocristo/golang-sdk/cmd/rest/user/handlers"
-	core "github.com/devpablocristo/golang-sdk/internal/core"
-	nc7 "github.com/devpablocristo/golang-sdk/internal/core/nimble-cin7"
-	cin7 "github.com/devpablocristo/golang-sdk/internal/core/nimble-cin7/cin7"
-	nim "github.com/devpablocristo/golang-sdk/internal/core/nimble-cin7/nimble"
-	usr "github.com/devpablocristo/golang-sdk/internal/core/user"
-	cass "github.com/devpablocristo/golang-sdk/internal/platform/cassandra"
-	rd "github.com/devpablocristo/golang-sdk/internal/platform/redis"
-	is "github.com/devpablocristo/golang-sdk/pkg/init-setup"
+	hauth "github.com/devpablocristo/golang/sdk/cmd/rest/auth/handlers"
+	hnc7 "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/handlers"
+	husr "github.com/devpablocristo/golang/sdk/cmd/rest/user/handlers"
+	core "github.com/devpablocristo/golang/sdk/internal/core"
+	nc7 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7"
+	cin7 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/cin7"
+	nim "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/nimble"
+	usr "github.com/devpablocristo/golang/sdk/internal/core/user"
+	cass "github.com/devpablocristo/golang/sdk/internal/platform/cassandra"
+	rd "github.com/devpablocristo/golang/sdk/internal/platform/redis"
+	is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
 )
 
 func InitializeUserHandler() (*husr.UserHandler, error) {

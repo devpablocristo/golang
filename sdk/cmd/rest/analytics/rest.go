@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	tst "github.com/devpablocristo/golang-sdk/analytics/cmd/api/tests"
-	ucs "github.com/devpablocristo/golang-sdk/analytics/internal/core"
+	tst "github.com/devpablocristo/golang/sdk/analytics/cmd/api/tests"
+	ucs "github.com/devpablocristo/golang/sdk/analytics/internal/core"
 )
 
 type RestHandler struct {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	eve "github.com/devpablocristo/golang-sdk/internal/core/event"
+	eve "github.com/devpablocristo/golang/sdk/internal/core/event"
 )
 
 type EventUseCasePort interface {

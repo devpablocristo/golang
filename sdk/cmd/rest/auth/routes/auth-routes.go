@@ -3,8 +3,8 @@ package authroutes
 import (
 	"github.com/gin-gonic/gin"
 
-	wire "github.com/devpablocristo/golang-sdk/cmd/rest"
-	is "github.com/devpablocristo/golang-sdk/pkg/init-setup"
+	wire "github.com/devpablocristo/golang/sdk/cmd/rest"
+	is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
 )
 
 func AuthRoutes(r *gin.Engine) {

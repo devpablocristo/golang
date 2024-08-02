@@ -1,7 +1,7 @@
 package book
 
 import (
-	pqsql "github.com/devpablocristo/golang-sdk/pkg/postgresql/pq"
+	pqsql "github.com/devpablocristo/golang/sdk/pkg/postgresql/pq"
 )
 
 // Repository represents the repository structure.

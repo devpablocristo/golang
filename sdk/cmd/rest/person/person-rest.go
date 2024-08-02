@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	ctypes "github.com/devpablocristo/golang-sdk/internal/platform/custom-types"
-	person "github.com/devpablocristo/golang-sdk/internal/user-manager/user/person"
+	ctypes "github.com/devpablocristo/golang/sdk/internal/platform/custom-types"
+	person "github.com/devpablocristo/golang/sdk/internal/user-manager/user/person"
 )
 
 type PersonHandler struct {

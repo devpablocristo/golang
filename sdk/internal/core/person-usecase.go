@@ -3,7 +3,7 @@ package core
 import (
 	"context"
 
-	"github.com/devpablocristo/golang-sdk/internal/core/person"
+	"github.com/devpablocristo/golang/sdk/internal/core/person"
 )
 
 type PersonUseCasePort interface {

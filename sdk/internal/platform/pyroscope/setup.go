@@ -3,7 +3,7 @@ package pyroscopesetup
 import (
 	"github.com/spf13/viper"
 
-	pyrosgo "github.com/devpablocristo/golang-sdk/pkg/pyroscope/pyroscope-go"
+	pyrosgo "github.com/devpablocristo/golang/sdk/pkg/pyroscope/pyroscope-go"
 )
 
 func NewPyroscopeInstance() (pyrosgo.PyroscopeClientPort, error) {

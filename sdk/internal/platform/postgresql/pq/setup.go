@@ -2,6 +2,8 @@ package postgresqlsetup
 
 import (
 	"github.com/spf13/viper"
+
+	pqpostgresql "github.com/devpablocristo/golang/sdk/pkg/postgresql/pq"
 )
 
 func NewPostgreSQLInstance() (pqpostgresql.PostgreSQLClientPort, error) {

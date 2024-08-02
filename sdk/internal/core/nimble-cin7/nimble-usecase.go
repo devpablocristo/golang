@@ -1,7 +1,7 @@
 package core
 
 import (
-	nimble "github.com/devpablocristo/golang-sdk/internal/core/nimble-cin7/nimble"
+	nimble "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/nimble"
 )
 
 type NimbleUseCase struct {

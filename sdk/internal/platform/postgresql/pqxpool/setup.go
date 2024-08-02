@@ -3,7 +3,7 @@ package postgresqlsetup
 import (
 	"github.com/spf13/viper"
 
-	pgxsdk "github.com/devpablocristo/golang-sdk/pkg/postgresql/pgxpool"
+	pgxsdk "github.com/devpablocristo/golang/sdk/pkg/postgresql/pgxpool"
 )
 
 func NewPostgreSQLInstance() (pgxsdk.PostgreSQLClientPort, error) {

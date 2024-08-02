@@ -64,7 +64,7 @@ The response will be in JSON format with the following structure:
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/devpablocristo/golang-sdk/rating.git
+   git clone https://github.com/devpablocristo/golang/sdk/rating.git
    cd dive-challenge
    ```
 

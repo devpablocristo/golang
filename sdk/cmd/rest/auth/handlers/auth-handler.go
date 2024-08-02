@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/devpablocristo/golang-sdk/internal/core"
+	"github.com/devpablocristo/golang/sdk/internal/core"
 )
 
 type AuthHandler struct {

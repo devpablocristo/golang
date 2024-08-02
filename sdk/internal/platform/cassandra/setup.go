@@ -3,7 +3,7 @@ package cassandrasetup
 import (
 	"github.com/spf13/viper"
 
-	csdgocsl "github.com/devpablocristo/golang-sdk/pkg/cassandra/gocql"
+	csdgocsl "github.com/devpablocristo/golang/sdk/pkg/cassandra/gocql"
 )
 
 func NewCassandraInstance() (csdgocsl.CassandraClientPort, error) {

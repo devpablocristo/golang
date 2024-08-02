@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	ucs "github.com/devpablocristo/golang-sdk/rating/internal/core"
+	ucs "github.com/devpablocristo/golang/sdk/rating/internal/core"
 )
 
 type RestHandler struct {

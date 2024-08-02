@@ -3,7 +3,7 @@ package person
 import (
 	"context"
 
-	mdb "github.com/devpablocristo/golang-sdk/pkg/mongodb/mongo-driver"
+	mdb "github.com/devpablocristo/golang/sdk/pkg/mongodb/mongo-driver"
 )
 
 type mongoEventDAO struct {

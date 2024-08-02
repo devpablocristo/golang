@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	pgxpostgres "github.com/devpablocristo/golang-sdk/pkg/postgresql/pgxpool"
+	pgxpostgres "github.com/devpablocristo/golang/sdk/pkg/postgresql/pgxpool"
 )
 
 // type Repository struct {

@@ -3,7 +3,7 @@ package consulsetup
 import (
 	"github.com/spf13/viper"
 
-	cslhash "github.com/devpablocristo/golang-sdk/pkg/consul/hashicorp"
+	cslhash "github.com/devpablocristo/golang/sdk/pkg/consul/hashicorp"
 )
 
 func NewConsulInstance() (cslhash.ConsulClientPort, error) {
