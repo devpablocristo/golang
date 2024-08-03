@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# TODO: configurar bien en entrypoint en el dockerfile, lo movi aqui desde el root
-
 # Load environment variables from the .env file
 if [ -f .env ]; then
   export $(cat .env | grep -v ^# | xargs)
