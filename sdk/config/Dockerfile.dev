@@ -8,18 +8,21 @@ RUN apk update && \
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the project files to the container
-COPY . .
+# Copy the entrypoint script first and make it executable
+COPY ./scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Copy go.mod and go.sum to leverage Docker cache
+COPY ./go.mod ./go.sum ./
 
 # Download and verify the project dependencies
 RUN go mod download && go mod verify
 
+# Copy the rest of the project files to the container
+COPY . .
+
 # Create the bin directory if it doesn't exist
 RUN mkdir -p /app/bin
-
-# Copy the entrypoint script and make it executable
-COPY ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 
 # Expose the necessary ports
 EXPOSE 8080 2345

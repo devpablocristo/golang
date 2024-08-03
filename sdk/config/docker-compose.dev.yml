@@ -4,18 +4,19 @@ services:
   rest:
     container_name: "${APP_NAME:-golang-sdk}"
     build:
-      context: .
-      dockerfile: Dockerfile.dev
+      context: ..  # Contexto de construcción: apunta a la raíz del proyecto
+      dockerfile: config/Dockerfile.dev  # Ruta al Dockerfile desde el contexto
     ports:
       - "${ROUTER_PORT:-8080}:${ROUTER_TARGET_PORT:-8080}"
       - "${DELVE_PORT:-2345}:${DELVE_TARGET_PORT:-2345}"
     volumes:
       - type: bind
-        source: ./
+        source: ..  # Monta la raíz del proyecto
         target: /app
       - type: bind
-        source: ./migrations
+        source: ../migrations  # Corrige esta ruta al nivel del proyecto
         target: /app/migrations
+
     environment:
       - APP_NAME=${APP_NAME:-golang-sdk}
       - DEBUG=true
