@@ -1,16 +1,16 @@
 package cin7
 
 import (
-	nimblecin7 "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7"
-	cin7 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/cin7"
+	dtoshared "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/shared"
+	"github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/cin7"
 	"github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/shared"
 )
 
 type ShipmentReq struct {
-	ShipmentID  string               `json:"shipment_id"`
-	OrderID     string               `json:"order_id"`
-	ShippedDate string               `json:"shipped_date"`
-	Items       []nimblecin7.ItemReq `json:"items"`
+	ShipmentID  string              `json:"shipment_id"`
+	OrderID     string              `json:"order_id"`
+	ShippedDate string              `json:"shipped_date"`
+	Items       []dtoshared.ItemReq `json:"items"`
 }
 
 // ToCin7Shipment convierte un ShipmentReq en un cin7.Shipment

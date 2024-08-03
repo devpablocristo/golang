@@ -3,17 +3,17 @@ package nimble
 import (
 	"net/http"
 
-	"github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/nimble"
+	"github.com/devpablocristo/golang/sdk/internal/core"
 	"github.com/gin-gonic/gin"
 )
 
 // Handler representa el controlador para manejar las solicitudes relacionadas con órdenes
 type Handler struct {
-	useCase nimble.CachePort
+	useCase core.NimbleUseCasePort
 }
 
 // NewNimbleHandler crea un nuevo controlador para Nimble
-func NewNimbleHandler(uc nimble.NimbleUseCasePort) *Handler {
+func NewNimbleHandler(uc core.NimbleUseCasePort) *Handler {
 	return &Handler{useCase: uc}
 }
 

@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	tst "github.com/devpablocristo/golang/sdk/analytics/cmd/api/tests"
-	ucs "github.com/devpablocristo/golang/sdk/analytics/internal/core"
+	ttools "github.com/devpablocristo/golang/sdk/cmd/rest/testing-tools"
+	ucs "github.com/devpablocristo/golang/sdk/internal/core"
 )
 
 type RestHandler struct {
@@ -21,7 +21,7 @@ func NewRestHandler(ucs ucs.UseCasePort) *RestHandler {
 }
 
 func (h *RestHandler) FakeCreateReport(c *gin.Context) {
-	data, err := tst.LoadTestData()
+	data, err := ttools.LoadTestData("test")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return

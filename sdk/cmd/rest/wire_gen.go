@@ -7,64 +7,21 @@
 package wire
 
 import (
-	handler2 "github.com/devpablocristo/golang/sdk/cmd/rest/auth/handlers"
-	handler3 "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/handlers"
-	"github.com/devpablocristo/golang/sdk/cmd/rest/user/handlers"
+	"github.com/devpablocristo/golang/sdk/cmd/rest/user/handler"
 	"github.com/devpablocristo/golang/sdk/internal/core"
-	core2 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7"
-	"github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/cin7"
-	"github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/nimble"
-	"github.com/devpablocristo/golang/sdk/internal/core/user"
+	user2 "github.com/devpablocristo/golang/sdk/internal/core/user"
 	"github.com/devpablocristo/golang/sdk/internal/platform/cassandra"
-	"github.com/devpablocristo/golang/sdk/internal/platform/redis"
-	"github.com/devpablocristo/golang/sdk/pkg/init-setup"
 )
 
 // Injectors from wire.go:
 
-func InitializeUserHandler() (*handler.UserHandler, error) {
+func InitializeUserHandler() (*user.Handler, error) {
 	cassandraClientPort, err := cassandrasetup.NewCassandraInstance()
 	if err != nil {
 		return nil, err
 	}
-	repositoryPort := user.NewUserRepository(cassandraClientPort)
+	repositoryPort := user2.NewUserRepository(cassandraClientPort)
 	userUseCasePort := core.NewUserUseCase(repositoryPort)
-	userHandler := handler.NewUserHandler(userUseCasePort)
-	return userHandler, nil
-}
-
-func InitializeAuthHandler() (*handler2.AuthHandler, error) {
-	cassandraClientPort, err := cassandrasetup.NewCassandraInstance()
-	if err != nil {
-		return nil, err
-	}
-	repositoryPort := user.NewUserRepository(cassandraClientPort)
-	string2 := initsetup.GetJWTSecretKey()
-	authUseCasePort := core.NewAuthUseCase(repositoryPort, string2)
-	authHandler := handler2.NewAuthHandler(authUseCasePort)
-	return authHandler, nil
-}
-
-func InitializeNimbleHandler() (*handler3.NimbleHandler, error) {
-	redisClientPort, err := redissetup.NewRedisInstance()
-	if err != nil {
-		return nil, err
-	}
-	redisPort := nimble.NewRedisRepository(redisClientPort)
-	cin7RedisPort := cin7.NewRedisRepository(redisClientPort)
-	cin7UseCasePort := core2.NewCin7UseCase(cin7RedisPort)
-	nimbleUseCasePort := core2.NewNimbleUseCase(redisPort, cin7UseCasePort)
-	nimbleHandler := handler3.NewNimbleHandler(nimbleUseCasePort)
-	return nimbleHandler, nil
-}
-
-func InitializeCin7Handler() (*handler3.Cin7Handler, error) {
-	redisClientPort, err := redissetup.NewRedisInstance()
-	if err != nil {
-		return nil, err
-	}
-	redisPort := cin7.NewRedisRepository(redisClientPort)
-	cin7UseCasePort := core2.NewCin7UseCase(redisPort)
-	cin7Handler := handler3.NewCin7Handler(cin7UseCasePort)
-	return cin7Handler, nil
+	handler := user.NewHandler(userUseCasePort)
+	return handler, nil
 }

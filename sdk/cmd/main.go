@@ -8,15 +8,18 @@ import (
 	//arts "github.com/devpablocristo/golang/sdk/cmd/rest/auth/routes"
 	mon "github.com/devpablocristo/golang/sdk/cmd/rest/monitoring"
 	//nrts "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/routes"
-	urts "github.com/devpablocristo/golang/sdk/cmd/rest/user/routes"
+
 	//csd "github.com/devpablocristo/golang/sdk/internal/platform/cassandra"
 	//cnsl "github.com/devpablocristo/golang/sdk/internal/platform/consul"
 	gin "github.com/devpablocristo/golang/sdk/internal/platform/gin"
 	gmw "github.com/devpablocristo/golang/sdk/internal/platform/go-micro-web"
+
 	//mysql "github.com/devpablocristo/golang/sdk/internal/platform/mysql"
 	//pgts "github.com/devpablocristo/golang/sdk/internal/platform/postgresql/pqxpool"
 	//redis "github.com/devpablocristo/golang/sdk/internal/platform/redis"
 	//stg "github.com/devpablocristo/golang/sdk/internal/platform/stage"
+
+	user "github.com/devpablocristo/golang/sdk/cmd/rest/user/routes"
 )
 
 func main() {
@@ -66,7 +69,7 @@ func main() {
 	r := ginInst.GetRouter()
 
 	//nrts.NimRoutes(r)
-	urts.UserRoutes(r)
+	user.Routes(r)
 	//arts.AuthRoutes(r)
 
 	mon.MonitoringRestAPI(ginInst, ms)

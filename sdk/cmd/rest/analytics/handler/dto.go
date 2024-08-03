@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/devpablocristo/golang/sdk/analytics/internal/core/report"
+	"github.com/devpablocristo/golang/sdk/internal/core/report"
 )
 
 type EventMetricsDTO struct {
