@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 # Variables
 ROOT_DIR := $(shell pwd)
-APP_NAME := events
+APP_NAME := golang-sdk
 VERSION := 0.1
 BUILD_DIR := ${ROOT_DIR}/bin
 
@@ -43,20 +43,20 @@ docker-down:
 	@echo "Stopping Docker containers for production mode..."
 	APP_NAME=${APP_NAME} docker-compose -f docker-compose.yml down --remove-orphans
 
-# Docker build target for debug mode
+# Docker build target for dev mode
 docker-dbuild:
-	@echo "Building Docker images for debug mode..."
-	APP_NAME=${APP_NAME} docker-compose -f docker-compose.debug.yml up --build
+	@echo "Building Docker images for dev mode..."
+	APP_NAME=${APP_NAME} docker-compose -f docker-compose.dev.yml up --build
 
-# Docker up target for debug mode
+# Docker up target for dev mode
 docker-dup:
-	@echo "Starting Docker containers in debug mode..."
-	APP_NAME=${APP_NAME} docker-compose -f docker-compose.debug.yml up
+	@echo "Starting Docker containers in dev mode..."
+	APP_NAME=${APP_NAME} docker-compose -f docker-compose.dev.yml up
 
-# Docker down target for debug mode
+# Docker down target for dev mode
 docker-ddown:
-	@echo "Stopping Docker containers in debug mode..."
-	APP_NAME=${APP_NAME} docker-compose -f docker-compose.debug.yml down --remove-orphans
+	@echo "Stopping Docker containers in dev mode..."
+	APP_NAME=${APP_NAME} docker-compose -f docker-compose.dev.yml down --remove-orphans
 
 # Clean target
 clean:

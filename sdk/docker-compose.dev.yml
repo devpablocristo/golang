@@ -2,10 +2,10 @@ version: "3.8"
 
 services:
   rest:
-    container_name: ${APP_NAME:-events}
+    container_name: "${APP_NAME:-golang-sdk}"
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - "${ROUTER_PORT:-8080}:${ROUTER_TARGET_PORT:-8080}"
       - "${DELVE_PORT:-2345}:${DELVE_TARGET_PORT:-2345}"
@@ -17,7 +17,7 @@ services:
         source: ./migrations
         target: /app/migrations
     environment:
-      - APP_NAME=${APP_NAME:-events}
+      - APP_NAME=${APP_NAME:-golang-sdk}
       - DEBUG=true
       - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
       - POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT:-5432}
@@ -28,7 +28,7 @@ services:
       - CONSUL_ID=${CONSUL_ID:-rest}
       - CONSUL_NAME=${CONSUL_NAME:-rest}
       - CONSUL_SERVICE_NAME=${CONSUL_SERVICE_NAME:-rest}
-      - CONSUL_HEALTH_CHECK=${CONSUL_HEALTH_CHECK:-http://rest:8080/health} # Corregido el cierre de llave
+      - CONSUL_HEALTH_CHECK=${CONSUL_HEALTH_CHECK:-http://rest:8080/health}
       - CONSUL_CHECK_INTERVAL=${CONSUL_CHECK_INTERVAL:-10s}
       - CONSUL_CHECK_TIMEOUT=${CONSUL_CHECK_TIMEOUT:-1s}
       - CONSUL_PORT=${CONSUL_PORT:-8500}
@@ -44,7 +44,7 @@ services:
       - CASSANDRA_ENDPOINT_SNITCH=${CASSANDRA_ENDPOINT_SNITCH:-GossipingPropertyFileSnitch}
       - REDIS_ADDRESS=${REDIS_ADDRESS:-redis:6379}
       - REDIS_PORT=${REDIS_PORT:-6379}
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-defaultpassword} # Asegúrate de definir un valor por defecto
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-defaultpassword}
       - REDIS_DB=${REDIS_DB:-0}
       - MYSQL_HOST=${MYSQL_HOST:-mysql}
       - MYSQL_PORT=${MYSQL_PORT:-3306}
@@ -56,6 +56,14 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-rootpassword}
       - MONGO_HOST=${MONGO_HOST:-mongodb}
       - MONGO_PORT=${MONGO_PORT:-27017}
+      - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}      # Añadido
+      - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}          # Añadido
+      - RABBITMQ_MANAGEMENT_PORT=${RABBITMQ_MANAGEMENT_PORT:-15672} # Añadido
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-user}        # Añadido
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-password}    # Añadido
+      - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT:-http://dynamodb:8765} # Añadido
+      - DYNAMODB_PORT=${DYNAMODB_PORT:-8765}          # Añadido
+      - DYNAMODB_REGION=${DYNAMODB_REGION:-us-west-2} # Añadido
     depends_on:
       - postgres
       - consul
@@ -66,6 +74,8 @@ services:
       - grafana
       - pyroscope
       - mongodb
+      - rabbitmq
+      - dynamodb
     networks:
       - app-network
     restart: on-failure
@@ -140,9 +150,9 @@ services:
     depends_on:
       - cassandra
     environment:
-      - DS_LICENSE=accept  
+      - DS_LICENSE=accept
     networks:
-      - app-network    
+      - app-network
     restart: on-failure
 
   redis:
@@ -237,15 +247,15 @@ services:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
       - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-rootpassword}
       - ME_CONFIG_MONGODB_SERVER=${MONGO_HOST:-mongodb}
-      - ME_CONFIG_MONGODB_URL=${ME_CONFIG_MONGODB_URL:-mongodb://root:rootpassword@mongodb:27017/} # Corregido el cierre de llave
+      - ME_CONFIG_MONGODB_URL=${ME_CONFIG_MONGODB_URL:-mongodb://root:rootpassword@mongodb:27017/}
     ports:
-      - "${ME_PORT:-8083}:${ME_PORT:-8081}" # Corregido el valor por defecto del puerto target
+      - "${ME_PORT:-8083}:${ME_PORT:-8081}"
     depends_on:
       - mongodb
     networks:
       - app-network
     restart: on-failure
-  
+
   ngrok:
     image: ngrok/ngrok:3.13.0-alpine-91be825
     container_name: ngrok
@@ -256,12 +266,12 @@ services:
       - "${NGROK_PORT:-5050}:${NGROK_PORT:-5050}"
     networks:
       - app-network
-    depends_on:  
+    depends_on:
       - rest
     restart: on-failure
 
   kong-migrations:
-    image: kong:2.8.5-alpine # Corregido el nombre de la imagen
+    image: kong:2.8.5-alpine
     command: kong migrations bootstrap
     environment:
       - KONG_DATABASE=${KONG_DATABASE:-postgres}
@@ -276,7 +286,7 @@ services:
       - app-network
 
   kong:
-    image: kong:2.8.5-alpine # Corregido el nombre de la imagen
+    image: kong:2.8.5-alpine
     container_name: kong
     environment:
       - KONG_DATABASE=${KONG_DATABASE:-postgres}
@@ -300,49 +310,30 @@ services:
     networks:
       - app-network
 
-  # dynamodb-local:
-  #   image: "amazon/dynamodb-local:1.24.0"
-  #   container_name: dynamodb-local
-  #   command: "-jar DynamoDBLocal.jar -port 8765 -sharedDb -dbPath /home/dynamodblocal/data"
-  #   restart: unless-stopped
-  #   networks:
-  #     - default
-  #   ports:
-  #     - target: 8765
-  #       published: 9876
-  #       protocol: tcp
-  #       mode: host
-  #   expose:
-  #     - 8765
-  #   volumes:
-  #     - type: bind
-  #       source: ./.docker-volumes/dynamodb
-  #       target: /home/dynamodblocal/data
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-user}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-password}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:${RABBITMQ_PORT:-5672}"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:${RABBITMQ_MANAGEMENT_PORT:-15672}"
+    networks:
+      - app-network
+    restart: on-failure
 
-  # rabbitmq:
-  #   image: "rabbitmq:3-management"
-  #   container_name: rabbitmq
-  #   environment:
-  #     RABBITMQ_DEFAULT_USER: "${RABBITMQ_DEFAULT_USER:-user}"
-  #     RABBITMQ_DEFAULT_PASS: "${RABBITMQ_DEFAULT_PASS:-password}"
-  #   ports:
-  #     - target: 5672
-  #       published: 5672
-  #       protocol: tcp
-  #       mode: host
-  #     - target: 15672
-  #       published: 15672
-  #       protocol: tcp
-  #       mode: host
-  #   volumes:
-  #     - type: bind
-  #       source: ./rabbitmq.conf
-  #       target: /etc/rabbitmq/rabbitmq.conf
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "rabbitmqctl status"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 3
+  dynamodb:
+    image: amazon/dynamodb-local:1.24.0
+    container_name: dynamodb
+    command: "-jar DynamoDBLocal.jar -port ${DYNAMODB_PORT:-8765} -sharedDb -dbPath /home/dynamodblocal/data"
+    ports:
+      - "${DYNAMODB_PORT:-8765}:${DYNAMODB_PORT:-8765}"
+    volumes:
+      - dynamodb_data:/home/dynamodblocal/data
+    networks:
+      - app-network
+    restart: on-failure
 
 networks:
   app-network:
@@ -355,3 +346,4 @@ volumes:
   mysql_data:
   pyroscope_data:
   mongodb_data:
+  dynamodb_data:
