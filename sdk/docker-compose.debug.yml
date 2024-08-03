@@ -261,7 +261,7 @@ services:
     restart: on-failure
 
   kong-migrations:
-    image: kong:latest
+    image: kong:kong:2.8.5-alpine
     command: kong migrations bootstrap
     environment:
       - KONG_DATABASE=${KONG_DATABASE:-postgres}
@@ -276,7 +276,7 @@ services:
       - app-network
 
   kong:
-    image: kong:latest
+    image: kong:kong:2.8.5-alpine
     container_name: kong
     environment:
       - KONG_DATABASE=${KONG_DATABASE:-postgres}
