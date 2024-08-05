@@ -21,7 +21,4 @@ func Routes(r *gin.Engine) {
 		user.GET(":id", handler.GetUser)
 	}
 
-	// Ruta de Salud
-	r.GET("/health", handler.Health)
-	r.GET("/ping", handler.Ping)
 }

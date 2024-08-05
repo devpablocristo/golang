@@ -1,4 +1,4 @@
-package monitoring
+package routes
 
 import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -7,8 +7,17 @@ import (
 	gmw "github.com/devpablocristo/golang/sdk/pkg/go-micro-web"
 )
 
-func MonitoringRestAPI(ginInst gnic.GinClientPort, ms gmw.GoMicroClientPort) {
+func Routes(ginInst gnic.GinClientPort, ms gmw.GoMicroClientPort) {
 	r := ginInst.GetRouter()
+
+	handler, err := wire.InitializeUserHandler()
+	if err != nil {
+		is.MicroLogError("userHandler error: %v", err)
+	}
+
+	// Ruta de Salud
+	r.GET("/health", handler.Health)
+	r.GET("/ping", handler.Ping)
 
 	// TODO: Probar prometheus
 	r.GET("/metrics", ginInst.WrapH(promhttp.Handler()))
