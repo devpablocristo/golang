@@ -11,11 +11,11 @@ import (
 	//nimble "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/nimble/handler"
 	monitoring "github.com/devpablocristo/golang/sdk/cmd/rest/monitoring/handler"
 	userhandler "github.com/devpablocristo/golang/sdk/cmd/rest/user/handler"
-	core "github.com/devpablocristo/golang/sdk/internal/core"
+	"github.com/devpablocristo/golang/sdk/internal/core"
 
 	//nc7 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7"
 	//nim "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/nimble"
-	usr "github.com/devpablocristo/golang/sdk/internal/core/user"
+	"github.com/devpablocristo/golang/sdk/internal/core/user"
 	cass "github.com/devpablocristo/golang/sdk/internal/platform/cassandra"
 	//rd "github.com/devpablocristo/golang/sdk/internal/platform/redis"
 	//is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
@@ -24,7 +24,7 @@ import (
 func InitializeUserHandler() (*userhandler.Handler, error) {
 	wire.Build(
 		cass.NewCassandraInstance,
-		usr.NewUserRepository,
+		user.NewUserRepository,
 		core.NewUserUseCase,
 		userhandler.NewHandler,
 	)
@@ -33,7 +33,7 @@ func InitializeUserHandler() (*userhandler.Handler, error) {
 
 func InitializeMonitoring() (*monitoring.Handler, error) {
 	wire.Build(
-		userhandler.NewHandler,
+		monitoring.NewHandler,
 	)
 	return &monitoring.Handler{}, nil
 }

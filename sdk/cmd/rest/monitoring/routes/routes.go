@@ -9,20 +9,20 @@ import (
 	is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
 )
 
-func Routes(ginInst gnic.GinClientPort, ms gmw.GoMicroClientPort) {
-	r := ginInst.GetRouter()
+func Routes(gingonic gnic.GinClientPort, ms gmw.GoMicroClientPort) {
+	r := gingonic.GetRouter()
 
 	handler, err := wire.InitializeMonitoring()
 	if err != nil {
 		is.MicroLogError("userHandler error: %v", err)
-	}	
+	}
 
 	// Ruta de Salud
 	r.GET("/health", handler.Health)
 	r.GET("/ping", handler.Ping)
 
 	// TODO: Probar prometheus
-	r.GET("/metrics", ginInst.WrapH(promhttp.Handler()))
+	r.GET("/metrics", gingonic.WrapH(promhttp.Handler()))
 
 	// Integrar Go Micro y Gin
 	ms.GetService().Handle("/", r)

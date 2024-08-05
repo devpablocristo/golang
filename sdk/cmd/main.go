@@ -10,7 +10,7 @@ import (
 	//nrts "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/routes"
 
 	//csd "github.com/devpablocristo/golang/sdk/internal/platform/cassandra"
-	//cnsl "github.com/devpablocristo/golang/sdk/internal/platform/consul"
+	cnsl "github.com/devpablocristo/golang/sdk/internal/platform/consul"
 	gin "github.com/devpablocristo/golang/sdk/internal/platform/gin"
 	gmw "github.com/devpablocristo/golang/sdk/internal/platform/go-micro-web"
 
@@ -35,12 +35,11 @@ func main() {
 	// 	is.MicroLogError("error initializing Stage: %v", err)
 	// }
 
-	// if _, err := cnsl.NewConsulInstance(); err != nil {
-	// 	is.MicroLogError("error initializing Consul: %v", err)
-	// }
-
-	// TODO: Probar go micro
-	ms, err := gmw.NewGoMicroInstance()
+	consul, err := cnsl.NewConsulInstance()
+	if err != nil {
+		is.MicroLogError("error initializing Consul: %v", err)
+	}
+	gomicro, err := gmw.NewGoMicroInstance(consul)
 	if err != nil {
 		is.MicroLogError("error initializing Go Micro: %v", err)
 	}
@@ -61,21 +60,20 @@ func main() {
 	// 	is.MicroLogError("error initializing MySQL: %v", err)
 	// }
 
-	ginInst, err := gin.NewGinInstance()
+	gingonic, err := gin.NewGinInstance()
 	if err != nil {
 		is.MicroLogError("error initializing Gin: %v", err)
 	}
 
-	monitoring.Routes(ginInst, ms)
+	r := gingonic.GetRouter()
 
-	r := ginInst.GetRouter()
-
+	monitoring.Routes(gingonic, gomicro)
 	user.Routes(r)
 
 	//arts.AuthRoutes(r)
 	//nrts.NimRoutes(r)
 
-	if err := ginInst.RunServer(); err != nil {
+	if err := gingonic.RunServer(); err != nil {
 		is.MicroLogError("error starting Gin server: %v", err)
 	}
 
