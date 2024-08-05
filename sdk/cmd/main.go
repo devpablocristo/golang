@@ -6,13 +6,13 @@ import (
 	is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
 
 	//arts "github.com/devpablocristo/golang/sdk/cmd/rest/auth/routes"
-	//mon "github.com/devpablocristo/golang/sdk/cmd/rest/monitoring"
+	monitoring "github.com/devpablocristo/golang/sdk/cmd/rest/monitoring/routes"
 	//nrts "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/routes"
 
 	//csd "github.com/devpablocristo/golang/sdk/internal/platform/cassandra"
 	//cnsl "github.com/devpablocristo/golang/sdk/internal/platform/consul"
 	gin "github.com/devpablocristo/golang/sdk/internal/platform/gin"
-	//gmw "github.com/devpablocristo/golang/sdk/internal/platform/go-micro-web"
+	gmw "github.com/devpablocristo/golang/sdk/internal/platform/go-micro-web"
 
 	//mysql "github.com/devpablocristo/golang/sdk/internal/platform/mysql"
 	//pgts "github.com/devpablocristo/golang/sdk/internal/platform/postgresql/pqxpool"
@@ -40,10 +40,10 @@ func main() {
 	// }
 
 	// TODO: Probar go micro
-	// ms, err := gmw.NewGoMicroInstance()
-	// if err != nil {
-	// 	is.MicroLogError("error initializing Go Micro: %v", err)
-	// }
+	ms, err := gmw.NewGoMicroInstance()
+	if err != nil {
+		is.MicroLogError("error initializing Go Micro: %v", err)
+	}
 
 	// if _, err = pgts.NewPostgreSQLInstance(); err != nil {
 	// 	is.MicroLogError("error initializing PostgresSQL: %v", err)
@@ -66,13 +66,14 @@ func main() {
 		is.MicroLogError("error initializing Gin: %v", err)
 	}
 
+	monitoring.Routes(ginInst, ms)
+
 	r := ginInst.GetRouter()
 
-	//nrts.NimRoutes(r)
 	user.Routes(r)
-	//arts.AuthRoutes(r)
 
-	//mon.MonitoringRestAPI(ginInst, ms)
+	//arts.AuthRoutes(r)
+	//nrts.NimRoutes(r)
 
 	if err := ginInst.RunServer(); err != nil {
 		is.MicroLogError("error starting Gin server: %v", err)

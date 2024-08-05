@@ -20,5 +20,4 @@ func Routes(r *gin.Engine) {
 	{
 		user.GET(":id", handler.GetUser)
 	}
-
 }

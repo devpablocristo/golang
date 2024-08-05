@@ -1,23 +1,17 @@
-package user
+package monitoring
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/devpablocristo/golang/sdk/internal/core"
 )
 
 // Handler representa el manejador de rutas para usuarios
-type Handler struct {
-	ucs core.UserUseCasePort
-}
+type Handler struct{}
 
 // NewHandler crea un nuevo manejador de rutas para usuarios
-func NewHandler(ucs core.UserUseCasePort) *Handler {
-	return &Handler{
-		ucs: ucs,
-	}
+func NewHandler() *Handler {
+	return &Handler{}
 }
 
 // Health verifica el estado del servicio y la conexión a la base de datos
