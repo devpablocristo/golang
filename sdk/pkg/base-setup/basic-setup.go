@@ -1,10 +1,10 @@
-package initsetup
+package BasicSetup
 
 import (
 	"fmt"
 )
 
-func InitSetup(configPaths ...string) error {
+func BasicSetup(configPaths ...string) error {
 	if len(configPaths) == 0 {
 		configPaths = append(configPaths, ".")
 	}

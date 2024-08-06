@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	wire "github.com/devpablocristo/golang/sdk/cmd/rest"
-	is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
+	is "github.com/devpablocristo/golang/sdk/pkg/base-setup"
 	mdhw "github.com/devpablocristo/golang/sdk/pkg/middleware"
 )
 

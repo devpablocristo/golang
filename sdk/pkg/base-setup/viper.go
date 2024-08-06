@@ -1,4 +1,4 @@
-package initsetup
+package BasicSetup
 
 import (
 	"fmt"

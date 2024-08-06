@@ -6,7 +6,7 @@ import (
 	"go-micro.dev/v4/registry"
 
 	cslhash "github.com/devpablocristo/golang/sdk/pkg/consul/hashicorp"
-	gmw "github.com/devpablocristo/golang/sdk/pkg/go-micro-web"
+	gmw "github.com/devpablocristo/golang/sdk/pkg/go-micro-web/v4"
 )
 
 func NewGoMicroInstance(consulInst cslhash.ConsulClientPort) (gmw.GoMicroClientPort, error) {
@@ -17,7 +17,6 @@ func NewGoMicroInstance(consulInst cslhash.ConsulClientPort) (gmw.GoMicroClientP
 	consulRegistry := consul.NewRegistry(func(op *registry.Options) {
 		op.Addrs = []string{consulAdreess}
 	})
-
 	config := gmw.GoMicroConfig{
 		Name:    viper.GetString("MICRO_SERVICE_NAME"),
 		Version: viper.GetString("MICRO_SERVICE_VERSION"),

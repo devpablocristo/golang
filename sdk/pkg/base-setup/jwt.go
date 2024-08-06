@@ -1,4 +1,4 @@
-package initsetup
+package BasicSetup
 
 import (
 	"github.com/spf13/viper"
