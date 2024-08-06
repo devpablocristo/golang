@@ -13,6 +13,7 @@ type ConsulConfig struct {
 	HealthCheck   string
 	CheckInterval string
 	CheckTimeout  string
+	Tags          []string
 }
 
 func (c ConsulConfig) Validate() error {

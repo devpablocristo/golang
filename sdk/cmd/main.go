@@ -41,6 +41,13 @@ func main() {
 
 	gomicro.GetService().Handle("/", r)
 
+	// Ejecuta Gin en la dirección especificada por Go-Micro
+	go func() {
+		if err := r.Run(":8080"); err != nil {
+			log.Fatalf("Failed to run Gin: %v", err)
+		}
+	}()
+
 	if err := gomicro.GetService().Run(); err != nil {
 		basesetup.MicroLogError("error starting GoMicro service: %v", err)
 	}

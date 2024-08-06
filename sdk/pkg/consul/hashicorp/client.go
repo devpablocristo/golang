@@ -66,6 +66,7 @@ func (client *ConsulClient) connect(config ConsulConfig) error {
 		Name:    config.Name,
 		Port:    config.Port,
 		Address: config.Service,
+		Tags:    config.Tags,
 		Check: &api.AgentServiceCheck{
 			HTTP:     config.HealthCheck,
 			Interval: config.CheckInterval,
