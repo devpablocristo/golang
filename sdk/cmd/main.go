@@ -5,7 +5,7 @@ import (
 
 	monitoring "github.com/devpablocristo/golang/sdk/cmd/rest/monitoring/routes"
 	user "github.com/devpablocristo/golang/sdk/cmd/rest/user/routes"
-	consulsetup "github.com/devpablocristo/golang/sdk/internal/platform/consul"
+
 	gingonicsetup "github.com/devpablocristo/golang/sdk/internal/platform/gin"
 	gmwsetup "github.com/devpablocristo/golang/sdk/internal/platform/go-micro-web"
 	basesetup "github.com/devpablocristo/golang/sdk/pkg/base-setup"
@@ -18,12 +18,7 @@ func main() {
 	basesetup.LogInfo("Application started with JWT secret key: %s", basesetup.GetJWTSecretKey())
 	basesetup.MicroLogInfo("Starting application...")
 
-	consul, err := consulsetup.NewConsulInstance()
-	if err != nil {
-		basesetup.MicroLogError("error initializing Consul: %v", err)
-	}
-
-	gomicro, err := gmwsetup.NewGoMicroInstance(consul)
+	gomicro, err := gmwsetup.NewGoMicroInstance()
 	if err != nil {
 		basesetup.MicroLogError("error initializing Go Micro: %v", err)
 	}
