@@ -7,7 +7,7 @@ import (
 )
 
 func SetupViperConfig(configPaths ...string) error {
-	viper.SetConfigName(".env")
+	viper.SetConfigName("./config/.env")
 	viper.SetConfigType("env")
 
 	for _, path := range configPaths {

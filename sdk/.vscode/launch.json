@@ -7,7 +7,7 @@
           "request": "launch",
           "mode": "auto",
           "program": "${workspaceRoot}/cmd",
-          "envFile": "${workspaceRoot}/.env"
+          "envFile": "${workspaceRoot}/./config/.env"
       },      
       {
         "name": "Docker",

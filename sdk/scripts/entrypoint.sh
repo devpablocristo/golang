@@ -1,20 +1,20 @@
 #!/bin/sh
 
 # shellcheck disable=SC2154  # Desactivar aviso de shellcheck para APP_NAME
-# shellcheck source=.env disable=SC1091 # Desactivar aviso de shellcheck de archivo no especificado
+# shellcheck source=./config/.env disable=SC1091 # Desactivar aviso de shellcheck de archivo no especificado
 
 
-# Load environment variables from the .env file in the parent directory
+# Load environment variables from the ./config/.env file in the parent directory
 loadEnv() {
-  if [ -f .env ]; then
-    log "Loading environment variables from .env"
+  if [ -f ./config/.env ]; then
+    log "Loading environment variables from ./config/.env"
     # Use `set -a` to export all variables
     set -a
-    # shellcheck source=.env
-    . .env
+    # shellcheck source=./config/.env
+    . ./config/.env
     set +a
   else
-    echo "ERROR: .env file not found in the parent directory. Please create .env with the necessary environment variables."
+    echo "ERROR: ./config/.env file not found in the parent directory. Please create ./config/.env with the necessary environment variables."
     exit 1
   fi
 }
@@ -27,12 +27,12 @@ log() {
 # Validate essential environment variables
 validateEnv() {
   if [ -z "${APP_NAME}" ]; then
-    log "ERROR: APP_NAME is not set. Please check .env file."
+    log "ERROR: APP_NAME is not set. Please check ./config/.env file."
     exit 1
   fi
 
   if [ -z "${DEBUG}" ]; then
-    log "ERROR: DEBUG is not set. Please check .env file."
+    log "ERROR: DEBUG is not set. Please check ./config/.env file."
     exit 1
   fi
 

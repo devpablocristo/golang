@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # TODO: no funciona el script del todo, pudo crear la base de datos (con los pasos de la documentacion de pgAdmin)
-# Función para cargar las variables de entorno desde el archivo .env
+# Función para cargar las variables de entorno desde el archivo ./config/.env
 load_env() {
-  export $(grep -v '^#' ../.env | xargs)
+  export $(grep -v '^#' .././config/.env | xargs)
 }
 
 # Llamar a la función para cargar las variables
 load_env
 
-# Variables de entorno cargadas desde el .env
+# Variables de entorno cargadas desde el ./config/.env
 POSTGRES_HOST=${POSTGRES_HOST:-postgres}
 POSTGRES_PORT=${POSTGRES_HOST_PORT:-5432}
 POSTGRES_NAME=${POSTGRES_DATABASE:-dev_events_db}
