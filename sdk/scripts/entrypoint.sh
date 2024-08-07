@@ -1,23 +1,54 @@
 #!/bin/sh
 
-# Load environment variables from the .env file
-if [ -f .env ]; then
-  export $(cat .env | grep -v ^# | xargs)
-fi
+# shellcheck disable=SC2154  # Desactivar aviso de shellcheck para APP_NAME
+# shellcheck source=.env disable=SC1091 # Desactivar aviso de shellcheck de archivo no especificado
+
+
+# Load environment variables from the .env file in the parent directory
+loadEnv() {
+  if [ -f .env ]; then
+    log "Loading environment variables from .env"
+    # Use `set -a` to export all variables
+    set -a
+    # shellcheck source=.env
+    . .env
+    set +a
+  else
+    echo "ERROR: .env file not found in the parent directory. Please create .env with the necessary environment variables."
+    exit 1
+  fi
+}
 
 # Function to log messages
 log() {
   echo "ENTRYPOINT: $1"
 }
 
+# Validate essential environment variables
+validateEnv() {
+  if [ -z "${APP_NAME}" ]; then
+    log "ERROR: APP_NAME is not set. Please check .env file."
+    exit 1
+  fi
+
+  if [ -z "${DEBUG}" ]; then
+    log "ERROR: DEBUG is not set. Please check .env file."
+    exit 1
+  fi
+
+  log "Environment variables loaded successfully."
+  log "APP_NAME: ${APP_NAME}"
+  log "DEBUG: ${DEBUG}"
+}
+
 # Function to build the server binary
 buildServer() {
   log "Building server binary"
-  go build -gcflags "all=-N -l" -buildvcs=false -o "/app/bin/$APP_NAME" "/app/cmd/main.go"
+  go build -gcflags "all=-N -l" -buildvcs=false -o "/app/bin/${APP_NAME}" "/app/cmd/main.go"
   # Verify if the binary file has been created and is executable
-  if [ -f "/app/bin/$APP_NAME" ]; then
+  if [ -f "/app/bin/${APP_NAME}" ]; then
     log "Binary file created successfully"
-    chmod +x "/app/bin/$APP_NAME"
+    chmod +x "/app/bin/${APP_NAME}"
   else
     log "Failed to create binary file"
     exit 1
@@ -30,15 +61,15 @@ runServer() {
 
   log "Killing old server"
   pkill -f dlv || true
-  pkill -f "/app/bin/$APP_NAME" || true
+  pkill -f "/app/bin/${APP_NAME}" || true
 
-  if [ "$DEBUG" = "true" ]; then
+  if [ "${DEBUG}" = "true" ]; then
     log "Run in debug mode"
-    dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec "/app/bin/$APP_NAME" &
+    dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec "/app/bin/${APP_NAME}" &
     liveReloading
   else
     log "Run in production mode"
-    "/app/bin/$APP_NAME"
+    "/app/bin/${APP_NAME}"
   fi
 }
 
@@ -53,9 +84,10 @@ rerunServer() {
 liveReloading() {
   log "Run liveReloading"
   inotifywait -e modify,delete,move -m -r --format '%w%f' --exclude '.*(\.tmp|\.swp)$' /app | (
-    while read file; do
-      if [[ "$file" == *.go ]]; then
-        log "File $file changed. Reloading..."
+    while read -r file; do
+      # Use [ ] instead of [[ ]] for POSIX compatibility
+      if [ "${file##*.}" = "go" ]; then
+        log "File ${file} changed. Reloading..."
         rerunServer
       fi
     done
@@ -70,6 +102,10 @@ initializeFileChangeLogger() {
 
 # Main function to orchestrate the process
 main() {
+  log "Starting script"
+  log "Current directory: $(pwd)"
+  loadEnv
+  validateEnv
   initializeFileChangeLogger
   buildServer
   runServer
