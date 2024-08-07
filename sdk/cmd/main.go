@@ -28,7 +28,7 @@ func main() {
 		basesetup.MicroLogError("error initializing Gin: %v", err)
 	}
 
-	monitoring.Routes(gingonic, gomicro)
+	monitoring.Routes(gingonic)
 
 	r := gingonic.GetRouter()
 

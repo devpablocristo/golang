@@ -1,15 +1,15 @@
 package monitoring
 
 import (
+	"github.com/gin-contrib/pprof" // Importa gin-contrib/pprof para integrar pprof con Gin
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	wire "github.com/devpablocristo/golang/sdk/cmd/rest"
 	basesetup "github.com/devpablocristo/golang/sdk/pkg/base-setup"
 	gingonic "github.com/devpablocristo/golang/sdk/pkg/gin-gonic/gin"
-	gmw "github.com/devpablocristo/golang/sdk/pkg/go-micro-web/v4"
 )
 
-func Routes(gingonic gingonic.GinClientPort, ms gmw.GoMicroClientPort) {
+func Routes(gingonic gingonic.GinClientPort) {
 	r := gingonic.GetRouter()
 
 	handler, err := wire.InitializeMonitoring()
@@ -17,13 +17,15 @@ func Routes(gingonic gingonic.GinClientPort, ms gmw.GoMicroClientPort) {
 		basesetup.MicroLogError("userHandler error: %v", err)
 	}
 
+	pprof.Register(r) // Registra las rutas de pprof en el enrutador de Gin
+
 	// Ruta de Salud
 	r.GET("/health", handler.Health)
 	r.GET("/ping", handler.Ping)
 
-	// TODO: Probar prometheus
+	// Prometheus
 	r.GET("/metrics", gingonic.WrapH(promhttp.Handler()))
 
-	// Integrar Go Micro y Gin
-	// ms.GetService().Handle("/", r)
+	// TODO: Falta Kong
+
 }

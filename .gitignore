@@ -100,11 +100,11 @@ yarn-error.log*
 *.pid
 *.seed
 *.pid.lock
-*.gz
-*.tgz
-*.zip
-*.7z
-*.rar
+# *.gz
+# *.tgz
+# *.zip
+# *.7z
+# *.rar
 
 # Compiled Dynamic Libraries
 *.dylib
