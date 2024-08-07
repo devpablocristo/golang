@@ -4,21 +4,23 @@ services:
   golang-sdk:
     container_name: "${APP_NAME:-golang-sdk}"
     build:
-      context: ..  # Contexto de construcción: apunta a la raíz del proyecto
-      dockerfile: config/Dockerfile.dev  # Ruta al Dockerfile desde el contexto
+      context: ..
+      dockerfile: config/Dockerfile.dev
+    image: "${APP_NAME:-golang-sdk}:${APP_VERSION:-1.0}"
     ports:
       - "${ROUTER_PORT:-8080}:${ROUTER_TARGET_PORT:-8080}"
       - "${DELVE_PORT:-2345}:${DELVE_TARGET_PORT:-2345}"
     volumes:
       - type: bind
-        source: ..  # Monta la raíz del proyecto
+        source: ..
         target: /app
       - type: bind
-        source: ../migrations  # Corrige esta ruta al nivel del proyecto
+        source: ../migrations
         target: /app/migrations
     environment:
       - APP_NAME=${APP_NAME:-golang-sdk}
-      - DEBUG=true
+      - APP_VERSION=${APP_VERSION:-1.0}
+      - DEBUG=${DEBUG:-true}
       - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
       - POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT:-5432}
       - POSTGRES_DATABASE=${POSTGRES_DATABASE:-dev_events_db}
@@ -57,17 +59,17 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-rootpassword}
       - MONGO_HOST=${MONGO_HOST:-mongodb}
       - MONGO_PORT=${MONGO_PORT:-27017}
-      - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}      # Añadido
-      - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}          # Añadido
-      - RABBITMQ_MANAGEMENT_PORT=${RABBITMQ_MANAGEMENT_PORT:-15672} # Añadido
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-user}        # Añadido
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-password}    # Añadido
-      - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT:-http://dynamodb:8765} # Añadido
-      - DYNAMODB_PORT=${DYNAMODB_PORT:-8765}          # Añadido
-      - DYNAMODB_REGION=${DYNAMODB_REGION:-us-west-2} # Añadido
+      - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}      
+      - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}          
+      - RABBITMQ_MANAGEMENT_PORT=${RABBITMQ_MANAGEMENT_PORT:-15672} 
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-user}        
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-password}    
+      - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT:-http://dynamodb:8765} 
+      - DYNAMODB_PORT=${DYNAMODB_PORT:-8765}          
+      - DYNAMODB_REGION=${DYNAMODB_REGION:-us-west-2} 
       - MICRO_SERVICE_NAME=${MICRO_SERVICE_NAME:-golang-sdk}
       - MICRO_SERVICE_VERSION=${MICRO_SERVICE_VERSION:-1.0.0}
-      - MICRO_SERVICE_ADDRESS=:${MICRO_SERVICE_ADDRESS:-8085}
+      - MICRO_SERVICE_ADDRESS=${MICRO_SERVICE_ADDRESS:-8085}
     depends_on:
       - postgres
       - consul

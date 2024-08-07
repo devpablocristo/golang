@@ -3,7 +3,7 @@ SHELL := /bin/bash
 # Variables
 ROOT_DIR := $(shell pwd)
 APP_NAME := golang-sdk
-VERSION := 0.1
+VERSION := 1.0
 BUILD_DIR := ${ROOT_DIR}/bin
 CONFIG_DIR := ${ROOT_DIR}/config
 SCRIPTS_DIR := ${ROOT_DIR}/scripts
