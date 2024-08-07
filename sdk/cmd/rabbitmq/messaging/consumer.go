@@ -6,9 +6,7 @@ import (
 	"github.com/rabbitmq/amqp091-go"
 )
 
-// StartConsumer inicia el consumidor que recibe mensajes de RabbitMQ
 func StartConsumer(channel *amqp091.Channel, queueName string) {
-	// Declara la cola
 	_, err := channel.QueueDeclare(
 		queueName, // nombre de la cola
 		true,      // durable
