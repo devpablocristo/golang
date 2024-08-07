@@ -3,7 +3,7 @@ package messaging
 import (
 	"log"
 
-	"github.com/streadway/amqp"
+	"github.com/rabbitmq/amqp091-go"
 )
 
 func failOnError(err error, msg string) {
@@ -14,7 +14,7 @@ func failOnError(err error, msg string) {
 
 func StartConsumer() {
 	// Conexión a RabbitMQ
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp091.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "No se pudo conectar a RabbitMQ")
 	defer conn.Close()
 

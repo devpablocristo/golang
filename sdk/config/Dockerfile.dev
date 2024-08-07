@@ -8,19 +8,6 @@ RUN apk update && \
 # Set the working directory inside the container
 WORKDIR /app
 
-#####
-# config vieja, borrar
-# Copy the entrypoint script first and make it executable
-# COPY ./scripts/entrypoint.sh /entrypoint.sh
-# RUN chmod +x /entrypoint.sh
-
-# Copy go.mod and go.sum to leverage Docker cache
-# COPY ./go.mod ./go.sum ./
-
-# Download and verify the project dependencies
-# RUN go mod download && go mod verify
-#####
-
 # Copy the rest of the project files to the container
 COPY . .
 # config nueva, funciona bien pero probar

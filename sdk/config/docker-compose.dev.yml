@@ -64,6 +64,7 @@ services:
       - RABBITMQ_MANAGEMENT_PORT=${RABBITMQ_MANAGEMENT_PORT:-15672} 
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-user}        
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-password}    
+      - RABBITMQ_VHOST=${RABBITMQ_VHOS:-/} 
       - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT:-http://dynamodb:8765} 
       - DYNAMODB_PORT=${DYNAMODB_PORT:-8765}          
       - DYNAMODB_REGION=${DYNAMODB_REGION:-us-west-2} 
@@ -317,7 +318,7 @@ services:
       - app-network
 
   rabbitmq:
-    image: "rabbitmq:3-management"
+    image: "rabbitmq:4.0.0-beta.3-management-alpine"
     container_name: rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-user}

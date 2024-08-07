@@ -5,7 +5,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	wire "github.com/devpablocristo/golang/sdk/cmd/rest"
-	basesetup "github.com/devpablocristo/golang/sdk/pkg/base-setup"
+	initialsetup "github.com/devpablocristo/golang/sdk/internal/platform/initial"
 	gingonic "github.com/devpablocristo/golang/sdk/pkg/gin-gonic/gin"
 )
 
@@ -14,7 +14,7 @@ func Routes(gingonic gingonic.GinClientPort) {
 
 	handler, err := wire.InitializeMonitoring()
 	if err != nil {
-		basesetup.MicroLogError("userHandler error: %v", err)
+		initialsetup.MicroLogError("userHandler error: %v", err)
 	}
 
 	pprof.Register(r) // Registra las rutas de pprof en el enrutador de Gin
