@@ -62,8 +62,8 @@ services:
       - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}      
       - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}          
       - RABBITMQ_MANAGEMENT_PORT=${RABBITMQ_MANAGEMENT_PORT:-15672} 
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-user}        
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-password}    
+      - RABBITMQ_USER=${RABBITMQ_USER:-user}        
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-password}    
       - RABBITMQ_VHOST=${RABBITMQ_VHOS:-/} 
       - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT:-http://dynamodb:8765} 
       - DYNAMODB_PORT=${DYNAMODB_PORT:-8765}          
@@ -321,8 +321,8 @@ services:
     image: "rabbitmq:4.0.0-beta.3-management-alpine"
     container_name: rabbitmq
     environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-user}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-password}
+      - RABBITMQ_USER=${RABBITMQ_USER:-user}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-password}
     ports:
       - "${RABBITMQ_PORT:-5672}:${RABBITMQ_PORT:-5672}"
       - "${RABBITMQ_MANAGEMENT_PORT:-15672}:${RABBITMQ_MANAGEMENT_PORT:-15672}"

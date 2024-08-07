@@ -27,7 +27,7 @@ type rabbitMQClient struct {
 // InitializeRabbitMQClient inicializa una nueva conexión de cliente RabbitMQ.
 func InitializeRabbitMQClient(config RabbitMQConfig) error {
 	once.Do(func() {
-		connString := fmt.Sprintf("amqp://%s:%s@%s:%d/%s",
+		connString := fmt.Sprintf("amqp://%s:%s@%s:%d%s",
 			config.User, config.Password, config.Host, config.Port, config.VHost)
 
 		conn, err := amqp091.Dial(connString)
@@ -51,6 +51,9 @@ func GetRabbitMQInstance() (RabbitMQClientPort, error) {
 
 // Channel devuelve un nuevo canal de comunicación con RabbitMQ.
 func (client *rabbitMQClient) Channel() (*amqp091.Channel, error) {
+	if client.connection == nil {
+		return nil, fmt.Errorf("rabbitmq connection is not open")
+	}
 	return client.connection.Channel()
 }
 

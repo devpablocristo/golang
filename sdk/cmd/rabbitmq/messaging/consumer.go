@@ -6,55 +6,36 @@ import (
 	"github.com/rabbitmq/amqp091-go"
 )
 
-func failOnError(err error, msg string) {
+// StartConsumer inicia el consumidor que recibe mensajes de RabbitMQ
+func StartConsumer(channel *amqp091.Channel, queueName string) {
+	// Declara la cola
+	_, err := channel.QueueDeclare(
+		queueName, // nombre de la cola
+		true,      // durable
+		false,     // auto-delete
+		false,     // exclusive
+		false,     // no-wait
+		nil,       // argumentos adicionales
+	)
 	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
+		log.Fatalf("Failed to declare queue: %v", err)
 	}
-}
 
-func StartConsumer() {
-	// Conexión a RabbitMQ
-	conn, err := amqp091.Dial("amqp://guest:guest@localhost:5672/")
-	failOnError(err, "No se pudo conectar a RabbitMQ")
-	defer conn.Close()
-
-	// Crear un canal
-	ch, err := conn.Channel()
-	failOnError(err, "No se pudo abrir el canal")
-	defer ch.Close()
-
-	// Declarar una cola
-	q, err := ch.QueueDeclare(
-		"hello", // nombre de la cola
-		false,   // durable
-		false,   // auto delete
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // argumentos
+	messages, err := channel.Consume(
+		queueName, // nombre de la cola
+		"",        // consumer tag
+		true,      // auto-acknowledge
+		false,     // exclusive
+		false,     // no-local
+		false,     // no-wait
+		nil,       // argumentos adicionales
 	)
-	failOnError(err, "No se pudo declarar la cola")
+	if err != nil {
+		log.Fatalf("failed to register a consumer: %v", err)
+	}
 
-	// Consumir mensajes
-	msgs, err := ch.Consume(
-		q.Name, // nombre de la cola
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // argumentos
-	)
-	failOnError(err, "No se pudo registrar el consumidor")
-
-	forever := make(chan bool)
-
-	// Goroutine para manejar los mensajes
-	go func() {
-		for d := range msgs {
-			log.Printf(" [x] Recibido %s", d.Body)
-		}
-	}()
-
-	log.Printf(" [*] Esperando mensajes. Para salir presiona CTRL+C")
-	<-forever
+	log.Println("Esperando mensajes. Para salir presiona CTRL+C")
+	for msg := range messages {
+		log.Printf(" [x] Recibido %s", string(msg.Body))
+	}
 }

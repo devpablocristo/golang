@@ -1,44 +1,43 @@
 package messaging
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/rabbitmq/amqp091-go"
 )
 
-func StartProducer() {
-	// Conexión a RabbitMQ
-	conn, err := amqp091.Dial("amqp://guest:guest@localhost:5672/")
-	failOnError(err, "No se pudo conectar a RabbitMQ")
-	defer conn.Close()
-
-	// Crear un canal
-	ch, err := conn.Channel()
-	failOnError(err, "No se pudo abrir el canal")
-	defer ch.Close()
-
-	// Declarar una cola
-	q, err := ch.QueueDeclare(
-		"hello", // nombre de la cola
-		false,   // durable
-		false,   // auto delete
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // argumentos
+// StartProducer inicia el productor que envía mensajes a RabbitMQ
+func StartProducer(channel *amqp091.Channel, queueName string) {
+	// Declara la cola
+	_, err := channel.QueueDeclare(
+		queueName, // nombre de la cola
+		true,      // durable
+		false,     // auto-delete
+		false,     // exclusive
+		false,     // no-wait
+		nil,       // argumentos adicionales
 	)
-	failOnError(err, "No se pudo declarar la cola")
+	if err != nil {
+		log.Fatalf("Failed to declare queue: %v", err)
+	}
 
-	// Publicar un mensaje
-	body := "Hola, RabbitMQ!"
-	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key (nombre de la cola)
-		false,  // mandatory
-		false,  // immediate
-		amqp091.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(body),
-		})
-	failOnError(err, "No se pudo publicar el mensaje")
-	log.Printf(" [x] Enviado %s", body)
+	// Publicar mensajes
+	for i := 0; i < 10; i++ {
+		message := fmt.Sprintf("Mensaje %d", i+1)
+		err := channel.Publish(
+			"",        // exchange
+			queueName, // routing key (nombre de la cola)
+			false,     // mandatory
+			false,     // immediate
+			amqp091.Publishing{
+				ContentType: "text/plain",
+				Body:        []byte(message),
+			})
+		if err != nil {
+			log.Printf("failed to publish message: %v", err)
+		} else {
+			log.Printf(" [x] Sent %s", message)
+		}
+	}
 }
