@@ -1,14 +1,12 @@
-package ws
+package wshandler
 
 import (
 	"log"
 	"net/http"
 
+	"github.com/devpablocristo/golang/sdk/internal/core/chat"
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-
-	chat "github.com/devpablocristo/interviews/b6/chat/domain"
-	renderjet "github.com/devpablocristo/interviews/b6/chat/infrastructure/renderjet"
-	usecases "github.com/devpablocristo/interviews/b6/chat/usecases"
 )
 
 // upgradeConnection is the websocket upgrader from gorilla/websockets
@@ -41,16 +39,7 @@ func WsEndpoint(w http.ResponseWriter, r *http.Request) {
 	go usecases.ListenForWs(&conn)
 }
 
-// Home renders the home page
-func Home(w http.ResponseWriter, r *http.Request) {
-	err := renderjet.RenderPage(w, "home.jet", nil)
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-
-// WsHandler estructura para manejar WebSocket
+// WsHandler estructura para manejar WebSocket con Gin
 type WsHandler struct {
 	upgrader websocket.Upgrader
 }
@@ -69,10 +58,9 @@ func NewWsHandler() *WsHandler {
 	}
 }
 
-// HomePageHandler maneja la solicitud de la página de inicio
+// Home maneja la solicitud de la página de inicio
 func (h *WsHandler) Home(c *gin.Context) {
 	c.String(http.StatusOK, "Welcome to the HomePage!")
-	fmt.Println("Endpoint Hit: homePage")
 }
 
 // Reader lee mensajes desde la conexión WebSocket

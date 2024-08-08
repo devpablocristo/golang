@@ -3,18 +3,16 @@ package core
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"sort"
-	"sync"
 
-	"github.com/devpablocristo/golang/sdk/cmd/websocket/chat/router"
-	"github.com/devpablocristo/golang/sdk/internal/core/chat"
+	chat "github.com/devpablocristo/golang/sdk/internal/core/chat"
 )
 
 var wsChan = make(chan chat.WsPayload)
 
 var Clients = make(map[chat.WebSocketConnection]string)
 
+// ListenForWs lee mensajes desde la conexión WebSocket
 func ListenForWs(conn *chat.WebSocketConnection) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -35,6 +33,7 @@ func ListenForWs(conn *chat.WebSocketConnection) {
 	}
 }
 
+// ListenToWsChannel maneja el canal de WebSocket
 func ListenToWsChannel() {
 	var response chat.WsJsonResponse
 
@@ -82,18 +81,4 @@ func broadcastToAll(response chat.WsJsonResponse) {
 			delete(Clients, client)
 		}
 	}
-}
-
-func ChatService(wg *sync.WaitGroup) {
-	defer wg.Done()
-	mux := router.Routes()
-
-	log.Println("Starting channel listener")
-	go usecases.ListenToWsChannel()
-
-	port := ":9999"
-
-	log.Println("Chat Service starting server on port:", port)
-
-	_ = http.ListenAndServe(port, mux)
 }
