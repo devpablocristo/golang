@@ -7,7 +7,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/devpablocristo/golang/sdk/cmd/grpc/chat/pb"
+	"github.com/devpablocristo/golang/sdk/cmd/gateways/chat/pb"
 	"github.com/devpablocristo/golang/sdk/internal/core/chat"
 )
 

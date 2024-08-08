@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
-	monitoring "github.com/devpablocristo/golang/sdk/cmd/rest/monitoring/routes"
-	user "github.com/devpablocristo/golang/sdk/cmd/rest/user/routes"
-
-	msg "github.com/devpablocristo/golang/sdk/cmd/rabbitmq/messaging"
+	msg "github.com/devpablocristo/golang/sdk/cmd/gateways/messaging"
+	monitoring "github.com/devpablocristo/golang/sdk/cmd/gateways/monitoring"
+	shared "github.com/devpablocristo/golang/sdk/cmd/gateways/shared"
+	user "github.com/devpablocristo/golang/sdk/cmd/gateways/user"
 	gingonicsetup "github.com/devpablocristo/golang/sdk/internal/platform/gin"
 	gmwsetup "github.com/devpablocristo/golang/sdk/internal/platform/go-micro-web"
 	initialsetup "github.com/devpablocristo/golang/sdk/internal/platform/initial"
@@ -32,11 +32,20 @@ func main() {
 		initialsetup.MicroLogError("error initializing Gin: %v", err)
 	}
 
-	monitoring.Routes(gingonic)
+	monitoringHandler, err := shared.InitializeMonitoring()
+	if err != nil {
+		initialsetup.MicroLogError("userHandler error: %v", err)
+	}
+
+	monitoring.Routes(gingonic, monitoringHandler)
 
 	r := gingonic.GetRouter()
 
-	user.Routes(r)
+	userHandler, err := shared.InitializeUserHandler()
+	if err != nil {
+		initialsetup.MicroLogError("userHandler error: %v", err)
+	}
+	user.Routes(r, userHandler)
 
 	gomicro.GetService().Handle("/", r)
 

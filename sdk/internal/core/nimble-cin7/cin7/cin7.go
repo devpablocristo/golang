@@ -1,10 +1,10 @@
 package cin7
 
-import "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/shared"
+import "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/utils"
 
 type Shipment struct {
 	ShipmentID  string
 	OrderID     string
 	ShippedDate string
-	Items       []shared.Item // Items de tipo shared.Item
+	Items       []utils.Item // Items de tipo shared.Item
 }
