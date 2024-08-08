@@ -1,6 +1,10 @@
 package chat
 
-import "github.com/gorilla/websocket"
+import (
+	"time"
+
+	"github.com/gorilla/websocket"
+)
 
 type WebSocketConnection struct {
 	*websocket.Conn
@@ -20,4 +24,10 @@ type WsPayload struct {
 	Username string              `json:"username"`
 	Message  string              `json:"message"`
 	Conn     WebSocketConnection `json:"-"`
+}
+
+type ChatMessage struct {
+	Sender    string
+	Message   string
+	Timestamp time.Time
 }

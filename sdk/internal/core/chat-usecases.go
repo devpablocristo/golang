@@ -1,13 +1,17 @@
 package core
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sort"
+	"time"
 
-	chat "github.com/devpablocristo/golang/sdk/internal/core/chat"
+	"github.com/devpablocristo/golang/sdk/cmd/grpc/chat/pb"
+	"github.com/devpablocristo/golang/sdk/internal/core/chat"
 )
 
+// websocket
 var wsChan = make(chan chat.WsPayload)
 
 var Clients = make(map[chat.WebSocketConnection]string)
@@ -82,3 +86,32 @@ func broadcastToAll(response chat.WsJsonResponse) {
 		}
 	}
 }
+
+//
+
+// grcp
+type ChatUseCasesPort interface {
+	SendMessage(context.Context, string, string) error
+}
+
+type ChatUseCases struct {
+	repo chat.Repository
+	pb.ChatServiceServer
+}
+
+func NewChatService(repo chat.Repository) ChatUseCasesPort {
+	return &ChatUseCases{
+		repo: repo,
+	}
+}
+
+func (s *ChatUseCases) SendMessage(ctx context.Context, sender, message string) error {
+	msg := &chat.ChatMessage{
+		Sender:    sender,
+		Message:   message,
+		Timestamp: time.Now(),
+	}
+	return s.repo.SaveMessage(ctx, msg)
+}
+
+//
