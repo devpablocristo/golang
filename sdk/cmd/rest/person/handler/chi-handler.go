@@ -12,35 +12,28 @@ type ChiHandler struct {
 	uc core.PersonUseCasePort
 }
 
-// NewChiHandler crea una nueva instancia de ChiHandler.
 func NewChiHandler(uc core.PersonUseCasePort) *ChiHandler {
 	return &ChiHandler{
 		uc: uc,
 	}
 }
 
-// CreatePerson maneja la creación de una nueva persona utilizando Chi.
 func (h *ChiHandler) CreatePerson(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	defer r.Body.Close()
 
-	// Decodificar JSON en DTO
 	var dto PersonDTO
 	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
 		shared.WriteErrorResponse(w, shared.ApiErrors["InvalidJSON"], "ChiHandler.CreatePerson")
 		return
 	}
 
-	// Convertir DTO a dominio
-	newPerson := dto.ToDomain()
-
-	ctx := r.Context()
-	if err := h.uc.CreatePerson(ctx, newPerson); err != nil {
+	if err := h.uc.CreatePerson(r.Context(), dto.ToDomain()); err != nil {
 		shared.WriteErrorResponse(w, shared.ApiErrors["InternalServer"], "ChiHandler.CreatePerson")
 		return
 	}
 
-	response := shared.NewApiResponse(true, http.StatusCreated, "Person created successfully", newPerson)
+	response := shared.NewApiResponse(true, http.StatusCreated, "Person created successfully", dto.ToDomain())
 	shared.WriteJSONResponse(w, http.StatusCreated, response)
 }
 

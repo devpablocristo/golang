@@ -56,8 +56,7 @@ func main() {
 	}
 }
 
-// messaging inicializa el productor y consumidor de RabbitMQ
-// messaging inicializa el productor y consumidor de RabbitMQ
+// RabbitMQ
 func messaging() {
 	client, err := amqpsetup.NewRabbitMQInstance()
 	if err != nil {

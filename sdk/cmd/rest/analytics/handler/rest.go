@@ -10,17 +10,17 @@ import (
 	ucs "github.com/devpablocristo/golang/sdk/internal/core"
 )
 
-type RestHandler struct {
+type Handler struct {
 	ucs ucs.UseCasePort
 }
 
-func NewRestHandler(ucs ucs.UseCasePort) *RestHandler {
-	return &RestHandler{
+func NewRestHandler(ucs ucs.UseCasePort) *Handler {
+	return &Handler{
 		ucs: ucs,
 	}
 }
 
-func (h *RestHandler) FakeCreateReport(c *gin.Context) {
+func (h *Handler) FakeCreateReport(c *gin.Context) {
 	data, err := ttools.LoadTestData("test")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())

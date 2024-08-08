@@ -30,28 +30,19 @@ func NewGinHandler(service core.PersonUseCasePort) GinHandlerPort {
 	}
 }
 
-// CreatePerson maneja la creación de una nueva persona utilizando Gin.
 func (h *GinHandler) CreatePerson(c *gin.Context) {
 	var dto PersonDTO
-
-	// Validar la entrada JSON en la estructura DTO.
 	if err := c.ShouldBindJSON(&dto); err != nil {
 		shared.WriteErrorResponse(c.Writer, shared.ApiErrors["BadRequest"], "GinHandler.CreatePerson")
 		return
 	}
 
-	// Convertir DTO a modelo de dominio.
-	newPerson := dto.ToDomain()
-
-	// Intentar crear la persona en la base de datos.
-	ctx := c.Request.Context()
-	if err := h.service.CreatePerson(ctx, newPerson); err != nil {
+	if err := h.service.CreatePerson(c.Request.Context(), dto.ToDomain()); err != nil {
 		shared.WriteErrorResponse(c.Writer, shared.ApiErrors["InternalServer"], "GinHandler.CreatePerson")
 		return
 	}
 
-	// Responder con un mensaje de éxito.
-	response := shared.NewApiResponse(true, http.StatusCreated, "Person created successfully", newPerson)
+	response := shared.NewApiResponse(true, http.StatusCreated, "Person created successfully", dto.ToDomain())
 	shared.WriteJSONResponse(c.Writer, http.StatusCreated, response)
 }
 
