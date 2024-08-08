@@ -7,7 +7,7 @@ import (
 	eve "github.com/devpablocristo/golang/sdk/internal/core/event"
 )
 
-type EventUseCasePort interface {
+type EventUseCasesPort interface {
 	CreateEvent(context.Context, *eve.Event) error
 	// DeleteEvent(context.Context, string) (*eve.Event, error)
 	// HardDeleteEvent(context.Context, string) (*eve.Event, error)
@@ -22,7 +22,7 @@ type eventUsecase struct {
 	eve eve.RepositoryPort
 }
 
-func NewEventseCase(r eve.RepositoryPort) EventUseCasePort {
+func NewEventseCase(r eve.RepositoryPort) EventUseCasesPort {
 	return &eventUsecase{
 		eve: r,
 	}

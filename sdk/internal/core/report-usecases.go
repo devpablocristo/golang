@@ -7,21 +7,21 @@ import (
 	"github.com/devpablocristo/golang/sdk/internal/core/report"
 )
 
-type UseCasePort interface {
+type UseCasesPort interface {
 	CreateReport(context.Context, *report.Report) error
 }
 
-type UseCase struct {
+type UseCases struct {
 	report report.RepositoryPort
 }
 
-func NewUseCase(r report.RepositoryPort) UseCasePort {
-	return &UseCase{
+func NewUseCases(r report.RepositoryPort) UseCasesPort {
+	return &UseCases{
 		report: r,
 	}
 }
 
-func (u *UseCase) CreateReport(ctx context.Context, report *report.Report) error {
+func (u *UseCases) CreateReport(ctx context.Context, report *report.Report) error {
 	fmt.Println(report)
 	return nil
 }

@@ -9,12 +9,12 @@ import (
 )
 
 type AuthHandler struct {
-	authUseCase core.AuthUseCasePort
+	authUseCases core.AuthUseCasesPort
 }
 
-func NewAuthHandler(authUseCase core.AuthUseCasePort) *AuthHandler {
+func NewAuthHandler(authUseCases core.AuthUseCasesPort) *AuthHandler {
 	return &AuthHandler{
-		authUseCase: authUseCase,
+		authUseCases: authUseCases,
 	}
 }
 
@@ -25,7 +25,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.authUseCase.Login(c.Request.Context(), req.Username, req.Password)
+	token, err := h.authUseCases.Login(c.Request.Context(), req.Username, req.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return

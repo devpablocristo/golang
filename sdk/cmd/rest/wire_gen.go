@@ -22,8 +22,8 @@ func InitializeUserHandler() (*user.Handler, error) {
 		return nil, err
 	}
 	repositoryPort := user2.NewUserRepository(cassandraClientPort)
-	userUseCasePort := core.NewUserUseCase(repositoryPort)
-	handler := user.NewHandler(userUseCasePort)
+	userUseCasesPort := core.NewUserUseCases(repositoryPort)
+	handler := user.NewHandler(userUseCasesPort)
 	return handler, nil
 }
 

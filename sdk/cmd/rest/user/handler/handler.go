@@ -10,10 +10,10 @@ import (
 )
 
 type Handler struct {
-	ucs core.UserUseCasePort
+	ucs core.UserUseCasesPort
 }
 
-func NewHandler(ucs core.UserUseCasePort) *Handler {
+func NewHandler(ucs core.UserUseCasesPort) *Handler {
 	return &Handler{
 		ucs: ucs,
 	}

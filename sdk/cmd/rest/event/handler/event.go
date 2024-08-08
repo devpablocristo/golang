@@ -13,11 +13,11 @@ import (
 )
 
 type Handler struct {
-	uc core.EventUseCasePort
+	uc core.EventUseCasesPort
 }
 
 // NewHandler crea un nuevo handler para los eventos.
-func NewHandler(uc core.EventUseCasePort) *Handler {
+func NewHandler(uc core.EventUseCasesPort) *Handler {
 	return &Handler{
 		uc: uc,
 	}
@@ -169,10 +169,10 @@ func (h *Handler) Health(c *gin.Context) {
 // // }
 
 // type RestHandler struct {
-// 	core uc.UseCasePort
+// 	core uc.UseCasesPort
 // }
 
-// func NewRestHandler(core uc.UseCasePort) *RestHandler {
+// func NewRestHandler(core uc.UseCasesPort) *RestHandler {
 // 	return &RestHandler{
 // 		core: core,
 // 	}

@@ -25,7 +25,7 @@ func InitializeUserHandler() (*userhandler.Handler, error) {
 	wire.Build(
 		cass.NewCassandraInstance,
 		user.NewUserRepository,
-		core.NewUserUseCase,
+		core.NewUserUseCases,
 		userhandler.NewHandler,
 	)
 	return &userhandler.Handler{}, nil
@@ -42,7 +42,7 @@ func InitializeMonitoring() (*monitoring.Handler, error) {
 // 	wire.Build(
 // 		cass.NewCassandraInstance,
 // 		usr.NewUserRepository,
-// 		core.NewAuthUseCase,
+// 		core.NewAuthUseCases,
 // 		is.GetJWTSecretKey,
 // 		hauth.NewAuthHandler,
 // 	)
@@ -54,8 +54,8 @@ func InitializeMonitoring() (*monitoring.Handler, error) {
 // 		rd.NewRedisInstance,
 // 		nim.NewRedisRepository,
 // 		cin7.NewRedisRepository,
-// 		nc7.NewCin7UseCase,
-// 		nc7.NewNimbleUseCase,
+// 		nc7.NewCin7UseCases,
+// 		nc7.NewNimbleUseCases,
 // 		cin7.NewCin7Handler,
 // 	)
 // 	return &hnc7.NimbleHandler{}, nil
@@ -65,7 +65,7 @@ func InitializeMonitoring() (*monitoring.Handler, error) {
 // 	wire.Build(
 // 		rd.NewRedisInstance,
 // 		cin7.NewRedisRepository,
-// 		nc7.NewCin7UseCase,
+// 		nc7.NewCin7UseCases,
 // 		hnc7.NewCin7Handler,
 // 	)
 // 	return &hnc7.Cin7Handler{}, nil

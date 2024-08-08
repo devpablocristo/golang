@@ -10,7 +10,7 @@ import (
 )
 
 type GinHandler struct {
-	service core.PersonUseCasePort
+	service core.PersonUseCasesPort
 }
 
 type GinHandlerPort interface {
@@ -24,7 +24,7 @@ type GinHandlerPort interface {
 }
 
 // NewGinHandler crea una nueva instancia de GinHandler.
-func NewGinHandler(service core.PersonUseCasePort) GinHandlerPort {
+func NewGinHandler(service core.PersonUseCasesPort) GinHandlerPort {
 	return &GinHandler{
 		service: service,
 	}
@@ -48,7 +48,7 @@ func (h *GinHandler) CreatePerson(c *gin.Context) {
 
 // func (es *GinHandler) DeletePerson(c *gin.Context) {
 // 	PersonID := c.Param("PersonID")
-// 	_, err := es.PersonUseCasePort.DeletePerson(c, PersonID)
+// 	_, err := es.PersonUseCasesPort.DeletePerson(c, PersonID)
 // 	if err != nil {
 // 		c.JSON(http.StatusBadRequest, ctypes.NewAPIError(http.StatusBadRequest, err.Error()))
 // 		return
@@ -59,7 +59,7 @@ func (h *GinHandler) CreatePerson(c *gin.Context) {
 
 // func (es *GinHandler) HardDeletePerson(c *gin.Context) {
 // 	PersonID := c.Param("PersonID")
-// 	_, err := es.PersonUseCasePort.HardDeletePerson(c, PersonID)
+// 	_, err := es.PersonUseCasesPort.HardDeletePerson(c, PersonID)
 // 	if err != nil {
 // 		c.JSON(http.StatusBadRequest, ctypes.NewAPIError(http.StatusBadRequest, err.Error()))
 // 		return
@@ -75,7 +75,7 @@ func (h *GinHandler) CreatePerson(c *gin.Context) {
 // 		return
 // 	}
 // 	PersonID := c.Param("PersonID")
-// 	_, err := es.PersonUseCasePort.UpdatePerson(c, dtoToDomain(dto), PersonID)
+// 	_, err := es.PersonUseCasesPort.UpdatePerson(c, dtoToDomain(dto), PersonID)
 // 	if err != nil {
 // 		c.JSON(http.StatusBadRequest, ctypes.NewAPIError(http.StatusBadRequest, err.Error()))
 // 		return
@@ -86,7 +86,7 @@ func (h *GinHandler) CreatePerson(c *gin.Context) {
 
 // func (es *GinHandler) RevivePerson(c *gin.Context) {
 // 	PersonID := c.Param("PersonID")
-// 	_, err := es.PersonUseCasePort.RevivePerson(c, PersonID)
+// 	_, err := es.PersonUseCasesPort.RevivePerson(c, PersonID)
 // 	if err != nil {
 // 		c.JSON(http.StatusBadRequest, ctypes.NewAPIError(http.StatusBadRequest, err.Error()))
 // 		return
@@ -97,7 +97,7 @@ func (h *GinHandler) CreatePerson(c *gin.Context) {
 
 // func (es *GinHandler) GetPerson(c *gin.Context) {
 // 	PersonID := c.Param("PersonID")
-// 	Person, err := es.PersonUseCasePort.GetPerson(c, PersonID)
+// 	Person, err := es.PersonUseCasesPort.GetPerson(c, PersonID)
 // 	if err != nil {
 // 		c.JSON(http.StatusBadRequest, ctypes.NewAPIError(http.StatusBadRequest, err.Error()))
 // 		return
@@ -107,7 +107,7 @@ func (h *GinHandler) CreatePerson(c *gin.Context) {
 // }
 
 // func (es *GinHandler) GetAllPersons(c *gin.Context) {
-// 	Persons, err := es.PersonUseCasePort.GetAllPersons(c)
+// 	Persons, err := es.PersonUseCasesPort.GetAllPersons(c)
 // 	if err != nil {
 // 		c.JSON(http.StatusBadRequest, ctypes.NewAPIError(http.StatusBadRequest, err.Error()))
 // 		return

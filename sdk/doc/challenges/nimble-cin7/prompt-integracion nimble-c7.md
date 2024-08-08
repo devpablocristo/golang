@@ -91,7 +91,7 @@ type NimbleRepository interface {
     CreateShipment(order Order) (Shipment, error)
 }
 
-type NimbleUseCase interface {
+type NimbleUseCases interface {
     ProcessOrder(order Order) error
 }
 ```
@@ -137,7 +137,7 @@ type Cin7Repository interface {
     SaveShipment(shipment Shipment) error
 }
 
-type Cin7UseCase interface {
+type Cin7UseCases interface {
     UpdateShipment(shipment Shipment) error
 }
 ```
@@ -171,10 +171,10 @@ import (
 )
 
 type NimbleHandler struct {
-    useCase domain.NimbleUseCase
+    useCase domain.NimbleUseCases
 }
 
-func NewNimbleHandler(uc domain.NimbleUseCase) *NimbleHandler {
+func NewNimbleHandler(uc domain.NimbleUseCases) *NimbleHandler {
     return &NimbleHandler{useCase: uc}
 }
 
@@ -222,10 +222,10 @@ import (
 )
 
 type Cin7Handler struct {
-    useCase domain.Cin7UseCase
+    useCase domain.Cin7UseCases
 }
 
-func NewCin7Handler(uc domain.Cin7UseCase) *Cin7Handler {
+func NewCin7Handler(uc domain.Cin7UseCases) *Cin7Handler {
     return &Cin7Handler{useCase: uc}
 }
 
@@ -271,23 +271,23 @@ import (
     "NimbleCin7Integration/internal/cin7/domain"
 )
 
-type NimbleUseCase struct {
+type NimbleUseCases struct {
     repo       domain.NimbleRepository
-    cin7UseCase domain.Cin7UseCase
+    cin7UseCases domain.Cin7UseCases
 }
 
-func NewNimbleUseCase(repo domain.NimbleRepository, cin7UseCase domain.Cin7UseCase) *NimbleUseCase {
-    return &NimbleUseCase{repo: repo, cin7UseCase: cin7UseCase}
+func NewNimbleUseCases(repo domain.NimbleRepository, cin7UseCases domain.Cin7UseCases) *NimbleUseCases {
+    return &NimbleUseCases{repo: repo, cin7UseCases: cin7UseCases}
 }
 
-func (uc *NimbleUseCase) ProcessOrder(order domain.Order) error {
+func (uc *NimbleUseCases) ProcessOrder(order domain.Order) error {
     // Transforma la orden de Nimble a un formato de envío de Cin7
     shipment, err := uc.repo.CreateShipment(order)
     if err != nil {
         return err
     }
     // Llama al caso de uso de Cin7 para actualizar el envío
-    return uc.cin7UseCase.UpdateShipment(shipment)
+    return uc.cin7UseCases.UpdateShipment(shipment)
 }
 ```
 
@@ -299,15 +299,15 @@ import (
     "NimbleCin7Integration/internal/cin7/domain"
 )
 
-type Cin7UseCase struct {
+type Cin7UseCases struct {
     repo domain.Cin7Repository
 }
 
-func NewCin7UseCase(repo domain.Cin7Repository) *Cin7UseCase {
-    return &Cin7UseCase{repo: repo}
+func NewCin7UseCases(repo domain.Cin7Repository) *Cin7UseCases {
+    return &Cin7UseCases{repo: repo}
 }
 
-func (uc *Cin7UseCase) UpdateShipment(shipment domain.Shipment) error {
+func (uc *Cin7UseCases) UpdateShipment(shipment domain.Shipment) error {
     return uc.repo.SaveShipment(shipment)
 }
 ```
@@ -418,11 +418,11 @@ func SetupRoutes(r *gin.Engine) {
     nimbleRepo := repository.NewNimbleRepository()
     cin7Repo := cin7repository.NewCin7Repository(config.RedisClient)
     
-    cin7UseCase := cin7usecase.NewCin7UseCase(cin7Repo)
-    nimbleUseCase := usecase.NewNimbleUseCase(nimbleRepo, cin7UseCase)
+    cin7UseCases := cin7usecase.NewCin7UseCases(cin7Repo)
+    nimbleUseCases := usecase.NewNimbleUseCases(nimbleRepo, cin7UseCases)
     
-    nimbleHandler := handler.NewNimbleHandler(nimbleUseCase)
-    cin7Handler := cin7handler.NewCin7Handler(cin7UseCase)
+    nimbleHandler := handler.NewNimbleHandler(nimbleUseCases)
+    cin7Handler := cin7handler.NewCin7Handler(cin7UseCases)
     
     r.POST("/nimble/orders", nimbleHandler.HandleOrderShipment)
     r.POST("/cin7/shipments", cin7Handler.HandleShipmentUpdate)
@@ -447,13 +447,13 @@ La arquitectura hexagonal se utiliza para separar las preocupaciones de la aplic
 ### Nimble
 - **DTOs**: Definiciones de datos para órdenes y artículos.
 - **Handler**: Controladores para las rutas de la API.
-- **UseCase**: Lógica de negocio para procesar órdenes.
+- **UseCases**: Lógica de negocio para procesar órdenes.
 - **Repository**: Interfaz y implementación para crear envíos.
 
 ### Cin7
 - **DTOs**: Definiciones de datos para envíos y artículos.
 - **Handler**: Controladores para las rutas de la API.
-- **UseCase**: Lógica de negocio para actualizar envíos.
+- **UseCases**: Lógica de negocio para actualizar envíos.
 - **Repository**: Interfaz y implementación para guardar envíos en Redis.
 
 ## Configuración
@@ -521,14 +521,14 @@ Wire se utiliza para la inyección de dependencias en el proyecto. La configurac
     - **Método**: `ProcessOrder`
 
     ```go
-    func (uc *NimbleUseCase) ProcessOrder(order domain.Order) error {
+    func (uc *NimbleUseCases) ProcessOrder(order domain.Order) error {
         // Transforma la orden de Nimble a un formato de envío de Cin7
         shipment, err := uc.repo.CreateShipment(order)
         if err != nil {
             return err
         }
         // Llama al caso de uso de Cin7 para actualizar el envío
-        return uc.cin7UseCase.UpdateShipment(shipment)
+        return uc.cin7UseCases.UpdateShipment(shipment)
     }
     ```
 
@@ -552,7 +552,7 @@ Wire se utiliza para la inyección de dependencias en el proyecto. La configurac
     - **Método**: `UpdateShipment`
 
     ```go
-    func (uc *Cin7UseCase) UpdateShipment(shipment domain.Shipment) error {
+    func (uc *Cin7UseCases) UpdateShipment(shipment domain.Shipment) error {
         return uc.repo.SaveShipment(shipment)
     }
     ```
@@ -584,14 +584,14 @@ Un diagrama de secuencia podría visualizar este flujo de control de manera clar
 
 1. **Nimble System** -> **Nimble API**: POST /nimble/orders
 2. **Nimble API** -> **Nimble Handler**: HandleOrderShipment
-3. **Nimble Handler** -> **Nimble UseCase**: ProcessOrder
-4. **Nimble UseCase** -> **Nimble Repository**: CreateShipment
-5. **Nimble Repository** -> **Nimble UseCase**: Return Cin7Shipment
-6. **Nimble UseCase** -> **Cin7 UseCase**: UpdateShipment
-7. **Cin7 UseCase** -> **Cin7 Repository**: SaveShipment
-8. **Cin7 Repository** -> **Cin7 UseCase**: Return Success
-9. **Cin7 UseCase** -> **Nimble UseCase**: Return Success
-10. **Nimble UseCase** -> **Nimble Handler**: Return Success
+3. **Nimble Handler** -> **Nimble UseCases**: ProcessOrder
+4. **Nimble UseCases** -> **Nimble Repository**: CreateShipment
+5. **Nimble Repository** -> **Nimble UseCases**: Return Cin7Shipment
+6. **Nimble UseCases** -> **Cin7 UseCases**: UpdateShipment
+7. **Cin7 UseCases** -> **Cin7 Repository**: SaveShipment
+8. **Cin7 Repository** -> **Cin7 UseCases**: Return Success
+9. **Cin7 UseCases** -> **Nimble UseCases**: Return Success
+10. **Nimble UseCases** -> **Nimble Handler**: Return Success
 11. **Nimble Handler** -> **Nimble API**: Return HTTP 200 OK
 
 ## Pruebas

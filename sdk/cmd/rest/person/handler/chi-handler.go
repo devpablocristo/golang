@@ -9,10 +9,10 @@ import (
 )
 
 type ChiHandler struct {
-	uc core.PersonUseCasePort
+	uc core.PersonUseCasesPort
 }
 
-func NewChiHandler(uc core.PersonUseCasePort) *ChiHandler {
+func NewChiHandler(uc core.PersonUseCasesPort) *ChiHandler {
 	return &ChiHandler{
 		uc: uc,
 	}

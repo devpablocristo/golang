@@ -11,10 +11,10 @@ import (
 )
 
 type Handler struct {
-	ucs ucs.UseCasePort
+	ucs ucs.UseCasesPort
 }
 
-func NewRestHandler(ucs ucs.UseCasePort) *Handler {
+func NewRestHandler(ucs ucs.UseCasesPort) *Handler {
 	return &Handler{
 		ucs: ucs,
 	}

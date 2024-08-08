@@ -9,11 +9,11 @@ import (
 
 // Handler representa el controlador para manejar las solicitudes relacionadas con órdenes
 type Handler struct {
-	useCase core.NimbleUseCasePort
+	useCase core.NimbleUseCasesPort
 }
 
 // NewNimbleHandler crea un nuevo controlador para Nimble
-func NewNimbleHandler(uc core.NimbleUseCasePort) *Handler {
+func NewNimbleHandler(uc core.NimbleUseCasesPort) *Handler {
 	return &Handler{useCase: uc}
 }
 

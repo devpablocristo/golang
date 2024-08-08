@@ -10,11 +10,11 @@ import (
 
 // Handler representa el controlador para manejar las solicitudes relacionadas con envíos
 type Handler struct {
-	useCase core.Cin7UseCasePort
+	useCase core.Cin7UseCasesPort
 }
 
 // NewCin7Handler crea un nuevo controlador para Cin7
-func NewCin7Handler(uc core.Cin7UseCasePort) *Handler {
+func NewCin7Handler(uc core.Cin7UseCasesPort) *Handler {
 	return &Handler{useCase: uc}
 }
 
