@@ -1,4 +1,4 @@
-package shared
+package middleware
 
 import (
 	"time"
@@ -7,7 +7,6 @@ import (
 	"go-micro.dev/v4/logger"
 )
 
-// TODO: normalizar y mover a pkg
 type LoggingOptions struct {
 	LogLevel       string
 	IncludeHeaders bool

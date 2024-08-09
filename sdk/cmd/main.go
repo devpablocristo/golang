@@ -7,6 +7,7 @@ import (
 	monitoring "github.com/devpablocristo/golang/sdk/cmd/gateways/monitoring"
 	shared "github.com/devpablocristo/golang/sdk/cmd/gateways/shared"
 	user "github.com/devpablocristo/golang/sdk/cmd/gateways/user"
+
 	gingonicsetup "github.com/devpablocristo/golang/sdk/internal/platform/gin"
 	gmwsetup "github.com/devpablocristo/golang/sdk/internal/platform/go-micro-web"
 	initialsetup "github.com/devpablocristo/golang/sdk/internal/platform/initial"
@@ -32,21 +33,20 @@ func main() {
 		initialsetup.MicroLogError("error initializing Gin: %v", err)
 	}
 
+	r := gingonic.GetRouter()
+
 	monitoringHandler, err := shared.InitializeMonitoring()
 	if err != nil {
 		initialsetup.MicroLogError("userHandler error: %v", err)
 	}
-
 	monitoring.Routes(gingonic, monitoringHandler)
-
-	r := gingonic.GetRouter()
 
 	userHandler, err := shared.InitializeUserHandler()
 	if err != nil {
 		initialsetup.MicroLogError("userHandler error: %v", err)
 	}
-	user.Routes(r, userHandler)
 
+	user.Routes(r, userHandler)
 	gomicro.GetService().Handle("/", r)
 
 	// Ejecuta Gin en la dirección especificada por Go-Micro

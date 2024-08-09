@@ -325,8 +325,8 @@ services:
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-password}
       - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_VHOST:-/}
     ports:
-      - "${RABBITMQ_PORT:-5672}:${RABBITMQ_PORT:-5672}"
-      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:${RABBITMQ_MANAGEMENT_PORT:-15672}"
+      - "${RABBITMQ_PORT:-5672}:${RABBITMQ_TARGET_PORT:-5672}"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:${RABBITMQ_TARGET_MANAGEMENT_PORT:-15672}"
     networks:
       - app-network
     restart: on-failure
@@ -336,12 +336,33 @@ services:
     container_name: dynamodb
     command: "-jar DynamoDBLocal.jar -port ${DYNAMODB_PORT:-8765} -sharedDb -dbPath /home/dynamodblocal/data"
     ports:
-      - "${DYNAMODB_PORT:-8765}:${DYNAMODB_PORT:-8765}"
+      - "${DYNAMODB_PORT:-8765}:${DYNAMODB_TARGET_PORT:-8765}"
     volumes:
       - dynamodb_data:/home/dynamodblocal/data
     networks:
       - app-network
     restart: on-failure
+
+  vault:
+    image: vault:1.13.3
+    container_name: vault
+    ports:
+      - "${VAULT_PORT:-8200}:${VAULT_TARGET_PORT:-8200}"
+    environment:
+      VAULT_ADDR: ${VAULT_ADDR}
+      VAULT_API_ADDR: ${VAULT_API_ADDR}
+      VAULT_CLUSTER_ADDR: ${VAULT_CLUSTER_ADDR}
+      VAULT_UI: ${VAULT_UI}
+    volumes:
+      - vault_data:/vault/data
+    command: server -config=/vault/config/vault-config.hcl
+    depends_on:
+      - consul
+    networks:
+      - app-network
+    restart: on-failure
+    cap_add:
+      - IPC_LOCK    
 
 networks:
   app-network:
@@ -355,3 +376,4 @@ volumes:
   pyroscope_data:
   mongodb_data:
   dynamodb_data:
+  vault_data:

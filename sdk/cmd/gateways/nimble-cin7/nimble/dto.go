@@ -8,8 +8,8 @@ import (
 
 // OrderReq representa la estructura del request para una orden de Nimble
 type OrderReq struct {
-	OrderID      string          `json:"order_id"`
-	CustomerName string          `json:"customer_name"`
+	OrderID      string           `json:"order_id"`
+	CustomerName string           `json:"customer_name"`
 	Items        []utils.ItemReq `json:"items"`
 }
 
