@@ -2,26 +2,18 @@ package core
 
 import (
 	"context"
-
-	"github.com/devpablocristo/golang/sdk/internal/core/user"
 )
 
 type GreaterUseCasesPort interface {
-	Login(context.Context, string, string) (string, error)
+	Hello(context.Context) (string, error)
 }
 
-type greeterUseCases struct {
-	userRepo  user.RepositoryPort
-	secretKey string
+type greeterUseCases struct{}
+
+func NewGreaterUseCases() GreaterUseCasesPort {
+	return &greeterUseCases{}
 }
 
-func NewGreaterUseCases(ur user.RepositoryPort, sk string) GreaterUseCasesPort {
-	return &authUseCases{
-		userRepo:  ur,
-		secretKey: sk,
-	}
-}
-
-func (s *authUseCases) Hello(ctx context.Context) (string, error) {
+func (s *greeterUseCases) Hello(ctx context.Context) (string, error) {
 	return "hello", nil
 }

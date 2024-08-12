@@ -9,17 +9,17 @@ import (
 	"github.com/devpablocristo/golang/sdk/internal/core/user"
 )
 
-type Handler struct {
+type GinHandler struct {
 	ucs core.UserUseCasesPort
 }
 
-func NewHandler(ucs core.UserUseCasesPort) *Handler {
-	return &Handler{
+func NewGinHandler(ucs core.UserUseCasesPort) *GinHandler {
+	return &GinHandler{
 		ucs: ucs,
 	}
 }
 
-func (h *Handler) CreateUser(c *gin.Context) {
+func (h *GinHandler) CreateUser(c *gin.Context) {
 	var user user.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
@@ -33,7 +33,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, user)
 }
 
-func (h *Handler) GetUser(c *gin.Context) {
+func (h *GinHandler) GetUser(c *gin.Context) {
 	id := c.Param("id")
 	user, err := h.ucs.GetUser(c.Request.Context(), id)
 	if err != nil {
@@ -44,7 +44,7 @@ func (h *Handler) GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (h *Handler) ListUsers(c *gin.Context) {
+func (h *GinHandler) ListUsers(c *gin.Context) {
 	users, err := h.ucs.ListUsers(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error fetching users"})
@@ -53,7 +53,7 @@ func (h *Handler) ListUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-func (h *Handler) UpdateUser(c *gin.Context) {
+func (h *GinHandler) UpdateUser(c *gin.Context) {
 	var user user.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
@@ -68,7 +68,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (h *Handler) DeleteUser(c *gin.Context) {
+func (h *GinHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 	err := h.ucs.DeleteUser(c.Request.Context(), id)
 	if err != nil {

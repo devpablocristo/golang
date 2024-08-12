@@ -4,16 +4,17 @@ import (
 	"github.com/spf13/viper"
 
 	amsgqp "github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091"
+	pkgport "github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/port"
 )
 
-func NewRabbitMQInstance() (amsgqp.RabbitMQClientPort, error) {
-	config := amsgqp.RabbitMQConfig{
-		Host:     viper.GetString("RABBITMQ_HOST"),
-		Port:     viper.GetInt("RABBITMQ_PORT"),
-		User:     viper.GetString("RABBITMQ_USER"),
-		Password: viper.GetString("RABBITMQ_PASSWORD"),
-		VHost:    viper.GetString("RABBITMQ_VHOST"),
-	}
+func NewRabbitMQInstance() (pkgport.RabbitMqClient, error) {
+	config := amsgqp.NewRabbitMqConfig(
+		viper.GetString("RABBITMQ_HOST"),
+		viper.GetInt("RABBITMQ_PORT"),
+		viper.GetString("RABBITMQ_USER"),
+		viper.GetString("RABBITMQ_PASSWORD"),
+		viper.GetString("RABBITMQ_VHOST"),
+	)
 
 	if err := config.Validate(); err != nil {
 		return nil, err

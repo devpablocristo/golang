@@ -4,31 +4,24 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/port"
 	"github.com/rabbitmq/amqp091-go"
 )
 
 var (
-	instance RabbitMQClientPort
+	instance port.RabbitMqClient
 	once     sync.Once
 	errInit  error
 )
 
-// RabbitMQClientPort es una interfaz que representa las operaciones que puedes realizar con RabbitMQ.
-type RabbitMQClientPort interface {
-	Channel() (*amqp091.Channel, error)
-	Close() error
-}
-
-// rabbitMQClient es una implementación del cliente de RabbitMQ.
-type rabbitMQClient struct {
+type rabbitMqClient struct {
 	connection *amqp091.Connection
 }
 
-// InitializeRabbitMQClient inicializa una nueva conexión de cliente RabbitMQ.
-func InitializeRabbitMQClient(config RabbitMQConfig) error {
+func InitializeRabbitMQClient(config port.RabbitMqConfig) error {
 	once.Do(func() {
 		connString := fmt.Sprintf("amqp://%s:%s@%s:%d%s",
-			config.User, config.Password, config.Host, config.Port, config.VHost)
+			config.GetUser(), config.GetPassword(), config.GetHost(), config.GetPort(), config.GetVHost())
 
 		conn, err := amqp091.Dial(connString)
 		if err != nil {
@@ -36,13 +29,13 @@ func InitializeRabbitMQClient(config RabbitMQConfig) error {
 			return
 		}
 
-		instance = &rabbitMQClient{connection: conn}
+		instance = &rabbitMqClient{connection: conn}
 	})
 	return errInit
 }
 
 // GetRabbitMQInstance devuelve la instancia del cliente RabbitMQ.
-func GetRabbitMQInstance() (RabbitMQClientPort, error) {
+func GetRabbitMQInstance() (port.RabbitMqClient, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("rabbitmq client is not initialized")
 	}
@@ -50,7 +43,7 @@ func GetRabbitMQInstance() (RabbitMQClientPort, error) {
 }
 
 // Channel devuelve un nuevo canal de comunicación con RabbitMQ.
-func (client *rabbitMQClient) Channel() (*amqp091.Channel, error) {
+func (client *rabbitMqClient) Channel() (*amqp091.Channel, error) {
 	if client.connection == nil {
 		return nil, fmt.Errorf("rabbitmq connection is not open")
 	}
@@ -58,6 +51,6 @@ func (client *rabbitMQClient) Channel() (*amqp091.Channel, error) {
 }
 
 // Close cierra la conexión con RabbitMQ.
-func (client *rabbitMQClient) Close() error {
+func (client *rabbitMqClient) Close() error {
 	return client.connection.Close()
 }

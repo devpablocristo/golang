@@ -6,7 +6,7 @@ package shared
 import (
 	"github.com/google/wire"
 
-	//hauth "github.com/devpablocristo/golang/sdk/cmd/rest/auth/handlers"
+	authhandler "github.com/devpablocristo/golang/sdk/cmd/gateways/auth"
 	//cin7 "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/cin7/handler"
 	//nimble "github.com/devpablocristo/golang/sdk/cmd/rest/nimble-cin7/nimble/handler"
 	monitoring "github.com/devpablocristo/golang/sdk/cmd/gateways/monitoring"
@@ -21,14 +21,23 @@ import (
 	//is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
 )
 
-func InitializeUserHandler() (*userhandler.Handler, error) {
+func InitializeUserHandler() (*userhandler.GinHandler, error) {
 	wire.Build(
 		cass.NewCassandraInstance,
 		user.NewUserRepository,
 		core.NewUserUseCases,
-		userhandler.NewHandler,
+		userhandler.NewGinHandler,
 	)
-	return &userhandler.Handler{}, nil
+	return &userhandler.GinHandler{}, nil
+}
+
+func InitializeAuthHandler() (*userhandler.GinHandler, error) {
+	wire.Build(
+
+		core.NewAuthUseCases,
+		authhandler.NewGinHandler,
+	)
+	return &userhandler.GinHandler{}, nil
 }
 
 func InitializeMonitoring() (*monitoring.Handler, error) {

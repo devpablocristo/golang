@@ -13,11 +13,11 @@ type PersonDTO struct {
 
 func (dto *PersonDTO) ToDomain() *person.Person {
 	return &person.Person{
-		Firstname:     dto.Firstname,
-		Lastname:      dto.Lastname,
-		Age:           dto.Age,
-		Gender:        dto.Gender,
-		IDC:           dto.IDC,
-		Qualification: dto.Qualification,
+		Firstname: dto.Firstname,
+		Lastname:  dto.Lastname,
+		Age:       dto.Age,
+		Gender:    dto.Gender,
+		IDC:       dto.IDC,
+		//Qualification: dto.Qualification,
 	}
 }

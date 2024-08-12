@@ -16,15 +16,15 @@ import (
 
 // Injectors from wire.go:
 
-func InitializeUserHandler() (*user.Handler, error) {
+func InitializeUserHandler() (*user.GinHandler, error) {
 	cassandraClientPort, err := cassandrasetup.NewCassandraInstance()
 	if err != nil {
 		return nil, err
 	}
 	repositoryPort := user2.NewUserRepository(cassandraClientPort)
 	userUseCasesPort := core.NewUserUseCases(repositoryPort)
-	handler := user.NewHandler(userUseCasesPort)
-	return handler, nil
+	ginHandler := user.NewHandler(userUseCasesPort)
+	return ginHandler, nil
 }
 
 func InitializeMonitoring() (*monitoring.Handler, error) {
