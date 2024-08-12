@@ -13,11 +13,11 @@ import (
 )
 
 type Handler struct {
-	uc core.EventUseCasesPort
+	uc core.EventUseCases
 }
 
 // NewHandler crea un nuevo handler para los eventos.
-func NewHandler(uc core.EventUseCasesPort) *Handler {
+func NewHandler(uc core.EventUseCases) *Handler {
 	return &Handler{
 		uc: uc,
 	}

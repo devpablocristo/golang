@@ -4,13 +4,13 @@ import (
 	"context"
 )
 
-type GreaterUseCasesPort interface {
+type GreaterUseCases interface {
 	Hello(context.Context) (string, error)
 }
 
 type greeterUseCases struct{}
 
-func NewGreaterUseCases() GreaterUseCasesPort {
+func NewGreaterUseCases() GreaterUseCases {
 	return &greeterUseCases{}
 }
 

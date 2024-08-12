@@ -12,10 +12,10 @@ type UseCasesPort interface {
 }
 
 type UseCases struct {
-	report report.RepositoryPort
+	report report.Repository
 }
 
-func NewUseCases(r report.RepositoryPort) UseCasesPort {
+func NewUseCases(r report.Repository) UseCasesPort {
 	return &UseCases{
 		report: r,
 	}

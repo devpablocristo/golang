@@ -3,23 +3,23 @@ package core
 import (
 	"context"
 
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/port"
+	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/ports"
 
 	"github.com/devpablocristo/golang/sdk/internal/core/auth"
 	"github.com/devpablocristo/golang/sdk/internal/core/user"
 )
 
-type AuthUseCasesPort interface {
+type AuthUseCases interface {
 	Login(context.Context, *user.User) (*auth.Auth, error)
 }
 
 type authUseCases struct {
 	//userRepo  user.RepositoryPort
 	//secretKey string
-	broker port.MessageBroker
+	broker ports.MessageBroker
 }
 
-func NewAuthUseCases(b port.MessageBroker) AuthUseCasesPort {
+func NewAuthUseCases(b ports.MessageBroker) AuthUseCases {
 	return &authUseCases{
 		broker: b,
 	}

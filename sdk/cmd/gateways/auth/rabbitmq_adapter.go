@@ -1,17 +1,16 @@
 package auth
 
 import (
-	pkgport "github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/port"
+	pkgports "github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/ports"
 
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/port"
+	ports "github.com/devpablocristo/golang/sdk/cmd/gateways/auth/ports"
 )
 
 type messageBroker struct {
-	rabbitClient pkgport.RabbitMqClient
+	rabbitClient pkgports.RabbitMqClient
 }
 
-// NewMessageBroker crea un nuevo messageBroker
-func NewMessageBroker(client pkgport.RabbitMqClient) port.MessageBroker {
+func NewMessageBroker(client pkgports.RabbitMqClient) ports.MessageBroker {
 	return &messageBroker{
 		rabbitClient: client,
 	}

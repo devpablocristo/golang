@@ -1,5 +1,5 @@
 package cin7
 
-type CachePort interface {
+type CacheRepository interface {
 	SaveShipment(Shipment) error
 }

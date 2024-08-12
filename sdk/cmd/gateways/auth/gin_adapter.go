@@ -9,10 +9,10 @@ import (
 )
 
 type GinHandler struct {
-	authUseCases core.AuthUseCasesPort
+	authUseCases core.AuthUseCases
 }
 
-func NewGinHandler(authUseCases core.AuthUseCasesPort) *GinHandler {
+func NewGinHandler(authUseCases core.AuthUseCases) *GinHandler {
 	return &GinHandler{
 		authUseCases: authUseCases,
 	}

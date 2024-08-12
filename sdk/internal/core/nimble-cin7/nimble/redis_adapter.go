@@ -11,7 +11,7 @@ type redisRepository struct {
 	redisInst redisv8.RedisClientPort
 }
 
-func NewRedisRepository(inst redisv8.RedisClientPort) CachePort {
+func NewRedisRepository(inst redisv8.RedisClientPort) CacheRepository {
 	return &redisRepository{
 		redisInst: inst,
 	}

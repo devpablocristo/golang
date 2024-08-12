@@ -4,6 +4,6 @@ import (
 	"context"
 )
 
-type RepositoryPort interface {
+type Repository interface {
 	CreateReport(context.Context) error
 }

@@ -8,7 +8,7 @@ type mapRepository struct {
 	db *InMemDB
 }
 
-func NewMapRepository() RepositoryPort {
+func NewMapRepository() Repository {
 	db := make(InMemDB)
 	return &mapRepository{
 		db: &db,

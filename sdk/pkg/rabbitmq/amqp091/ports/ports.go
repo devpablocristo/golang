@@ -1,4 +1,4 @@
-package port
+package ports
 
 import "github.com/rabbitmq/amqp091-go"
 

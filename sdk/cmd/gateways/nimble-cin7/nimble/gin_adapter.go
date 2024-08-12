@@ -9,11 +9,11 @@ import (
 
 // Handler representa el controlador para manejar las solicitudes relacionadas con órdenes
 type Handler struct {
-	useCase core.NimbleUseCasesPort
+	useCase core.NimbleUseCases
 }
 
 // NewNimbleHandler crea un nuevo controlador para Nimble
-func NewNimbleHandler(uc core.NimbleUseCasesPort) *Handler {
+func NewNimbleHandler(uc core.NimbleUseCases) *Handler {
 	return &Handler{useCase: uc}
 }
 
@@ -38,4 +38,3 @@ func (h *Handler) OrderShipment(c *gin.Context) {
 func (h *Handler) NimblePing(c *gin.Context) {
 	c.String(http.StatusOK, "nimble pong")
 }
-

@@ -10,7 +10,7 @@ import (
 )
 
 type GinHandler struct {
-	service core.PersonUseCasesPort
+	service core.PersonUseCases
 }
 
 type GinHandlerPort interface {
@@ -24,7 +24,7 @@ type GinHandlerPort interface {
 }
 
 // NewGinHandler crea una nueva instancia de GinHandler.
-func NewGinHandler(service core.PersonUseCasesPort) GinHandlerPort {
+func NewGinHandler(service core.PersonUseCases) GinHandlerPort {
 	return &GinHandler{
 		service: service,
 	}

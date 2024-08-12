@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/port"
+	"github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/ports"
 	"github.com/rabbitmq/amqp091-go"
 )
 
 var (
-	instance port.RabbitMqClient
+	instance ports.RabbitMqClient
 	once     sync.Once
 	errInit  error
 )
@@ -18,7 +18,7 @@ type rabbitMqClient struct {
 	connection *amqp091.Connection
 }
 
-func InitializeRabbitMQClient(config port.RabbitMqConfig) error {
+func InitializeRabbitMQClient(config ports.RabbitMqConfig) error {
 	once.Do(func() {
 		connString := fmt.Sprintf("amqp://%s:%s@%s:%d%s",
 			config.GetUser(), config.GetPassword(), config.GetHost(), config.GetPort(), config.GetVHost())
@@ -35,7 +35,7 @@ func InitializeRabbitMQClient(config port.RabbitMqConfig) error {
 }
 
 // GetRabbitMQInstance devuelve la instancia del cliente RabbitMQ.
-func GetRabbitMQInstance() (port.RabbitMqClient, error) {
+func GetRabbitMQInstance() (ports.RabbitMqClient, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("rabbitmq client is not initialized")
 	}

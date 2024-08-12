@@ -6,7 +6,7 @@ import (
 	"github.com/devpablocristo/golang/sdk/internal/core/person"
 )
 
-type PersonUseCasesPort interface {
+type PersonUseCases interface {
 	CreatePerson(context.Context, *person.Person) error
 	// DeletePerson(context.Context, string) error
 	// HardDeletePerson(context.Context, string) (person.Person, error)
@@ -16,29 +16,29 @@ type PersonUseCasesPort interface {
 	// ListPersons(context.Context) ([]person.Person, error)
 }
 
-type PersonUseCases struct {
+type personUseCases struct {
 	storage person.RepositoryPort
 }
 
-func NewPersonService(s person.RepositoryPort) PersonUseCasesPort {
-	return &PersonUseCases{
+func NewPersonService(s person.RepositoryPort) PersonUseCases {
+	return &personUseCases{
 		storage: s,
 	}
 }
 
-func (ps *PersonUseCases) CreatePerson(ctx context.Context, p *person.Person) error {
+func (ps *personUseCases) CreatePerson(ctx context.Context, p *person.Person) error {
 	if err := ps.storage.SavePerson(ctx, p); err != nil {
 		return err
 	}
 	return nil
 }
 
-// func (ps *PersonUseCases) GetPersons(ctx context.Context) (map[string]*person.Person, error) {
+// func (ps *personUseCases) GetPersons(ctx context.Context) (map[string]*person.Person, error) {
 // 	persons := ps.storage.ListPersons(ctx)
 // 	return persons, nil
 // }
 
-// func (ps *PersonUseCases) GetPerson(ctx context.Context, UUID string) (*person.Person, error) {
+// func (ps *personUseCases) GetPerson(ctx context.Context, UUID string) (*person.Person, error) {
 // 	p, err := ps.storage.GetPerson(ctx, UUID)
 // 	if err != nil {
 // 		return nil, err
@@ -46,10 +46,10 @@ func (ps *PersonUseCases) CreatePerson(ctx context.Context, p *person.Person) er
 // 	return p, nil
 // }
 
-// func (ps *PersonUseCases) UpdatePerson(ctx context.Context, UUID string) error {
+// func (ps *personUseCases) UpdatePerson(ctx context.Context, UUID string) error {
 // 	return ps.storage.UpdatePerson(ctx, UUID)
 // }
 
-// func (ps *PersonUseCases) DeletePerson(ctx context.Context, UUID string) error {
+// func (ps *personUseCases) DeletePerson(ctx context.Context, UUID string) error {
 // 	return ps.storage.DeletePerson(ctx, UUID)
 // }

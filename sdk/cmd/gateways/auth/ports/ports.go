@@ -1,4 +1,4 @@
-package port
+package ports
 
 type MessageBroker interface {
 	Login()

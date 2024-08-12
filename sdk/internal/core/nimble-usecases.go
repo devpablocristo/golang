@@ -4,16 +4,16 @@ import (
 	nimble "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/nimble"
 )
 
-type NimbleUseCasesPort interface {
+type NimbleUseCases interface {
 	ProcessOrder(nimble.Order) error
 }
 
 type nimbleUseCases struct {
-	repo         nimble.CachePort
-	cin7UseCases Cin7UseCasesPort
+	repo         nimble.CacheRepository
+	cin7UseCases Cin7UseCases
 }
 
-func NewNimbleUseCases(repo nimble.CachePort, cin7UseCases Cin7UseCasesPort) NimbleUseCasesPort {
+func NewNimbleUseCases(repo nimble.CacheRepository, cin7UseCases Cin7UseCases) NimbleUseCases {
 	return &nimbleUseCases{
 		repo:         repo,
 		cin7UseCases: cin7UseCases,

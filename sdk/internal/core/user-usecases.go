@@ -7,7 +7,7 @@ import (
 	"github.com/devpablocristo/golang/sdk/internal/core/user"
 )
 
-type UserUseCasesPort interface {
+type UserUseCases interface {
 	GetUser(context.Context, string) (*user.User, error)
 	DeleteUser(context.Context, string) error
 	ListUsers(context.Context) (*user.InMemDB, error)
@@ -20,7 +20,7 @@ type userUseCases struct {
 	user user.RepositoryPort
 }
 
-func NewUserUseCases(r user.RepositoryPort) UserUseCasesPort {
+func NewUserUseCases(r user.RepositoryPort) UserUseCases {
 	return &userUseCases{
 		user: r,
 	}

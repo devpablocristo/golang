@@ -9,11 +9,11 @@ import (
 )
 
 type GreetHandler struct {
-	greetService core.GreaterUseCasesPort
+	greetService core.GreaterUseCases
 	pb.GreeterServer
 }
 
-func NewGreetHandler(gs core.GreaterUseCasesPort) pb.GreeterServer {
+func NewGreetHandler(gs core.GreaterUseCases) pb.GreeterServer {
 	return &GreetHandler{
 		greetService: gs,
 	}

@@ -10,10 +10,10 @@ import (
 )
 
 type GinHandler struct {
-	ucs core.UserUseCasesPort
+	ucs core.UserUseCases
 }
 
-func NewGinHandler(ucs core.UserUseCasesPort) *GinHandler {
+func NewGinHandler(ucs core.UserUseCases) *GinHandler {
 	return &GinHandler{
 		ucs: ucs,
 	}

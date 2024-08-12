@@ -4,10 +4,10 @@ import (
 	"github.com/spf13/viper"
 
 	amsgqp "github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091"
-	pkgport "github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/port"
+	pkgports "github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/ports"
 )
 
-func NewRabbitMQInstance() (pkgport.RabbitMqClient, error) {
+func NewRabbitMQInstance() (pkgports.RabbitMqClient, error) {
 	config := amsgqp.NewRabbitMqConfig(
 		viper.GetString("RABBITMQ_HOST"),
 		viper.GetInt("RABBITMQ_PORT"),
