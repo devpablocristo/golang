@@ -15,9 +15,9 @@ import (
 
 	//nc7 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7"
 	//nim "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/nimble"
+	cass "github.com/devpablocristo/golang/sdk/internal/bootstrap/cassandra"
 	user "github.com/devpablocristo/golang/sdk/internal/core/user"
-	cass "github.com/devpablocristo/golang/sdk/internal/platform/cassandra"
-	//rd "github.com/devpablocristo/golang/sdk/internal/platform/redis"
+	//rd "github.com/devpablocristo/golang/sdk/internal/bootstrap/redis"
 	//is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
 )
 

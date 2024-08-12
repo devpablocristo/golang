@@ -11,7 +11,7 @@ import (
 	"github.com/devpablocristo/golang/sdk/cmd/gateways/user"
 	"github.com/devpablocristo/golang/sdk/internal/core"
 	user2 "github.com/devpablocristo/golang/sdk/internal/core/user"
-	"github.com/devpablocristo/golang/sdk/internal/platform/cassandra"
+	"github.com/devpablocristo/golang/sdk/internal/bootstrap/cassandra"
 )
 
 // Injectors from wire.go:

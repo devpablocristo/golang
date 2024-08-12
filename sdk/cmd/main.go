@@ -8,10 +8,10 @@ import (
 	shared "github.com/devpablocristo/golang/sdk/cmd/gateways/shared"
 	user "github.com/devpablocristo/golang/sdk/cmd/gateways/user"
 
-	gingonicsetup "github.com/devpablocristo/golang/sdk/internal/platform/gin"
-	gmwsetup "github.com/devpablocristo/golang/sdk/internal/platform/go-micro-web"
-	initialsetup "github.com/devpablocristo/golang/sdk/internal/platform/initial"
-	amqpsetup "github.com/devpablocristo/golang/sdk/internal/platform/rabbitmq"
+	gingonicsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/gin"
+	gmwsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/go-micro-web"
+	initialsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/initial"
+	amqpsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/rabbitmq"
 )
 
 func main() {

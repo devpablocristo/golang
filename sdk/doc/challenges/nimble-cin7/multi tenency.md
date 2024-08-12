@@ -178,7 +178,7 @@ import (
     "api/cmd/rest/handlers"
     "api/internal/core"
     "api/internal/core/item"
-    "api/internal/platform/mysql"
+    "api/internal/bootstrap/mysql"
     "api/middleware"
 )
 
