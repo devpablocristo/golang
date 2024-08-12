@@ -18,7 +18,7 @@ type LoginResponse struct {
 func toDomain(loginReq *LoginRequest) *user.User {
 	return &user.User{
 		Username: loginReq.Username,
-		Password: loginReq.Password,
+		PasswordHash: loginReq.Password,
 		LoggedAt: time.Now(),
 	}
 }

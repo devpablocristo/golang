@@ -47,7 +47,7 @@ func (dto *EventRequest) ToDomain() *event.Event {
 		planners[i] = user.User{
 			UUID:      p.UUID,
 			Username:  p.Username,
-			Password:  p.Password,
+			Password:  p.PasswordHash,
 			CreatedAt: p.CreatedAt,
 		}
 	}

@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/devpablocristo/golang/sdk/internal/core/user"
+	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
+	"github.com/devpablocristo/golang/sdk/internal/core/user/ports"
 )
 
+// UserUseCases define los casos de uso para el manejo de usuarios
 type UserUseCases interface {
 	GetUser(context.Context, string) (*user.User, error)
 	DeleteUser(context.Context, string) error
@@ -17,10 +19,11 @@ type UserUseCases interface {
 }
 
 type userUseCases struct {
-	user user.Repository
+	user ports.Repository
 }
 
-func NewUserUseCases(r user.Repository) UserUseCases {
+// NewUserUseCases crea una nueva instancia de UserUseCases
+func NewUserUseCases(r ports.Repository) UserUseCases {
 	return &userUseCases{
 		user: r,
 	}
