@@ -6,10 +6,9 @@ import (
 
 	"github.com/gocql/gocql"
 
+	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
+	"github.com/devpablocristo/golang/sdk/internal/core/user/ports"
 	csdgocsl "github.com/devpablocristo/golang/sdk/pkg/cassandra/gocql"
-
-	user "github.com/devpablocristo/golang/sdk/internal/core/user/entities"
-	ports "github.com/devpablocristo/golang/sdk/internal/core/user/ports"
 )
 
 // repository struct con instancia de cliente de Cassandra
@@ -17,7 +16,7 @@ type repository struct {
 	csdInst csdgocsl.CassandraClientPort
 }
 
-// NewUserRepository crea un nuevo repositorio de usuarios
+// NewCassandraRepository crea un nuevo repositorio de usuarios en Cassandra
 func NewCassandraRepository(inst csdgocsl.CassandraClientPort) ports.Repository {
 	return &repository{
 		csdInst: inst,
@@ -25,7 +24,7 @@ func NewCassandraRepository(inst csdgocsl.CassandraClientPort) ports.Repository 
 }
 
 // SaveUser guarda un nuevo usuario en Cassandra
-func (r *repository) SaveUser(ctx context.Context, user *user.User) error {
+func (r *repository) SaveUser(ctx context.Context, user *entities.User) error {
 	return r.csdInst.GetSession().Query(
 		"INSERT INTO users (id, username, password, created_at) VALUES (?, ?, ?, ?)",
 		user.UUID, user.Username, user.PasswordHash, user.CreatedAt,
@@ -33,8 +32,8 @@ func (r *repository) SaveUser(ctx context.Context, user *user.User) error {
 }
 
 // GetUser recupera un usuario por su UUID
-func (r *repository) GetUser(ctx context.Context, id string) (*user.User, error) {
-	var user user.User
+func (r *repository) GetUser(ctx context.Context, id string) (*entities.User, error) {
+	var user entities.User
 	err := r.csdInst.GetSession().Query(
 		"SELECT id, username, password, created_at FROM users WHERE id = ?",
 		id,
@@ -46,8 +45,8 @@ func (r *repository) GetUser(ctx context.Context, id string) (*user.User, error)
 }
 
 // GetUserByUsername recupera un usuario por su nombre de usuario
-func (r *repository) GetUserByUsername(ctx context.Context, username string) (*user.User, error) {
-	var user user.User
+func (r *repository) GetUserByUsername(ctx context.Context, username string) (*entities.User, error) {
+	var user entities.User
 	err := r.csdInst.GetSession().Query(
 		"SELECT id, username, password, created_at FROM users WHERE username = ?",
 		username,
@@ -66,16 +65,15 @@ func (r *repository) DeleteUser(ctx context.Context, id string) error {
 	).Exec()
 }
 
-// ListUsers lista todos los usuarios
 // ListUsers lista todos los usuarios en la base de datos
-func (r *repository) ListUsers(ctx context.Context) (*user.InMemDB, error) {
+func (r *repository) ListUsers(ctx context.Context) (*entities.InMemDB, error) {
 	// Crear una instancia de InMemDB
-	userDB := make(user.InMemDB)
+	userDB := make(entities.InMemDB)
 
 	// Crear un iterador para la consulta a la base de datos
 	iter := r.csdInst.GetSession().Query("SELECT id, username, password, created_at FROM users").Iter()
 
-	var user user.User
+	var user entities.User
 	for iter.Scan(&user.UUID, &user.Username, &user.PasswordHash, &user.CreatedAt) {
 		// Agregar el usuario al mapa usando el UUID como clave
 		userCopy := user // Crear una copia del usuario para evitar sobrescribir el mismo puntero
@@ -91,7 +89,7 @@ func (r *repository) ListUsers(ctx context.Context) (*user.InMemDB, error) {
 }
 
 // UpdateUser actualiza la información de un usuario
-func (r *repository) UpdateUser(ctx context.Context, user *user.User, id string) error {
+func (r *repository) UpdateUser(ctx context.Context, user *entities.User, id string) error {
 	// Verificar si el usuario existe
 	existingUser, err := r.GetUser(ctx, id)
 	if err != nil {

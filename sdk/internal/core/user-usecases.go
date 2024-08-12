@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
+	"github.com/devpablocristo/golang/sdk/internal/core/user"
 	"github.com/devpablocristo/golang/sdk/internal/core/user/ports"
 )
 
@@ -30,7 +30,7 @@ func NewUserUseCases(r ports.Repository) UserUseCases {
 }
 
 func (u *userUseCases) GetUser(ctx context.Context, ID string) (*user.User, error) {
-	user, err := u.user.GetUser(ctx, ID)
+	user, err := u.GetUser(ctx, ID)
 	if err != nil {
 		return nil, err
 	}
@@ -38,20 +38,20 @@ func (u *userUseCases) GetUser(ctx context.Context, ID string) (*user.User, erro
 }
 
 func (u *userUseCases) DeleteUser(ctx context.Context, ID string) error {
-	return u.user.DeleteUser(ctx, ID)
+	return u.DeleteUser(ctx, ID)
 }
 
 func (u *userUseCases) ListUsers(ctx context.Context) (*user.InMemDB, error) {
-	db, err := u.user.ListUsers(ctx)
+	db, err := u.ListUsers(ctx)
 	return db, err
 }
 
 func (u *userUseCases) UpdateUser(ctx context.Context, usr *user.User, ID string) error {
-	return u.user.UpdateUser(ctx, usr, ID)
+	return u.UpdateUser(ctx, usr, ID)
 }
 
 func (u *userUseCases) CreateUser(ctx context.Context, ucs *user.User) error {
-	return u.user.SaveUser(ctx, ucs)
+	return u.CreateUser(ctx, ucs)
 }
 
 func (u *userUseCases) PublishMessage(ctx context.Context, msg string) (string, error) {
