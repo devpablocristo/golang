@@ -17,10 +17,10 @@ type UserUseCases interface {
 }
 
 type userUseCases struct {
-	user user.RepositoryPort
+	user user.Repository
 }
 
-func NewUserUseCases(r user.RepositoryPort) UserUseCases {
+func NewUserUseCases(r user.Repository) UserUseCases {
 	return &userUseCases{
 		user: r,
 	}

@@ -1,15 +1,46 @@
 package auth
 
-// Token: Representa los tokens de acceso y/o refresh, necesarios para la autenticación y autorización.
-// Role: Define los roles que un usuario puede tener dentro del sistema (e.g., administrador, usuario regular).
-// Permission: Especifica los permisos que pueden asociarse a roles y usuarios, definiendo qué acciones pueden realizar dentro del sistema.
-// Credential: Podría representar las credenciales de acceso, como un correo electrónico y una contraseña, o las credenciales de OAuth.
-// Session: Representa una sesión de usuario activa, útil para gestionar la persistencia de la sesión y el manejo de tokens.
+import (
+	"time"
+)
 
+// Token representa un token de acceso o refresh, necesario para la autenticación y autorización.
+type Token struct {
+	AccessToken  string
+	RefreshToken string
+	ExpiresAt    time.Time
+}
+
+// Role define los roles que un usuario puede tener dentro del sistema.
+type Role struct {
+	Name        string
+	Permissions []Permission
+}
+
+// Permission especifica los permisos asociados a roles y usuarios.
+type Permission struct {
+	Name        string
+	Description string
+}
+
+// Credential representa las credenciales de acceso, como un correo electrónico y una contraseña.
+type Credential struct {
+	UserUUID string // Referencia al UUID del usuario en el microservicio de `users`
+	Password string
+}
+
+// Session representa una sesión de usuario activa.
+type Session struct {
+	UserUUID  string
+	Token     Token
+	LoggedAt  time.Time
+	ExpiresAt time.Time
+}
+
+// Auth es la estructura principal de autenticación que relaciona credenciales, roles y sesiones.
 type Auth struct {
-	Token      string
-	Role       string
-	Permission string
-	Credential string
-	Session    string
+	UserUUID   string // Referencia al usuario en el microservicio de `users`
+	Credential Credential
+	Role       Role
+	Session    Session
 }

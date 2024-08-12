@@ -15,7 +15,7 @@ type repository struct {
 }
 
 // NewUserRepository crea un nuevo repositorio de usuarios
-func NewUserRepository(inst csdgocsl.CassandraClientPort) RepositoryPort {
+func NewUserRepository(inst csdgocsl.CassandraClientPort) Repository {
 	return &repository{
 		csdInst: inst,
 	}
@@ -25,7 +25,7 @@ func NewUserRepository(inst csdgocsl.CassandraClientPort) RepositoryPort {
 func (r *repository) SaveUser(ctx context.Context, user *User) error {
 	return r.csdInst.GetSession().Query(
 		"INSERT INTO users (id, username, password, created_at) VALUES (?, ?, ?, ?)",
-		user.UUID, user.Username, user.Password, user.CreatedAt,
+		user.UUID, user.Username, user.PasswordHash, user.CreatedAt,
 	).Exec()
 }
 
@@ -35,7 +35,7 @@ func (r *repository) GetUser(ctx context.Context, id string) (*User, error) {
 	err := r.csdInst.GetSession().Query(
 		"SELECT id, username, password, created_at FROM users WHERE id = ?",
 		id,
-	).Consistency(gocql.One).Scan(&user.UUID, &user.Username, &user.Password, &user.CreatedAt)
+	).Consistency(gocql.One).Scan(&user.UUID, &user.Username, &user.PasswordHash, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (r *repository) GetUserByUsername(ctx context.Context, username string) (*U
 	err := r.csdInst.GetSession().Query(
 		"SELECT id, username, password, created_at FROM users WHERE username = ?",
 		username,
-	).Consistency(gocql.One).Scan(&user.UUID, &user.Username, &user.Password, &user.CreatedAt)
+	).Consistency(gocql.One).Scan(&user.UUID, &user.Username, &user.PasswordHash, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (r *repository) ListUsers(ctx context.Context) (*InMemDB, error) {
 	iter := r.csdInst.GetSession().Query("SELECT id, username, password, created_at FROM users").Iter()
 
 	var user User
-	for iter.Scan(&user.UUID, &user.Username, &user.Password, &user.CreatedAt) {
+	for iter.Scan(&user.UUID, &user.Username, &user.PasswordHash, &user.CreatedAt) {
 		// Agregar el usuario al mapa usando el UUID como clave
 		userCopy := user // Crear una copia del usuario para evitar sobrescribir el mismo puntero
 		userDB[user.UUID] = &userCopy
@@ -101,6 +101,6 @@ func (r *repository) UpdateUser(ctx context.Context, user *User, id string) erro
 	// Actualizar el usuario
 	return r.csdInst.GetSession().Query(
 		"UPDATE users SET username = ?, password = ? WHERE id = ?",
-		user.Username, user.Password, id,
+		user.Username, user.PasswordHash, id,
 	).Exec()
 }

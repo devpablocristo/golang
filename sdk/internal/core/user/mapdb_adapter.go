@@ -14,7 +14,7 @@ type MapDbRepository struct {
 }
 
 // NewMapDbRepository crea un nuevo repositorio de usuarios en memoria
-func NewMapDbRepository() RepositoryPort {
+func NewMapDbRepository() Repository {
 	db := make(InMemDB)
 	return &MapDbRepository{
 		db: &db,
@@ -78,8 +78,8 @@ func (r *MapDbRepository) UpdateUser(ctx context.Context, usr *User, UUID string
 	if usr.Username != "" {
 		existingUser.Username = usr.Username
 	}
-	if usr.Password != "" {
-		existingUser.Password = usr.Password
+	if usr.PasswordHash != "" {
+		existingUser.PasswordHash = usr.PasswordHash
 	}
 	// Mantener la fecha de creación original
 	usr.CreatedAt = existingUser.CreatedAt

@@ -1,8 +1,10 @@
 package user
 
-import "context"
+import (
+	"context"
+)
 
-type RepositoryPort interface {
+type Repository interface {
 	SaveUser(context.Context, *User) error
 	GetUser(context.Context, string) (*User, error)
 	GetUserByUsername(context.Context, string) (*User, error)
