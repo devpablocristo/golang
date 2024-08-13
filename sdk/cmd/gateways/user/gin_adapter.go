@@ -5,15 +5,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/devpablocristo/golang/sdk/cmd/gateways/user/gtwports"
 	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
 	"github.com/devpablocristo/golang/sdk/internal/core/user/portscore"
 )
 
+// GinHandler implementa la interfaz gtwports.GinHandler utilizando Gin como framework.
 type GinHandler struct {
 	ucs portscore.UserUseCases
 }
 
-func NewGinHandler(ucs portscore.UserUseCases) *GinHandler {
+// NewGinHandler crea una nueva instancia de GinHandler y la devuelve como un gtwports.GinHandler.
+func NewGinHandler(ucs portscore.UserUseCases) gtwports.GinHandler {
 	return &GinHandler{
 		ucs: ucs,
 	}
@@ -40,7 +43,6 @@ func (h *GinHandler) GetUser(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
-
 	c.JSON(http.StatusOK, user)
 }
 

@@ -59,69 +59,51 @@ func (client *rabbitMqClient) Close() error {
 	return client.connection.Close()
 }
 
-// SendAndReceive envía un mensaje a RabbitMQ y espera una respuesta en la misma cola.
-func (client *rabbitMqClient) SendAndReceive(ctx context.Context, queueName string, message []byte) ([]byte, error) {
+func (client *rabbitMqClient) Produce(ctx context.Context, queueName string, message []byte) (string, error) {
 	// Abre un canal
+	ch, err := client.Channel()
+	if err != nil {
+		return "", fmt.Errorf("failed to open RabbitMQ channel: %w", err)
+	}
+	defer ch.Close()
+
+	// Genera un correl_id para rastrear la respuesta
+	corrId := fmt.Sprintf("%d", time.Now().UnixNano())
+
+	// Publica el mensaje en la cola original
+	err = ch.PublishWithContext(ctx,
+		"",         // exchange
+		queueName,  // routing key
+		false,      // mandatory
+		false,      // immediate
+		amqp091.Publishing{
+			ContentType:   "application/json",
+			Body:          message,
+			CorrelationId: corrId,
+			ReplyTo:       "reply_queue_name", // La cola donde se recibirá la respuesta
+		})
+	if err != nil {
+		return "", fmt.Errorf("failed to publish message to RabbitMQ: %w", err)
+	}
+
+	return corrId, nil
+}
+
+func (client *rabbitMqClient) Consume(ctx context.Context, replyQueueName string, corrId string) ([]byte, error) {
 	ch, err := client.Channel()
 	if err != nil {
 		return nil, fmt.Errorf("failed to open RabbitMQ channel: %w", err)
 	}
 	defer ch.Close()
 
-	// Declara la cola donde se enviará el mensaje
-	q, err := ch.QueueDeclare(
-		queueName, // Nombre de la cola
-		false,     // durable
-		false,     // delete when unused
-		false,     // exclusive
-		false,     // no-wait
-		nil,       // arguments
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to declare RabbitMQ queue: %w", err)
-	}
-
-	// Genera un correl_id para rastrear la respuesta
-	corrId := fmt.Sprintf("%d", time.Now().UnixNano())
-
-	// Declara una cola temporal para recibir la respuesta
-	replyQueue, err := ch.QueueDeclare(
-		"",    // Nombre de la cola (vacío para que sea temporal)
-		false, // durable
-		false, // delete when unused
-		true,  // exclusive
-		false, // no-wait
-		nil,   // arguments
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to declare RabbitMQ reply queue: %w", err)
-	}
-
-	// Publica el mensaje en la cola original
-	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
-		amqp091.Publishing{
-			ContentType:   "application/json",
-			Body:          message,
-			ReplyTo:       replyQueue.Name,
-			CorrelationId: corrId,
-		})
-	if err != nil {
-		return nil, fmt.Errorf("failed to publish message to RabbitMQ: %w", err)
-	}
-
-	// Consume el mensaje de respuesta
 	msgs, err := ch.Consume(
-		replyQueue.Name, // queue
-		"",              // consumer
-		true,            // auto-ack
-		false,           // exclusive
-		false,           // no-local
-		false,           // no-wait
-		nil,             // args
+		replyQueueName, // queue
+		"",             // consumer
+		true,           // auto-ack
+		false,          // exclusive
+		false,          // no-local
+		false,          // no-wait
+		nil,            // args
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to consume from RabbitMQ: %w", err)
@@ -136,3 +118,4 @@ func (client *rabbitMqClient) SendAndReceive(ctx context.Context, queueName stri
 
 	return nil, fmt.Errorf("no response received for correlation ID: %s", corrId)
 }
+

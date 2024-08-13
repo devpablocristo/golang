@@ -23,7 +23,7 @@ func NewAuthUseCases(mb gtwports.MessageBroker, jc portspkg.JWTClient) portscore
 	}
 }
 
-func (s *useAuthCases) Login(ctx context.Context, user *entities.AuthUser) (*entities.Token, error) {
+func (s *useAuthCases) Login(ctx context.Context, user *entities.LogingCredentials) (*entities.Token, error) {
 	_, err := s.messageBroker.GetUserUUID(ctx, user)
 	if err != nil {
 		return nil, err

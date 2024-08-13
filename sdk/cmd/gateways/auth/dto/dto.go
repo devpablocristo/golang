@@ -13,14 +13,14 @@ type LoginResponse struct {
 	Token string `json:"token"`
 }
 
-func LoginRequestToDomain(lr *LoginRequest) *entities.AuthUser {
-	return &entities.AuthUser{
+func LoginRequestToDomain(lr *LoginRequest) *entities.LogingCredentials {
+	return &entities.LogingCredentials{
 		Username: lr.Username,
 		Password: lr.Password,
 	}
 }
 
-func DomainToLoginResponse(au *entities.AuthUser) *LoginRequest {
+func DomainToLoginResponse(au *entities.LogingCredentials) *LoginRequest {
 	return &LoginRequest{
 		Username: au.Username,
 		Password: au.Password,

@@ -45,7 +45,7 @@ type Auth struct {
 	Session    Session
 }
 
-type AuthUser struct {
+type LogingCredentials struct {
 	Username string
 	Password string
 }

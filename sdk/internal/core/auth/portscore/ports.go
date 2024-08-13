@@ -7,5 +7,5 @@ import (
 )
 
 type AuthUseCases interface {
-	Login(context.Context, *entities.AuthUser) (*entities.Token, error)
+	Login(context.Context, *entities.LogingCredentials) (*entities.Token, error)
 }

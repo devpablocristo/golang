@@ -7,5 +7,5 @@ import (
 )
 
 type MessageBroker interface {
-	GetUserUUID(context.Context, *entities.AuthUser) (string, error)
+	GetUserUUID(context.Context, *entities.LogingCredentials) (string, error)
 }
