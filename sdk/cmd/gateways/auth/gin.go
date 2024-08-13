@@ -5,33 +5,34 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/devpablocristo/golang/sdk/internal/core"
+	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/dto"
+	"github.com/devpablocristo/golang/sdk/internal/core/auth/coreports"
 )
 
 type GinHandler struct {
-	authUseCases core.AuthUseCases
+	useCases coreports.AuthUseCases
 }
 
-func NewGinHandler(authUseCases core.AuthUseCases) *GinHandler {
+func NewGinHandler(useCases coreports.AuthUseCases) *GinHandler {
 	return &GinHandler{
-		authUseCases: authUseCases,
+		useCases: useCases,
 	}
 }
 
 func (h *GinHandler) Login(c *gin.Context) {
-	var req *LoginRequest
+	var req *dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
 
-	auth, err := h.authUseCases.Login(c.Request.Context(), toDomain(req))
+	token, err := h.useCases.Login(c.Request.Context(), dto.LoginRequestToDomain(req))
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
 
-	c.JSON(http.StatusOK, LoginResponse{Token: auth.Token})
+	c.JSON(http.StatusOK, dto.LoginResponse{Token: token.AccessToken})
 }
 
 func (h *GinHandler) ProtectedHandler(c *gin.Context) {

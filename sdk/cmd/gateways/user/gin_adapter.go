@@ -5,22 +5,22 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/devpablocristo/golang/sdk/internal/core"
-	"github.com/devpablocristo/golang/sdk/internal/core/user"
+	"github.com/devpablocristo/golang/sdk/internal/core/user/coreports"
+	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
 )
 
 type GinHandler struct {
-	ucs core.UserUseCases
+	ucs coreports.UserUseCases
 }
 
-func NewGinHandler(ucs core.UserUseCases) *GinHandler {
+func NewGinHandler(ucs coreports.UserUseCases) *GinHandler {
 	return &GinHandler{
 		ucs: ucs,
 	}
 }
 
 func (h *GinHandler) CreateUser(c *gin.Context) {
-	var user user.User
+	var user entities.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
@@ -54,7 +54,7 @@ func (h *GinHandler) ListUsers(c *gin.Context) {
 }
 
 func (h *GinHandler) UpdateUser(c *gin.Context) {
-	var user user.User
+	var user entities.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return

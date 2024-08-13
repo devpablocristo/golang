@@ -5,7 +5,7 @@ import (
 
 	"github.com/devpablocristo/golang/sdk/internal/core/event"
 	"github.com/devpablocristo/golang/sdk/internal/core/location"
-	"github.com/devpablocristo/golang/sdk/internal/core/user"
+	user "github.com/devpablocristo/golang/sdk/internal/core/user/entities"
 )
 
 // EventRequest representa la solicitud para crear o actualizar un evento
@@ -34,10 +34,10 @@ func (dto *EventRequest) ToDomain() *event.Event {
 	attendees := make([]user.User, len(dto.Attendees))
 	for i, a := range dto.Attendees {
 		attendees[i] = user.User{
-			UUID:      a.UUID,
-			Username:  a.Username,
-			Password:  a.Password,
-			CreatedAt: a.CreatedAt,
+			UUID:         a.UUID,
+			Username:     a.Username,
+			PasswordHash: a.PasswordHash,
+			CreatedAt:    a.CreatedAt,
 		}
 	}
 
@@ -45,10 +45,10 @@ func (dto *EventRequest) ToDomain() *event.Event {
 	planners := make([]user.User, len(dto.Planners))
 	for i, p := range dto.Planners {
 		planners[i] = user.User{
-			UUID:      p.UUID,
-			Username:  p.Username,
-			Password:  p.PasswordHash,
-			CreatedAt: p.CreatedAt,
+			UUID:         p.UUID,
+			Username:     p.Username,
+			PasswordHash: p.PasswordHash,
+			CreatedAt:    p.CreatedAt,
 		}
 	}
 
@@ -58,7 +58,7 @@ func (dto *EventRequest) ToDomain() *event.Event {
 		organizers[i] = user.User{
 			UUID:      o.UUID,
 			Username:  o.Username,
-			Password:  o.Password,
+			PasswordHash:  o.PasswordHash,
 			CreatedAt: o.CreatedAt,
 		}
 	}

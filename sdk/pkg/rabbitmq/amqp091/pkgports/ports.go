@@ -1,10 +1,15 @@
-package ports
+package pkgports
 
-import "github.com/rabbitmq/amqp091-go"
+import (
+	"context"
+
+	"github.com/rabbitmq/amqp091-go"
+)
 
 type RabbitMqClient interface {
 	Channel() (*amqp091.Channel, error)
 	Close() error
+	SendAndReceive(context.Context, string, []byte) ([]byte, error)
 }
 
 type RabbitMqConfig interface {

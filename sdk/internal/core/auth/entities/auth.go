@@ -1,4 +1,4 @@
-package auth
+package entities
 
 import (
 	"time"
@@ -43,4 +43,9 @@ type Auth struct {
 	Credential Credential
 	Role       Role
 	Session    Session
+}
+
+type AuthUser struct {
+	Username string
+	Password string
 }

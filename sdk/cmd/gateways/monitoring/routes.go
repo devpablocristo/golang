@@ -7,7 +7,7 @@ import (
 	gingonic "github.com/devpablocristo/golang/sdk/pkg/gin-gonic/gin"
 )
 
-func Routes(gingonic gingonic.GinClientPort, handler *Handler) {
+func Routes(gingonic gingonic.GinClientPort, handler *GinHandler) {
 	r := gingonic.GetRouter()
 
 	pprof.Register(r) // Registra las rutas de pprof en el enrutador de Gin

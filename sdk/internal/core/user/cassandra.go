@@ -6,25 +6,26 @@ import (
 
 	"github.com/gocql/gocql"
 
-	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
-	"github.com/devpablocristo/golang/sdk/internal/core/user/ports"
 	csdgocsl "github.com/devpablocristo/golang/sdk/pkg/cassandra/gocql"
+
+	"github.com/devpablocristo/golang/sdk/internal/core/user/coreports"
+	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
 )
 
-// repository struct con instancia de cliente de Cassandra
-type repository struct {
+// cassandraRepository struct con instancia de cliente de Cassandra
+type cassandraRepository struct {
 	csdInst csdgocsl.CassandraClientPort
 }
 
 // NewCassandraRepository crea un nuevo repositorio de usuarios en Cassandra
-func NewCassandraRepository(inst csdgocsl.CassandraClientPort) ports.Repository {
-	return &repository{
+func NewCassandraRepository(inst csdgocsl.CassandraClientPort) coreports.Repository {
+	return &cassandraRepository{
 		csdInst: inst,
 	}
 }
 
 // SaveUser guarda un nuevo usuario en Cassandra
-func (r *repository) SaveUser(ctx context.Context, user *entities.User) error {
+func (r *cassandraRepository) SaveUser(ctx context.Context, user *entities.User) error {
 	return r.csdInst.GetSession().Query(
 		"INSERT INTO users (id, username, password, created_at) VALUES (?, ?, ?, ?)",
 		user.UUID, user.Username, user.PasswordHash, user.CreatedAt,
@@ -32,7 +33,7 @@ func (r *repository) SaveUser(ctx context.Context, user *entities.User) error {
 }
 
 // GetUser recupera un usuario por su UUID
-func (r *repository) GetUser(ctx context.Context, id string) (*entities.User, error) {
+func (r *cassandraRepository) GetUser(ctx context.Context, id string) (*entities.User, error) {
 	var user entities.User
 	err := r.csdInst.GetSession().Query(
 		"SELECT id, username, password, created_at FROM users WHERE id = ?",
@@ -45,7 +46,7 @@ func (r *repository) GetUser(ctx context.Context, id string) (*entities.User, er
 }
 
 // GetUserByUsername recupera un usuario por su nombre de usuario
-func (r *repository) GetUserByUsername(ctx context.Context, username string) (*entities.User, error) {
+func (r *cassandraRepository) GetUserByUsername(ctx context.Context, username string) (*entities.User, error) {
 	var user entities.User
 	err := r.csdInst.GetSession().Query(
 		"SELECT id, username, password, created_at FROM users WHERE username = ?",
@@ -58,7 +59,7 @@ func (r *repository) GetUserByUsername(ctx context.Context, username string) (*e
 }
 
 // DeleteUser elimina un usuario por su UUID
-func (r *repository) DeleteUser(ctx context.Context, id string) error {
+func (r *cassandraRepository) DeleteUser(ctx context.Context, id string) error {
 	return r.csdInst.GetSession().Query(
 		"DELETE FROM users WHERE id = ?",
 		id,
@@ -66,7 +67,7 @@ func (r *repository) DeleteUser(ctx context.Context, id string) error {
 }
 
 // ListUsers lista todos los usuarios en la base de datos
-func (r *repository) ListUsers(ctx context.Context) (*entities.InMemDB, error) {
+func (r *cassandraRepository) ListUsers(ctx context.Context) (*entities.InMemDB, error) {
 	// Crear una instancia de InMemDB
 	userDB := make(entities.InMemDB)
 
@@ -89,7 +90,7 @@ func (r *repository) ListUsers(ctx context.Context) (*entities.InMemDB, error) {
 }
 
 // UpdateUser actualiza la información de un usuario
-func (r *repository) UpdateUser(ctx context.Context, user *entities.User, id string) error {
+func (r *cassandraRepository) UpdateUser(ctx context.Context, user *entities.User, id string) error {
 	// Verificar si el usuario existe
 	existingUser, err := r.GetUser(ctx, id)
 	if err != nil {

@@ -9,9 +9,8 @@ package shared
 import (
 	"github.com/devpablocristo/golang/sdk/cmd/gateways/monitoring"
 	"github.com/devpablocristo/golang/sdk/cmd/gateways/user"
-	"github.com/devpablocristo/golang/sdk/internal/core"
-	user2 "github.com/devpablocristo/golang/sdk/internal/core/user"
 	"github.com/devpablocristo/golang/sdk/internal/bootstrap/cassandra"
+	user2 "github.com/devpablocristo/golang/sdk/internal/core/user"
 )
 
 // Injectors from wire.go:
@@ -21,13 +20,13 @@ func InitializeUserHandler() (*user.GinHandler, error) {
 	if err != nil {
 		return nil, err
 	}
-	repositoryPort := user2.NewUserRepository(cassandraClientPort)
-	userUseCasesPort := core.NewUserUseCases(repositoryPort)
-	ginHandler := user.NewHandler(userUseCasesPort)
+	repository := user2.NewCassandraRepository(cassandraClientPort)
+	userUseCases := user2.NewUserUseCases(repository)
+	ginHandler := user.NewGinHandler(userUseCases)
 	return ginHandler, nil
 }
 
-func InitializeMonitoring() (*monitoring.Handler, error) {
-	handler := monitoring.NewHandler()
-	return handler, nil
+func InitializeMonitoring() (*monitoring.GinHandler, error) {
+	ginHandler := monitoring.NewGinHandler()
+	return ginHandler, nil
 }

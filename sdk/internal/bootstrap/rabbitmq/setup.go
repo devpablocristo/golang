@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/viper"
 
 	amsgqp "github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091"
-	pkgports "github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/pkgports"
 )
 
 func NewRabbitMQInstance() (pkgports.RabbitMqClient, error) {

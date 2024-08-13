@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/devpablocristo/golang/sdk/internal/core/location"
-	"github.com/devpablocristo/golang/sdk/internal/core/user"
+	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
 )
 
 type EventStatus string
@@ -44,9 +44,9 @@ type Event struct {
 	IsRecurring bool
 	SeriesID    string
 	Status      EventStatus
-	Organizers  []user.User
-	Attendees   []user.User
-	Planners    []user.User
+	Organizers  []entities.User
+	Attendees   []entities.User
+	Planners    []entities.User
 	Tags        []string
 }
 

@@ -6,16 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Handler representa el manejador de rutas para usuarios
-type Handler struct{}
+// GinHandler representa el manejador de rutas para usuarios
+type GinHandler struct{}
 
-// NewHandler crea un nuevo manejador de rutas para usuarios
-func NewHandler() *Handler {
-	return &Handler{}
+// NewGinHandler crea un nuevo manejador de rutas para usuarios
+func NewGinHandler() *GinHandler {
+	return &GinHandler{}
 }
 
 // Health verifica el estado del servicio y la conexión a la base de datos
-func (h *Handler) Health(c *gin.Context) {
+func (h *GinHandler) Health(c *gin.Context) {
 	// TODO: Implementar la verificación de la conexión a la base de datos
 	// dbErr := h.ucs.CheckDatabaseConnection()
 	// if dbErr != nil {
@@ -32,6 +32,6 @@ func (h *Handler) Health(c *gin.Context) {
 }
 
 // Ping responde con un mensaje "pong"
-func (h *Handler) Ping(c *gin.Context) {
+func (h *GinHandler) Ping(c *gin.Context) {
 	c.String(http.StatusOK, "pong")
 }
