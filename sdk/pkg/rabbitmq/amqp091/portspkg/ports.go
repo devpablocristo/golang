@@ -9,8 +9,8 @@ import (
 type RabbitMqClient interface {
 	Channel() (*amqp091.Channel, error)
 	Close() error
-	Produce(context.Context, string, []byte) (string, error)
-	Consume(context.Context, string, string) ([]byte, error)
+	Produce(context.Context, string, string, string, interface{}) (string, error)
+	Consume(context.Context, string, string) ([]byte, string, error)
 }
 
 type RabbitMqConfig interface {

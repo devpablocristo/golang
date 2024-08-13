@@ -1,6 +1,10 @@
 package gtwports
 
-import "github.com/gin-gonic/gin"
+import (
+	"context"
+
+	"github.com/gin-gonic/gin"
+)
 
 type GinHandler interface {
 	CreateUser(c *gin.Context)
@@ -8,4 +12,8 @@ type GinHandler interface {
 	ListUsers(c *gin.Context)
 	UpdateUser(c *gin.Context)
 	DeleteUser(c *gin.Context)
+}
+
+type MessageBroker interface {
+	SendUser(context.Context) error
 }

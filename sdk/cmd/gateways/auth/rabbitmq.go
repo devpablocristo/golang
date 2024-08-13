@@ -22,32 +22,34 @@ func NewRabbitMqBroker(client portspkg.RabbitMqClient) gtwports.MessageBroker {
 }
 
 func (b *rabbitMqBroker) GetUserUUID(ctx context.Context, lc *entities.LogingCredentials) (string, error) {
-	lr := dto.DomainToLoginResponse(lc)
+	// Preparar el mensaje de solicitud
+	loginCredentials := dto.DomainToLoginResponse(lc)
 
-	body, err := json.Marshal(lr)
+	// Definir las colas
+	queueName := "getuseruuid_req_queue"
+	replyTo := "getuseruuid_res_queue"
+
+	// Enviar el mensaje usando el Producer del SDK
+	corrID, err := b.client.Produce(ctx, queueName, replyTo, "", loginCredentials)
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal login request: %w", err)
+		return "", fmt.Errorf("failed to send login request: %w", err)
 	}
 
-	corrId, err := b.client.Produce(ctx, "user_uuid_queue", body)
+	// Consumir la respuesta de la cola de respuestas
+	responseBody, returnedCorrID, err := b.client.Consume(ctx, replyTo, corrID)
 	if err != nil {
-		return "", fmt.Errorf("failed to communicate with RabbitMQ: %w", err)
+		return "", fmt.Errorf("failed to consume response from RabbitMQ: %w", err)
 	}
 
-	responseBody, err := b.client.Consume(ctx, "user_uuid_reply_queue", corrId)
-	if err != nil {
-		return "", fmt.Errorf("failed to consume message from RabbitMQ: %w", err)
+	// Verificar si el `corrID` recibido coincide con el que se envió
+	if corrID != returnedCorrID {
+		return "", fmt.Errorf("mismatched correlation ID: expected %s but got %s", corrID, returnedCorrID)
 	}
 
-	// Deserializar la respuesta que se espera sea solo un UUID en formato string
+	// Procesar la respuesta (por ejemplo, deserializar UUID)
 	var uuid string
 	if err := json.Unmarshal(responseBody, &uuid); err != nil {
 		return "", fmt.Errorf("failed to unmarshal response: %w", err)
-	}
-
-	// Verificar si el UUID está vacío, lo que indicaría que el usuario no existe
-	if uuid == "" {
-		return "", fmt.Errorf("user does not exist")
 	}
 
 	return uuid, nil
