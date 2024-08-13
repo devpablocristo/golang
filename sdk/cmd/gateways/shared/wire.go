@@ -6,37 +6,51 @@ package shared
 import (
 	"github.com/google/wire"
 
-	// authhandler "github.com/devpablocristo/golang/sdk/cmd/gateways/auth"
-	// auth "github.com/devpablocristo/golang/sdk/internal/core/auth"
+	jwtsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/jwt"
+	rabbitmqsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/rabbitmq"
 
-	monhandler "github.com/devpablocristo/golang/sdk/cmd/gateways/monitoring"
+	authgin "github.com/devpablocristo/golang/sdk/cmd/gateways/auth"
 
-	userhandler "github.com/devpablocristo/golang/sdk/cmd/gateways/user"
-	cass "github.com/devpablocristo/golang/sdk/internal/bootstrap/cassandra"
-	user "github.com/devpablocristo/golang/sdk/internal/core/user"
+	authucs "github.com/devpablocristo/golang/sdk/internal/core/auth"
+	// casssetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/cassandra"
+	// mongin "github.com/devpablocristo/golang/sdk/cmd/gateways/monitoring"
+	// usergin "github.com/devpablocristo/golang/sdk/cmd/gateways/user"
+	// userhucs "github.com/devpablocristo/golang/sdk/internal/core/user"
 )
 
-func InitializeUserHandler() (*userhandler.GinHandler, error) {
-	wire.Build(
-		cass.NewCassandraInstance,
-		user.NewCassandraRepository,
-		user.NewUserUseCases,
-		userhandler.NewGinHandler,
-	)
-	return &userhandler.GinHandler{}, nil
-}
-
-// func InitializeAuthHandler() (*authhandler.GinHandler, error) {
+// func InitializeUserHandler() (*userhandler.GinHandler, error) {
 // 	wire.Build(
-// 		auth.NewAuthUseCases,
-// 		authhandler.NewGinHandler,
+// 		cass.NewCassandraInstance,
+// 		user.NewCassandraRepository,
+// 		user.NewUserUseCases,
+// 		usergin.NewGinHandler,
 // 	)
-// 	return &authhandler.GinHandler{}, nil
+// 	return &userhandler.GinHandler{}, nil
 // }
 
-func InitializeMonitoring() (*monhandler.GinHandler, error) {
+// func InitializeAuthHandler() (*authgin.GinHandler, error) {
+// 	wire.Build(
+// 		authjwt.NewJWTInstance,
+// 		authrmq.NewRabbitMqInstance,
+// 		authucs.NewAuthUseCases,
+// 		authgin.NewGinHandler,
+// 	)
+// 	return &authgin.GinHandler{}, nil
+// }
+
+// func InitializeMonitoring() (*monhandler.GinHandler, error) {
+// 	wire.Build(
+// 		monhandler.NewGinHandler,
+// 	)
+// 	return &monhandler.GinHandler{}, nil
+// }
+
+func InitializeAuthHandler() (*authgin.GinHandler, error) {
 	wire.Build(
-		monhandler.NewGinHandler,
+		jwtsetup.NewJWTInstance,
+		rabbitmqsetup.NewRabbitMqInstance,
+		authucs.NewAuthUseCases,
+		authgin.NewGinHandler,
 	)
-	return &monhandler.GinHandler{}, nil
+	return &authgin.GinHandler{}, nil
 }

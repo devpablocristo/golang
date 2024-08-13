@@ -1,16 +1,15 @@
-package jwtoken
+package jwtpkg
 
 import (
 	"fmt"
 	"sync"
 
-	"github.com/golang-jwt/jwt/v5"
-
 	"github.com/devpablocristo/golang/sdk/pkg/jwt/v5/portspkg"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var (
-	jwtInstance portspkg.JWTClient
+	jwtInstance portspkg.JwtClient
 	jwtOnce     sync.Once
 	errInit     error
 )
@@ -33,15 +32,13 @@ func InitializeJWTService(secretKey string) error {
 	return errInit
 }
 
-// GetJWTInstance devuelve la instancia del servicio JWT.
-func GetJWTInstance() (portspkg.JWTClient, error) {
+func GetJWTInstance() (portspkg.JwtClient, error) {
 	if jwtInstance == nil {
 		return nil, fmt.Errorf("JWT service is not initialized")
 	}
 	return jwtInstance, nil
 }
 
-// GenerateToken genera un token JWT con las declaraciones proporcionadas.
 func (j *jwtService) GenerateToken(claims jwt.MapClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(j.secretKey))
@@ -51,10 +48,8 @@ func (j *jwtService) GenerateToken(claims jwt.MapClaims) (string, error) {
 	return signedToken, nil
 }
 
-// ValidateToken valida un token JWT y devuelve el token decodificado si es válido.
 func (j *jwtService) ValidateToken(token string) (*jwt.Token, error) {
 	return jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		// Verifica que el método de firma coincide con el esperado
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}

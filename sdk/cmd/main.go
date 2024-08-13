@@ -3,10 +3,9 @@ package main
 import (
 	"log"
 
+	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth"
 	msg "github.com/devpablocristo/golang/sdk/cmd/gateways/messaging"
-	monitoring "github.com/devpablocristo/golang/sdk/cmd/gateways/monitoring"
 	shared "github.com/devpablocristo/golang/sdk/cmd/gateways/shared"
-	user "github.com/devpablocristo/golang/sdk/cmd/gateways/user"
 
 	ginsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/gin"
 	gmwsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/go-micro-web"
@@ -35,18 +34,24 @@ func main() {
 
 	r := ginpkg.GetRouter()
 
-	monitoringHandler, err := shared.InitializeMonitoring()
+	// monitoringHandler, err := shared.InitializeMonitoring()
+	// if err != nil {
+	// 	inisetup.MicroLogError("userHandler error: %v", err)
+	// }
+	// monitoring.Routes(ginpkg, monitoringHandler)
+
+	// userHandler, err := shared.InitializeUserHandler()
+	// if err != nil {
+	// 	inisetup.MicroLogError("userHandler error: %v", err)
+	// }
+
+	authHandler, err := shared.InitializeAuthHandler()
 	if err != nil {
 		inisetup.MicroLogError("userHandler error: %v", err)
 	}
-	monitoring.Routes(ginpkg, monitoringHandler)
 
-	userHandler, err := shared.InitializeUserHandler()
-	if err != nil {
-		inisetup.MicroLogError("userHandler error: %v", err)
-	}
-
-	user.Routes(r, userHandler)
+	auth.Routes(r, authHandler)
+	//user.Routes(r, userHandler)
 	gomicro.GetService().Handle("/", r)
 
 	// Ejecuta Gin en la dirección especificada por Go-Micro
@@ -67,7 +72,7 @@ func main() {
 
 // RabbitMQ
 func messaging() {
-	client, err := amqpsetup.NewRabbitMQInstance()
+	client, err := amqpsetup.NewRabbitMqInstance()
 	if err != nil {
 		log.Fatalf("Failed to initialize RabbitMQ client: %v", err)
 	}

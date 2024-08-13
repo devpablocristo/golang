@@ -1,4 +1,4 @@
-package jwtoken
+package jwtpkg
 
 import (
 	"fmt"

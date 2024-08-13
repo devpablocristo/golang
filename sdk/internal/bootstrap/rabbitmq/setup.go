@@ -7,7 +7,7 @@ import (
 	"github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/portspkg"
 )
 
-func NewRabbitMQInstance() (portspkg.RabbitMqClient, error) {
+func NewRabbitMqInstance() (portspkg.RabbitMqClient, error) {
 	config := rabbitpkg.NewRabbitMqConfig(
 		viper.GetString("RABBITMQ_HOST"),
 		viper.GetInt("RABBITMQ_PORT"),

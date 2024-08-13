@@ -13,10 +13,10 @@ import (
 
 type useAuthCases struct {
 	messageBroker gtwports.MessageBroker
-	jwtClient     portspkg.JWTClient
+	jwtClient     portspkg.JwtClient
 }
 
-func NewAuthUseCases(mb gtwports.MessageBroker, jc portspkg.JWTClient) portscore.AuthUseCases {
+func NewAuthUseCases(mb gtwports.MessageBroker, jc portspkg.JwtClient) portscore.AuthUseCases {
 	return &useAuthCases{
 		messageBroker: mb,
 		jwtClient:     jc,
