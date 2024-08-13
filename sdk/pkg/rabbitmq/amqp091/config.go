@@ -1,6 +1,10 @@
 package amsgqp
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/pkgports"
+)
 
 // rabbitMqConfig representa la configuración necesaria para conectarse a RabbitMQ.
 type rabbitMqConfig struct {
@@ -12,7 +16,7 @@ type rabbitMqConfig struct {
 }
 
 // NewRabbitMqConfig crea una nueva configuración de RabbitMQ con los valores proporcionados.
-func NewRabbitMqConfig(host string, port int, user, password, vhost string) *rabbitMqConfig {
+func NewRabbitMqConfig(host string, port int, user, password, vhost string) pkgports.RabbitMqConfig {
 	return &rabbitMqConfig{
 		host:     host,
 		port:     port,

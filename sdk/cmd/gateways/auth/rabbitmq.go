@@ -2,46 +2,47 @@ package auth
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"time"
 
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/dto"
 	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/gtwports"
 	"github.com/devpablocristo/golang/sdk/internal/core/auth/entities"
-	"github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/pkgports"
+	"github.com/devpablocristo/golang/sdk/pkg/jwt/v5/pkgports"
 )
 
-type rabbitMqBroker struct {
-	rabbitClient pkgports.RabbitMqClient
+type useAuthCases struct {
+	broker    gtwports.MessageBroker
+	jwtClient pkgports.JWTClient
 }
 
-func NewRabbitMqBroker(client pkgports.RabbitMqClient) gtwports.MessageBroker {
-	return &rabbitMqBroker{
-		rabbitClient: client,
+func NewAuthUseCases(b gtwports.MessageBroker, j pkgports.JWTClient) *useAuthCases {
+	return &useAuthCases{
+		broker:    b,
+		jwtClient: j,
 	}
 }
 
-func (b *rabbitMqBroker) GetUserUUID(ctx context.Context, au *entities.AuthUser) (string, error) {
-	// Convertimos AuthUser a LoginRequest
-	lr := dto.DomainToLoginResponse(au)
-
-	// Serializar LoginRequest a JSON
-	body, err := json.Marshal(lr)
+func (s *useAuthCases) Login(ctx context.Context, user *entities.AuthUser) (*entities.Token, error) {
+	_, err := s.broker.GetUserUUID(ctx, user)
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal login request: %w", err)
+		return nil, err
 	}
 
-	// Utilizar el cliente de RabbitMQ desde pkg para enviar y recibir mensajes
-	responseBody, err := b.rabbitClient.SendAndReceive(ctx, "user_uuid_queue", body)
+	// Crear las declaraciones del token JWT
+	claims := map[string]interface{}{
+		"username": user.Username,
+		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Expiración en 24 horas
+	}
+
+	// Generar el token usando el cliente JWT
+	signedToken, err := s.jwtClient.GenerateToken(claims)
 	if err != nil {
-		return "", fmt.Errorf("failed to communicate with RabbitMQ: %w", err)
+		return nil, fmt.Errorf("failed to generate token: %w", err)
 	}
 
-	// Aquí se asume que la respuesta es un UUID en formato string
-	var uuid string
-	if err := json.Unmarshal(responseBody, &uuid); err != nil {
-		return "", fmt.Errorf("failed to unmarshal response: %w", err)
-	}
-
-	return uuid, nil
+	// Devolver el token generado
+	return &entities.Token{
+		AccessToken: signedToken,
+		ExpiresAt:   time.Now().Add(time.Hour * 24),
+	}, nil
 }
