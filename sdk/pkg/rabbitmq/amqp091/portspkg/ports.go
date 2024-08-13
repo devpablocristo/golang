@@ -1,4 +1,4 @@
-package pkgports
+package portspkg
 
 import (
 	"context"

@@ -4,16 +4,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/devpablocristo/golang/sdk/internal/core/user/coreports"
 	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
+	"github.com/devpablocristo/golang/sdk/internal/core/user/portscore"
 )
 
 type userUseCases struct {
-	repository coreports.Repository
+	repository portscore.Repository
 }
 
 // NewUserUseCases crea una nueva instancia de UserUseCases
-func NewUserUseCases(r coreports.Repository) coreports.UserUseCases {
+func NewUserUseCases(r portscore.Repository) portscore.UserUseCases {
 	return &userUseCases{
 		repository: r,
 	}

@@ -1,4 +1,4 @@
-package coreports
+package portscore
 
 import (
 	"context"

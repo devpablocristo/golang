@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/devpablocristo/golang/sdk/internal/core/user/coreports"
 	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
+	"github.com/devpablocristo/golang/sdk/internal/core/user/portscore"
 )
 
 // mapDbRepository es una implementación del repositorio usando un mapa en memoria
@@ -17,7 +17,7 @@ type mapDbRepository struct {
 }
 
 // NewMapDbRepository crea un nuevo repositorio de usuarios en memoria
-func NewMapDbRepository() coreports.Repository {
+func NewMapDbRepository() portscore.Repository {
 	db := make(entities.InMemDB)
 	return &mapDbRepository{
 		db: &db,

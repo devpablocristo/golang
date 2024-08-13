@@ -5,21 +5,22 @@ import (
 
 	"github.com/spf13/viper"
 
-	gin "github.com/devpablocristo/golang/sdk/pkg/gin-gonic/gin"
+	ginpkg "github.com/devpablocristo/golang/sdk/pkg/gin-gonic/gin"
+	"github.com/devpablocristo/golang/sdk/pkg/gin-gonic/gin/portspkg"
 )
 
-func NewGinInstance() (gin.GinClientPort, error) {
-	config := gin.GinConfig{
-		RouterPort: viper.GetString("ROUTER_PORT"),
+func NewGinInstance() (portspkg.GinClient, error) {
+	// Crear la configuración utilizando viper para leer las variables de entorno
+	config := ginpkg.NewGinConfig(viper.GetString("ROUTER_PORT"))
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to create gin config: %w", err)
+	// }
+
+	// Inicializar el cliente Gin con la configuración
+	if err := ginpkg.InitializeGinClient(config); err != nil {
+		return nil, fmt.Errorf("failed to initialize gin client: %w", err)
 	}
 
-	if config.RouterPort == "" {
-		return nil, fmt.Errorf("router port is not configured")
-	}
-
-	if err := gin.InitializeGinClient(config); err != nil {
-		return nil, err
-	}
-
-	return gin.GetGinInstance()
+	// Devolver la instancia del cliente Gin
+	return ginpkg.GetGinInstance()
 }

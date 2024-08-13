@@ -4,11 +4,11 @@ import (
 	"github.com/gin-contrib/pprof" // Importa gin-contrib/pprof para integrar pprof con Gin
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	gingonic "github.com/devpablocristo/golang/sdk/pkg/gin-gonic/gin"
+	"github.com/devpablocristo/golang/sdk/pkg/gin-gonic/gin/portspkg"
 )
 
-func Routes(gingonic gingonic.GinClientPort, handler *GinHandler) {
-	r := gingonic.GetRouter()
+func Routes(ginpkg portspkg.GinClient, handler *GinHandler) {
+	r := ginpkg.GetRouter()
 
 	pprof.Register(r) // Registra las rutas de pprof en el enrutador de Gin
 
@@ -17,7 +17,7 @@ func Routes(gingonic gingonic.GinClientPort, handler *GinHandler) {
 	r.GET("/ping", handler.Ping)
 
 	// Prometheus
-	r.GET("/metrics", gingonic.WrapH(promhttp.Handler()))
+	r.GET("/metrics", ginpkg.WrapH(promhttp.Handler()))
 
 	// TODO: Falta Kong
 

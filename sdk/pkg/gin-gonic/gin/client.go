@@ -1,34 +1,36 @@
-package gingonic
+package ginpkg
 
 import (
 	"fmt"
 	"net/http"
 	"sync"
 
+	"github.com/devpablocristo/golang/sdk/pkg/gin-gonic/gin/portspkg"
 	"github.com/gin-gonic/gin"
 )
 
 var (
-	instance GinClientPort
+	instance portspkg.GinClient
 	once     sync.Once
 	errInit  error
 )
 
-type GinClientPort interface {
-	RunServer() error
-	GetRouter() *gin.Engine
-	WrapH(h http.Handler) gin.HandlerFunc
-}
-
-type GinClient struct {
+type ginClient struct {
 	router *gin.Engine
-	config GinConfig
+	config *ginConfig
 }
 
-func InitializeGinClient(config GinConfig) error {
+// InitializeGinClient inicializa el cliente Gin como un singleton.
+func InitializeGinClient(config *ginConfig) error {
 	once.Do(func() {
+		err := config.Validate()
+		if err != nil {
+			errInit = err
+			return
+		}
+
 		r := gin.Default()
-		client := &GinClient{
+		client := &ginClient{
 			config: config,
 			router: r,
 		}
@@ -37,24 +39,25 @@ func InitializeGinClient(config GinConfig) error {
 	return errInit
 }
 
-func GetGinInstance() (GinClientPort, error) {
+// GetGinInstance devuelve la instancia del cliente Gin.
+func GetGinInstance() (portspkg.GinClient, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("gin client is not initialized")
 	}
 	return instance, nil
 }
 
-func (client *GinClient) RunServer() error {
-	if client.config.RouterPort == "" {
-		return fmt.Errorf("router port is not configured")
-	}
-	return client.router.Run(":" + client.config.RouterPort)
+// RunServer inicia el servidor Gin en el puerto configurado.
+func (client *ginClient) RunServer() error {
+	return client.router.Run(":" + client.config.GetRouterPort())
 }
 
-func (client *GinClient) GetRouter() *gin.Engine {
+// GetRouter devuelve el enrutador Gin.
+func (client *ginClient) GetRouter() *gin.Engine {
 	return client.router
 }
 
-func (client *GinClient) WrapH(h http.Handler) gin.HandlerFunc {
+// WrapH envuelve un http.Handler en un gin.HandlerFunc.
+func (client *ginClient) WrapH(h http.Handler) gin.HandlerFunc {
 	return gin.WrapH(h)
 }

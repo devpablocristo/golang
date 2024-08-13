@@ -8,42 +8,42 @@ import (
 	shared "github.com/devpablocristo/golang/sdk/cmd/gateways/shared"
 	user "github.com/devpablocristo/golang/sdk/cmd/gateways/user"
 
-	gingonicsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/gin"
+	ginsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/gin"
 	gmwsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/go-micro-web"
-	initialsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/initial"
+	inisetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/initial"
 	amqpsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/rabbitmq"
 )
 
 func main() {
-	if err := initialsetup.BasicSetup(); err != nil {
+	if err := inisetup.BasicSetup(); err != nil {
 		log.Fatalf("Error setting up configurations: %v", err)
 	}
-	initialsetup.LogInfo("Application started with JWT secret key: %s", initialsetup.GetJWTSecretKey())
-	initialsetup.MicroLogInfo("Starting application...")
+	inisetup.LogInfo("Application started with JWT secret key: %s", inisetup.GetJWTSecretKey())
+	inisetup.MicroLogInfo("Starting application...")
 
 	// Configurar y verificar Go Micro
 	gomicro, err := gmwsetup.NewGoMicroInstance()
 	if err != nil {
-		initialsetup.MicroLogError("error initializing Go Micro: %v", err)
+		inisetup.MicroLogError("error initializing Go Micro: %v", err)
 	}
 
 	// Configurar y verificar Gin
-	gingonic, err := gingonicsetup.NewGinInstance()
+	ginpkg, err := ginsetup.NewGinInstance()
 	if err != nil {
-		initialsetup.MicroLogError("error initializing Gin: %v", err)
+		inisetup.MicroLogError("error initializing Gin: %v", err)
 	}
 
-	r := gingonic.GetRouter()
+	r := ginpkg.GetRouter()
 
 	monitoringHandler, err := shared.InitializeMonitoring()
 	if err != nil {
-		initialsetup.MicroLogError("userHandler error: %v", err)
+		inisetup.MicroLogError("userHandler error: %v", err)
 	}
-	monitoring.Routes(gingonic, monitoringHandler)
+	monitoring.Routes(ginpkg, monitoringHandler)
 
 	userHandler, err := shared.InitializeUserHandler()
 	if err != nil {
-		initialsetup.MicroLogError("userHandler error: %v", err)
+		inisetup.MicroLogError("userHandler error: %v", err)
 	}
 
 	user.Routes(r, userHandler)
@@ -61,7 +61,7 @@ func main() {
 
 	// Ejecutar el servicio Go Micro
 	if err := gomicro.GetService().Run(); err != nil {
-		initialsetup.MicroLogError("error starting GoMicro service: %v", err)
+		inisetup.MicroLogError("error starting GoMicro service: %v", err)
 	}
 }
 

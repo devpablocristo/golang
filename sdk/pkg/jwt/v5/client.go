@@ -6,11 +6,11 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/devpablocristo/golang/sdk/pkg/jwt/v5/pkgports"
+	"github.com/devpablocristo/golang/sdk/pkg/jwt/v5/portspkg"
 )
 
 var (
-	jwtInstance pkgports.JWTClient
+	jwtInstance portspkg.JWTClient
 	jwtOnce     sync.Once
 	errInit     error
 )
@@ -34,7 +34,7 @@ func InitializeJWTService(secretKey string) error {
 }
 
 // GetJWTInstance devuelve la instancia del servicio JWT.
-func GetJWTInstance() (pkgports.JWTClient, error) {
+func GetJWTInstance() (portspkg.JWTClient, error) {
 	if jwtInstance == nil {
 		return nil, fmt.Errorf("JWT service is not initialized")
 	}

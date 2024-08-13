@@ -5,15 +5,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/devpablocristo/golang/sdk/internal/core/user/coreports"
 	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
+	"github.com/devpablocristo/golang/sdk/internal/core/user/portscore"
 )
 
 type GinHandler struct {
-	ucs coreports.UserUseCases
+	ucs portscore.UserUseCases
 }
 
-func NewGinHandler(ucs coreports.UserUseCases) *GinHandler {
+func NewGinHandler(ucs portscore.UserUseCases) *GinHandler {
 	return &GinHandler{
 		ucs: ucs,
 	}

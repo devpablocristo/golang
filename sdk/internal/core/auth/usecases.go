@@ -5,43 +5,40 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
-
 	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/gtwports"
 	"github.com/devpablocristo/golang/sdk/internal/core/auth/entities"
+	"github.com/devpablocristo/golang/sdk/internal/core/auth/portscore"
+	"github.com/devpablocristo/golang/sdk/pkg/jwt/v5/portspkg"
 )
 
 type useAuthCases struct {
-	broker    gtwports.MessageBroker
-	secretKey string // Llave secreta para firmar el token JWT
+	messageBroker gtwports.MessageBroker
+	jwtClient     portspkg.JWTClient
 }
 
-func NewAuthUseCases(b gtwports.MessageBroker, k string) *useAuthCases {
+func NewAuthUseCases(mb gtwports.MessageBroker, jc portspkg.JWTClient) portscore.AuthUseCases {
 	return &useAuthCases{
-		broker:    b,
-		secretKey: k,
+		messageBroker: mb,
+		jwtClient:     jc,
 	}
 }
 
 func (s *useAuthCases) Login(ctx context.Context, user *entities.AuthUser) (*entities.Token, error) {
-	_, err := s.broker.GetUserUUID(ctx, user)
+	_, err := s.messageBroker.GetUserUUID(ctx, user)
 	if err != nil {
 		return nil, err
 	}
 
 	// Crear las declaraciones del token JWT
-	claims := jwt.MapClaims{
+	claims := map[string]interface{}{
 		"username": user.Username,
 		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Expiración en 24 horas
 	}
 
-	// Crear el token con las declaraciones
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// Firmar el token con la llave secreta
-	signedToken, err := token.SignedString([]byte(s.secretKey))
+	// Generar el token usando el cliente JWT
+	signedToken, err := s.jwtClient.GenerateToken(claims)
 	if err != nil {
-		return nil, fmt.Errorf("failed to sign token: %w", err)
+		return nil, fmt.Errorf("failed to generate token: %w", err)
 	}
 
 	// Devolver el token generado

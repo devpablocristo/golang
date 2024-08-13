@@ -8,8 +8,8 @@ import (
 
 	csdgocsl "github.com/devpablocristo/golang/sdk/pkg/cassandra/gocql"
 
-	"github.com/devpablocristo/golang/sdk/internal/core/user/coreports"
 	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
+	"github.com/devpablocristo/golang/sdk/internal/core/user/portscore"
 )
 
 // cassandraRepository struct con instancia de cliente de Cassandra
@@ -18,7 +18,7 @@ type cassandraRepository struct {
 }
 
 // NewCassandraRepository crea un nuevo repositorio de usuarios en Cassandra
-func NewCassandraRepository(inst csdgocsl.CassandraClientPort) coreports.Repository {
+func NewCassandraRepository(inst csdgocsl.CassandraClientPort) portscore.Repository {
 	return &cassandraRepository{
 		csdInst: inst,
 	}
