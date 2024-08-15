@@ -28,16 +28,17 @@ type EventRequest struct {
 	Tags        []string          `json:"tags"`
 }
 
-// ToDomain convierte un EventRequest a un objeto del dominio Event
 func (dto *EventRequest) ToDomain() *event.Event {
 	// Convertir lista de asistentes
 	attendees := make([]user.User, len(dto.Attendees))
 	for i, a := range dto.Attendees {
 		attendees[i] = user.User{
-			UUID:         a.UUID,
-			Username:     a.Username,
-			PasswordHash: a.PasswordHash,
-			CreatedAt:    a.CreatedAt,
+			UUID: a.UUID,
+			Credentials: user.Credentials{
+				Username:     a.Credentials.Username,
+				PasswordHash: a.Credentials.Username,
+			},
+			CreatedAt: a.CreatedAt,
 		}
 	}
 
@@ -45,10 +46,12 @@ func (dto *EventRequest) ToDomain() *event.Event {
 	planners := make([]user.User, len(dto.Planners))
 	for i, p := range dto.Planners {
 		planners[i] = user.User{
-			UUID:         p.UUID,
-			Username:     p.Username,
-			PasswordHash: p.PasswordHash,
-			CreatedAt:    p.CreatedAt,
+			UUID: p.UUID,
+			Credentials: user.Credentials{
+				Username:     p.Credentials.Username,
+				PasswordHash: p.Credentials.PasswordHash,
+			},
+			CreatedAt: p.CreatedAt,
 		}
 	}
 
@@ -56,9 +59,11 @@ func (dto *EventRequest) ToDomain() *event.Event {
 	organizers := make([]user.User, len(dto.Organizer))
 	for i, o := range dto.Organizer {
 		organizers[i] = user.User{
-			UUID:      o.UUID,
-			Username:  o.Username,
-			PasswordHash:  o.PasswordHash,
+			UUID: o.UUID,
+			Credentials: user.Credentials{
+				Username:     o.Credentials.Username,
+				PasswordHash: o.Credentials.PasswordHash,
+			},
 			CreatedAt: o.CreatedAt,
 		}
 	}

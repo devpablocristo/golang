@@ -6,6 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/dto"
+
+	mdw "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
+
 	"github.com/devpablocristo/golang/sdk/internal/core/auth/portscore"
 )
 
@@ -20,7 +23,7 @@ func NewGinHandler(auc portscore.AuthUseCases) *GinHandler {
 }
 
 func (h *GinHandler) Login(c *gin.Context) {
-	var req *dto.LoginRequest
+	var req *mdw.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return

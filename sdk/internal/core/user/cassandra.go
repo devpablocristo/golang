@@ -28,7 +28,7 @@ func NewCassandraRepository(inst csdgocsl.CassandraClientPort) portscore.Reposit
 func (r *cassandraRepository) SaveUser(ctx context.Context, user *entities.User) error {
 	return r.csdInst.GetSession().Query(
 		"INSERT INTO users (id, username, password, created_at) VALUES (?, ?, ?, ?)",
-		user.UUID, user.Username, user.PasswordHash, user.CreatedAt,
+		user.UUID, user.Credentials.Username, user.Credentials.PasswordHash, user.CreatedAt,
 	).Exec()
 }
 
@@ -38,7 +38,7 @@ func (r *cassandraRepository) GetUser(ctx context.Context, id string) (*entities
 	err := r.csdInst.GetSession().Query(
 		"SELECT id, username, password, created_at FROM users WHERE id = ?",
 		id,
-	).Consistency(gocql.One).Scan(&user.UUID, &user.Username, &user.PasswordHash, &user.CreatedAt)
+	).Consistency(gocql.One).Scan(&user.UUID, &user.Credentials.Username, &user.Credentials.PasswordHash, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (r *cassandraRepository) GetUserByUsername(ctx context.Context, username st
 	err := r.csdInst.GetSession().Query(
 		"SELECT id, username, password, created_at FROM users WHERE username = ?",
 		username,
-	).Consistency(gocql.One).Scan(&user.UUID, &user.Username, &user.PasswordHash, &user.CreatedAt)
+	).Consistency(gocql.One).Scan(&user.UUID, &user.Credentials.Username, &user.Credentials.PasswordHash, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (r *cassandraRepository) ListUsers(ctx context.Context) (*entities.InMemDB,
 	iter := r.csdInst.GetSession().Query("SELECT id, username, password, created_at FROM users").Iter()
 
 	var user entities.User
-	for iter.Scan(&user.UUID, &user.Username, &user.PasswordHash, &user.CreatedAt) {
+	for iter.Scan(&user.UUID, &user.Credentials.Username, &user.Credentials.PasswordHash, &user.CreatedAt) {
 		// Agregar el usuario al mapa usando el UUID como clave
 		userCopy := user // Crear una copia del usuario para evitar sobrescribir el mismo puntero
 		userDB[user.UUID] = &userCopy
@@ -103,6 +103,6 @@ func (r *cassandraRepository) UpdateUser(ctx context.Context, user *entities.Use
 	// Actualizar el usuario
 	return r.csdInst.GetSession().Query(
 		"UPDATE users SET username = ?, password = ? WHERE id = ?",
-		user.Username, user.PasswordHash, id,
+		user.Credentials.Username, user.Credentials.PasswordHash, id,
 	).Exec()
 }

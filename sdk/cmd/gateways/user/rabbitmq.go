@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/dto"
 	"github.com/devpablocristo/golang/sdk/cmd/gateways/user/gtwports"
+	mdw "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 	"github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/portspkg"
 )
 
@@ -28,7 +28,7 @@ func (b *rabbitMqBroker) SendUser(ctx context.Context) error {
 	}
 
 	// Deserializar las credenciales del usuario desde el mensaje
-	var lc dto.LoginRequest
+	var lc mdw.LoginRequest
 	if err := json.Unmarshal(messageBody, &lc); err != nil {
 		return fmt.Errorf("failed to unmarshal login credentials: %w", err)
 	}

@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
+
+	pb "github.com/devpablocristo/golang/sdk/cmd/gateways/user/pb"
 )
 
 type GinHandler interface {
@@ -16,4 +18,8 @@ type GinHandler interface {
 
 type MessageBroker interface {
 	SendUser(context.Context) error
+}
+
+type GrpcServer interface {
+	GetUserUUID(context.Context, *pb.GetUserRequest) (*pb.GetUserResponse, error)
 }

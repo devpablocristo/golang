@@ -7,5 +7,9 @@ import (
 )
 
 type MessageBroker interface {
-	GetUserUUID(context.Context, *entities.LogingCredentials) (string, error)
+	GetUserUUID(context.Context, *entities.LoginCredentials) (string, error)
+}
+
+type GrpcClient interface {
+	GetUserUUID(string, string) (string, error)
 }

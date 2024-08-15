@@ -1,37 +1,21 @@
-// package auth
-
-// "github.com/gin-gonic/gin"
-
-// wire "github.com/devpablocristo/golang/sdk/cmd/rest"
-// is "github.com/devpablocristo/golang/sdk/pkg/init-setup"
-
-// func AuthRoutes(r *gin.Engine) {
-// 	authHandler, err := wire.InitializeAuthHandler()
-// 	if err != nil {
-// 		is.MicroLogError("authHandler error: %v", err)
-// 	}
-
-// 	api := r.Group("/api/v1")
-// 	{
-// 		api.POST("/login", authHandler.Login)
-// 	}
-// }
-
 package auth
 
 import (
+	mdw "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 	"github.com/gin-gonic/gin"
-
-	mdhw "github.com/devpablocristo/golang/sdk/pkg/middleware"
 )
 
-func Routes(r *gin.Engine, ginHandler *GinHandler) {
-	r.POST("/login", ginHandler.Login)
+func Routes(r *gin.Engine, ginHandler *GinHandler, apiVersion string, secret string) {
+	apiPrefix := "/api/" + apiVersion
 
-	secret := "secret"
-	// "/api/v1/" <-- centralizar su creacion y enviarlo aqui
-	authorized := r.Group("/api/v1/auth/protected")
-	authorized.Use(mdhw.AuthMiddleware(secret))
+	validated := r.Group(apiPrefix + "/auth/loginValidated")
+	validated.Use(mdw.ValidateLoginFields())
+	{
+		validated.POST("/login", ginHandler.Login)
+	}
+
+	authorized := r.Group(apiPrefix + "/auth/protected")
+	authorized.Use(mdw.JWTAuthMiddleware(secret))
 	{
 		authorized.GET("/auth-protected", ginHandler.ProtectedHandler)
 	}

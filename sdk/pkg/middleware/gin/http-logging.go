@@ -7,14 +7,14 @@ import (
 	"go-micro.dev/v4/logger"
 )
 
-type LoggingOptions struct {
+type HttpLoggingOptions struct {
 	LogLevel       string
 	IncludeHeaders bool
 	IncludeBody    bool
 	ExcludedPaths  []string
 }
 
-func LoggingMiddleware(options LoggingOptions) gin.HandlerFunc {
+func HttpLoggingMiddleware(options HttpLoggingOptions) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check if path is excluded
 		for _, path := range options.ExcludedPaths {

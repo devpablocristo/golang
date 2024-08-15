@@ -4,58 +4,91 @@ import (
 	"fmt"
 	"sync"
 
+	"go-micro.dev/v4"
+	"go-micro.dev/v4/client"
+	"go-micro.dev/v4/registry"
+	"go-micro.dev/v4/server"
 	"go-micro.dev/v4/web"
+
+	portspkg "github.com/devpablocristo/golang/sdk/pkg/go-micro-web/v4/portspkg"
 )
 
 var (
-	instance GoMicroClientPort
+	instance portspkg.GoMicroClient
 	once     sync.Once
 	errInit  error
 )
 
-type GoMicroClientPort interface {
-	Start() error
-	Stop() error
-	GetService() web.Service
+type goMicroClient struct {
+	service    micro.Service
+	webService web.Service
+	client     client.Client
+	server     server.Server
 }
 
-type GoMicroClient struct {
-	service web.Service
-}
-
-func InitializeGoMicroClient(config GoMicroConfig) error {
+// InitializeGoMicroClient inicializa una instancia única del cliente y servidor Go-Micro.
+func InitializeGoMicroClient(config portspkg.GoMicroConfig) error {
 	once.Do(func() {
-		ms := web.NewService(
-			web.Name(config.Name),
-			web.Version(config.Version),
-			web.Registry(config.Registry),
-			web.Address(config.Address),
+		ms := micro.NewService(
+			micro.Name(config.GetName()),
+			micro.Version(config.GetVersion()),
+			micro.Registry(config.GetRegistry().(registry.Registry)),
+			micro.Address(config.GetAddress()),
 		)
 
-		if err := ms.Init(); err != nil {
-			errInit = fmt.Errorf("failed to initialize go micro service: %w", err)
-			return
+		ms.Init()
+
+		ws := web.NewService(
+			web.Name(config.GetName()),
+			web.Version(config.GetVersion()),
+			web.Registry(config.GetRegistry().(registry.Registry)),
+			web.Address(config.GetAddress()),
+		)
+
+		instance = &goMicroClient{
+			service:    ms,
+			webService: ws,
+			client:     ms.Client(),
+			server:     ms.Server(),
 		}
-		instance = &GoMicroClient{service: ms}
 	})
 	return errInit
 }
 
-func GetGoMicroInstance() (GoMicroClientPort, error) {
+// GetGoMicroClientInstance devuelve la instancia del cliente Go-Micro.
+func GetGoMicroClientInstance() (portspkg.GoMicroClient, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("go micro client is not initialized")
 	}
 	return instance, nil
 }
 
-func (c *GoMicroClient) Start() error {
-	return c.service.Run()
+// Start inicia el servicio Go-Micro.
+func (c *goMicroClient) Start() error {
+	return c.webService.Run()
 }
 
-func (c *GoMicroClient) Stop() error {
-	return c.service.Stop()
+// Stop detiene el servicio Go-Micro.
+func (c *goMicroClient) Stop() error {
+	return nil
 }
 
-func (c *GoMicroClient) GetService() web.Service {
+// GetService devuelve la instancia del servicio Go-Micro.
+func (c *goMicroClient) GetService() interface{} {
 	return c.service
+}
+
+// GetWebService devuelve la instancia del servicio web Go-Micro.
+func (c *goMicroClient) GetWebService() web.Service {
+	return c.webService
+}
+
+// GetGrpcClient devuelve la instancia del cliente gRPC.
+func (c *goMicroClient) GetGrpcClient() client.Client {
+	return c.client
+}
+
+// GetGrpcServer devuelve la instancia del servidor gRPC.
+func (c *goMicroClient) GetGrpcServer() server.Server {
+	return c.server
 }

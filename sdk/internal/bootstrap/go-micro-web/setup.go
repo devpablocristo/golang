@@ -5,19 +5,20 @@ import (
 	"go-micro.dev/v4/registry"
 
 	gmw "github.com/devpablocristo/golang/sdk/pkg/go-micro-web/v4"
+	portspkg "github.com/devpablocristo/golang/sdk/pkg/go-micro-web/v4/portspkg"
 )
 
-func NewGoMicroInstance() (gmw.GoMicroClientPort, error) {
-	config := gmw.GoMicroConfig{
-		Name:     viper.GetString("MICRO_SERVICE_NAME"),
-		Version:  viper.GetString("MICRO_SERVICE_VERSION"),
-		Address:  viper.GetString("MICRO_SERVICE_ADDRESS"),
-		Registry: registry.DefaultRegistry,
-	}
+func NewGoMicroInstance() (portspkg.GoMicroClient, error) {
+	config := gmw.NewGoMicroConfig(
+		viper.GetString("MICRO_SERVICE_NAME"),
+		viper.GetString("MICRO_SERVICE_VERSION"),
+		viper.GetString("MICRO_SERVICE_ADDRESS"),
+		registry.DefaultRegistry,
+	)
 
 	if err := gmw.InitializeGoMicroClient(config); err != nil {
 		return nil, err
 	}
 
-	return gmw.GetGoMicroInstance()
+	return gmw.GetGoMicroClientInstance()
 }

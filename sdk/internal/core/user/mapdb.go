@@ -25,16 +25,16 @@ func NewMapDbRepository() portscore.Repository {
 }
 
 // SaveUser guarda un nuevo usuario en el repositorio
-func (r *mapDbRepository) SaveUser(ctx context.Context, usr *entities.User) error {
-	if usr.Username == "" {
+func (r *mapDbRepository) SaveUser(ctx context.Context, user *entities.User) error {
+	if user.Credentials.Username == "" {
 		return errors.New("username is required")
 	}
 
 	// Generar un nuevo UUID para el usuario
-	usr.UUID = uuid.New().String()
-	usr.CreatedAt = time.Now()
+	user.UUID = uuid.New().String()
+	user.CreatedAt = time.Now()
 
-	(*r.db)[usr.UUID] = usr
+	(*r.db)[user.UUID] = user
 	return nil
 }
 
@@ -50,7 +50,7 @@ func (r *mapDbRepository) GetUser(ctx context.Context, UUID string) (*entities.U
 // GetUserByUsername obtiene un usuario por su nombre de usuario
 func (r *mapDbRepository) GetUserByUsername(ctx context.Context, username string) (*entities.User, error) {
 	for _, user := range *r.db {
-		if user.Username == username {
+		if user.Credentials.Username == username {
 			return user, nil
 		}
 	}
@@ -72,20 +72,20 @@ func (r *mapDbRepository) ListUsers(ctx context.Context) (*entities.InMemDB, err
 }
 
 // UpdateUser actualiza la información de un usuario existente
-func (r *mapDbRepository) UpdateUser(ctx context.Context, usr *entities.User, UUID string) error {
+func (r *mapDbRepository) UpdateUser(ctx context.Context, user *entities.User, UUID string) error {
 	existingUser, exists := (*r.db)[UUID]
 	if !exists {
 		return errors.New("user not found")
 	}
 
-	if usr.Username != "" {
-		existingUser.Username = usr.Username
+	if user.Credentials.Username != "" {
+		existingUser.Credentials.Username = user.Credentials.Username
 	}
-	if usr.PasswordHash != "" {
-		existingUser.PasswordHash = usr.PasswordHash
+	if user.Credentials.PasswordHash != "" {
+		existingUser.Credentials.PasswordHash = user.Credentials.PasswordHash
 	}
 	// Mantener la fecha de creación original
-	usr.CreatedAt = existingUser.CreatedAt
+	user.CreatedAt = existingUser.CreatedAt
 
 	(*r.db)[UUID] = existingUser
 	return nil

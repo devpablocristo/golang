@@ -10,6 +10,8 @@ import (
 	ginsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/gin"
 	gmwsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/go-micro-web"
 	inisetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/initial"
+
+	// jwtsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/jwt"
 	amqpsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/rabbitmq"
 )
 
@@ -25,6 +27,11 @@ func main() {
 	if err != nil {
 		inisetup.MicroLogError("error initializing Go Micro: %v", err)
 	}
+
+	// jwtpkg, err :=jwtsetup.NewJWTInstance()
+	// if err != nil {
+	// 	inisetup.MicroLogError("error initializing Gin: %v", err)
+	// }
 
 	// Configurar y verificar Gin
 	ginpkg, err := ginsetup.NewGinInstance()
@@ -50,10 +57,15 @@ func main() {
 		inisetup.MicroLogError("userHandler error: %v", err)
 	}
 
-	auth.Routes(r, authHandler)
+	apiVersion := "/api/v1"
+	auth.Routes(r, authHandler, apiVersion, "secret")
 	//user.Routes(r, userHandler)
-	gomicro.GetService().Handle("/", r)
+	// Manejar rutas HTTP
+	gomicro..GetWebService().Handle("/", r)
 
+	// Usar gRPC cliente o servidor
+	grpcClient := gomicroInstance.GetGrpcClient()
+	grpcServer := gomicroInstance.GetGrpcServer()
 	// Ejecuta Gin en la dirección especificada por Go-Micro
 	go func() {
 		if err := r.Run(":8080"); err != nil {

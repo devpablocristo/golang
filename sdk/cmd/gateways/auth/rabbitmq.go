@@ -21,7 +21,7 @@ func NewRabbitMqBroker(client portspkg.RabbitMqClient) gtwports.MessageBroker {
 	}
 }
 
-func (b *rabbitMqBroker) GetUserUUID(ctx context.Context, lc *entities.LogingCredentials) (string, error) {
+func (b *rabbitMqBroker) GetUserUUID(ctx context.Context, lc *entities.LoginCredentials) (string, error) {
 	// Preparar el mensaje de solicitud
 	loginCredentials := dto.DomainToLoginResponse(lc)
 
