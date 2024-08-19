@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# TODO: no funciona el script del todo, pudo crear la base de datos (con los pasos de la documentacion de pgAdmin)
+# NOTE: no funciona el script del todo, pudo crear la base de datos (con los pasos de la documentacion de pgAdmin)
 # Función para cargar las variables de entorno desde el archivo ./config/.env
 load_env() {
   export $(grep -v '^#' .././config/.env | xargs)
