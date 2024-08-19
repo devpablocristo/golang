@@ -212,12 +212,12 @@ func (ed *mongoEventDAO) Create(ctx context.Context, event *Event) error {
 // }
 
 // // helpers
-// func checkEventFields(event *EventDAO) map[string]interface{} {
+// func checkEventFields(event *EventDAO) map[string]any {
 // 	if event == nil {
 // 		return nil
 // 	}
 
-// 	updateFields := make(map[string]interface{})
+// 	updateFields := make(map[string]any)
 
 // 	if event.EventName != "" {
 // 		updateFields["event_name"] = event.EventName

@@ -1,31 +1,31 @@
-package grpcpkg
+package ggrpcgpkg
 
 import (
 	"fmt"
 	"net"
 	"sync"
 
-	"github.com/devpablocristo/golang/sdk/pkg/grpc/google/portspkg"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/reflection"
+
+	"github.com/devpablocristo/golang/sdk/pkg/grpc/google/portspkg"
 )
 
 var (
-	serverInstance portspkg.GrpcServer
+	serverInstance portspkg.GgrpcServer
 	onceServer     sync.Once
 	errInitServer  error
 )
 
-type grpcServer struct {
+type ggrpcServer struct {
 	server   *grpc.Server
 	listener net.Listener
 }
 
-// InitializeGrpcServer inicializa un servidor gRPC con la configuración proporcionada.
-func InitializeGrpcServer(config portspkg.GrpcConfig) error {
+func InitializeGgrpcServer(config portspkg.GgrpcConfig) error {
 	onceServer.Do(func() {
 		var opts []grpc.ServerOption
-
 		if config.GetTLSConfig() != nil {
 			tlsConfig, err := loadTLSConfig(config.GetTLSConfig())
 			if err != nil {
@@ -43,13 +43,15 @@ func InitializeGrpcServer(config portspkg.GrpcConfig) error {
 		}
 
 		server := grpc.NewServer(opts...)
-		serverInstance = &grpcServer{server: server, listener: listener}
+		reflection.Register(server) // Registro de reflexión gRPC
+
+		serverInstance = &ggrpcServer{server: server, listener: listener}
 	})
 	return errInitServer
 }
 
 // GetGrpcServerInstance devuelve la instancia del servidor gRPC.
-func GetGrpcServerInstance() (portspkg.GrpcServer, error) {
+func GetGgrpcServerInstance() (portspkg.GgrpcServer, error) {
 	if serverInstance == nil {
 		return nil, fmt.Errorf("grpc server is not initialized")
 	}
@@ -57,17 +59,17 @@ func GetGrpcServerInstance() (portspkg.GrpcServer, error) {
 }
 
 // Start inicia el servidor gRPC.
-func (s *grpcServer) Start() error {
+func (s *ggrpcServer) Start() error {
 	return s.server.Serve(s.listener)
 }
 
 // Stop detiene el servidor gRPC.
-func (s *grpcServer) Stop() error {
+func (s *ggrpcServer) Stop() error {
 	s.server.GracefulStop()
 	return s.listener.Close()
 }
 
 // RegisterService registra un servicio gRPC en el servidor.
-func (s *grpcServer) RegisterService(serviceDesc *grpc.ServiceDesc, impl interface{}) {
+func (s *ggrpcServer) RegisterService(serviceDesc *grpc.ServiceDesc, impl any) {
 	s.server.RegisterService(serviceDesc, impl)
 }

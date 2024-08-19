@@ -1,4 +1,4 @@
-package grpcpkg
+package ggrpcgpkg
 
 import (
 	"context"
@@ -8,27 +8,26 @@ import (
 	"os"
 	"sync"
 
-	"github.com/devpablocristo/golang/sdk/pkg/grpc/google/portspkg"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/devpablocristo/golang/sdk/pkg/grpc/google/portspkg"
 )
 
 var (
-	instance portspkg.GrpcClient
+	instance portspkg.GgrpcClient
 	once     sync.Once
 	errInit  error
 )
 
-type grpcClient struct {
+type ggrpcClient struct {
 	conn *grpc.ClientConn
 }
 
-// InitializeGrpcClient inicializa una conexión única a gRPC.
-func InitializeGrpcClient(config portspkg.GrpcConfig) error {
+func InitializeGgrpcClient(config portspkg.GgrpcConfig) error {
 	once.Do(func() {
 		var opts []grpc.DialOption
-
 		if config.GetTLSConfig() != nil {
 			tlsConfig, err := loadTLSConfig(config.GetTLSConfig())
 			if err != nil {
@@ -47,13 +46,12 @@ func InitializeGrpcClient(config portspkg.GrpcConfig) error {
 			return
 		}
 
-		instance = &grpcClient{conn: conn}
+		instance = &ggrpcClient{conn: conn}
 	})
 	return errInit
 }
 
-// GetGrpcClientInstance devuelve la instancia del cliente gRPC.
-func GetGrpcClientInstance() (portspkg.GrpcClient, error) {
+func GetGgrpcClientInstance() (portspkg.GgrpcClient, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("grpc client is not initialized")
 	}
@@ -61,12 +59,12 @@ func GetGrpcClientInstance() (portspkg.GrpcClient, error) {
 }
 
 // InvokeMethod realiza la invocación de un método gRPC.
-func (client *grpcClient) InvokeMethod(ctx context.Context, method string, request, response interface{}) error {
+func (client *ggrpcClient) InvokeMethod(ctx context.Context, method string, request, response any) error {
 	return client.conn.Invoke(ctx, method, request, response)
 }
 
 // Close cierra la conexión con el servidor gRPC.
-func (client *grpcClient) Close() error {
+func (client *ggrpcClient) Close() error {
 	return client.conn.Close()
 }
 

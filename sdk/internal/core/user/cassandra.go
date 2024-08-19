@@ -6,7 +6,7 @@ import (
 
 	"github.com/gocql/gocql"
 
-	csdgocsl "github.com/devpablocristo/golang/sdk/pkg/cassandra/gocql"
+	portspkg "github.com/devpablocristo/golang/sdk/pkg/cassandra/gocql/portspkg"
 
 	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
 	"github.com/devpablocristo/golang/sdk/internal/core/user/portscore"
@@ -14,11 +14,11 @@ import (
 
 // cassandraRepository struct con instancia de cliente de Cassandra
 type cassandraRepository struct {
-	csdInst csdgocsl.CassandraClientPort
+	csdInst portspkg.CassandraClient
 }
 
 // NewCassandraRepository crea un nuevo repositorio de usuarios en Cassandra
-func NewCassandraRepository(inst csdgocsl.CassandraClientPort) portscore.Repository {
+func NewCassandraRepository(inst portspkg.CassandraClient) portscore.Repository {
 	return &cassandraRepository{
 		csdInst: inst,
 	}
@@ -43,6 +43,19 @@ func (r *cassandraRepository) GetUser(ctx context.Context, id string) (*entities
 		return nil, err
 	}
 	return &user, nil
+}
+
+// GetUserUUID recupera el UUID de un usuario dado su nombre de usuario y hash de contraseña
+func (r *cassandraRepository) GetUserUUID(ctx context.Context, username, passwordHash string) (string, error) {
+	var uuid string
+	err := r.csdInst.GetSession().Query(
+		"SELECT id FROM users WHERE username = ? AND password = ?",
+		username, passwordHash,
+	).Consistency(gocql.One).Scan(&uuid)
+	if err != nil {
+		return "", err
+	}
+	return uuid, nil
 }
 
 // GetUserByUsername recupera un usuario por su nombre de usuario

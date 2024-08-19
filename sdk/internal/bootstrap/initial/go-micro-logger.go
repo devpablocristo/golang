@@ -16,27 +16,27 @@ const (
 	ColorReset  = "\033[0m"
 )
 
-func LogInfo(format string, v ...interface{}) {
+func LogInfo(format string, v ...any) {
 	log.Printf(ColorBlue+format+ColorReset, v...)
 }
 
-func LogWarning(format string, v ...interface{}) {
+func LogWarning(format string, v ...any) {
 	log.Printf(ColorYellow+format+ColorReset, v...)
 }
 
-func LogError(format string, v ...interface{}) {
+func LogError(format string, v ...any) {
 	log.Printf(ColorRed+format+ColorReset, v...)
 }
 
-func MicroLogInfo(format string, v ...interface{}) {
+func MicroLogInfo(format string, v ...any) {
 	logger.Infof(ColorBlue+format+ColorReset, v...)
 }
 
-func MicroLogWarning(format string, v ...interface{}) {
+func MicroLogWarning(format string, v ...any) {
 	logger.Warnf(ColorYellow+format+ColorReset, v...)
 }
 
-func MicroLogError(format string, v ...interface{}) {
+func MicroLogError(format string, v ...any) {
 	logger.Errorf(ColorRed+format+ColorReset, v...)
 }
 

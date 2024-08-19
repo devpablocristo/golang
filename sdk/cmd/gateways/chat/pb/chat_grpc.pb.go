@@ -92,7 +92,7 @@ func RegisterChatServiceServer(s grpc.ServiceRegistrar, srv ChatServiceServer) {
 	s.RegisterService(&ChatService_ServiceDesc, srv)
 }
 
-func _ChatService_Chat_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _ChatService_Chat_Handler(srv any, stream grpc.ServerStream) error {
 	return srv.(ChatServiceServer).Chat(&chatServiceChatServer{stream})
 }
 

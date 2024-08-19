@@ -70,7 +70,7 @@ func RegisterBookstoreInventoryServer(s grpc.ServiceRegistrar, srv BookstoreInve
 	s.RegisterService(&BookstoreInventory_ServiceDesc, srv)
 }
 
-func _BookstoreInventory_CreateNewBook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BookstoreInventory_CreateNewBook_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(NewBook)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func _BookstoreInventory_CreateNewBook_Handler(srv interface{}, ctx context.Cont
 		Server:     srv,
 		FullMethod: "/grpcbook.BookstoreInventory/CreateNewBook",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(BookstoreInventoryServer).CreateNewBook(ctx, req.(*NewBook))
 	}
 	return interceptor(ctx, in, info, handler)

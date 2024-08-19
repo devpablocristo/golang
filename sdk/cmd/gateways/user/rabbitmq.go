@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/user/gtwports"
+	"github.com/devpablocristo/golang/sdk/cmd/gateways/user/portsgtw"
 	mdw "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 	"github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/portspkg"
 )
@@ -14,7 +14,7 @@ type rabbitMqBroker struct {
 	client portspkg.RabbitMqClient
 }
 
-func NewRabbitMqBroker(client portspkg.RabbitMqClient) gtwports.MessageBroker {
+func NewRabbitMqBroker(client portspkg.RabbitMqClient) portsgtw.MessageBroker {
 	return &rabbitMqBroker{
 		client: client,
 	}

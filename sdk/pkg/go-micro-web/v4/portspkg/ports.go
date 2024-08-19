@@ -1,7 +1,9 @@
 package gomicroports
 
 import (
+	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
+	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/server"
 	"go-micro.dev/v4/web"
 )
@@ -9,7 +11,7 @@ import (
 type GoMicroClient interface {
 	Start() error
 	Stop() error
-	GetService() interface{}
+	GetService() micro.Service
 	GetWebService() web.Service
 	GetGrpcClient() client.Client
 	GetGrpcServer() server.Server
@@ -22,7 +24,7 @@ type GoMicroConfig interface {
 	SetVersion(string)
 	GetAddress() string
 	SetAddress(string)
-	GetRegistry() interface{}
-	SetRegistry(interface{})
+	GetRegistry() registry.Registry
+	SetRegistry(registry.Registry)
 	Validate() error
 }

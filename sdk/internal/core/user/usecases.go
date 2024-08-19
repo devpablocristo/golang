@@ -27,6 +27,10 @@ func (u *userUseCases) GetUser(ctx context.Context, ID string) (*entities.User, 
 	return user, nil
 }
 
+func (r *userUseCases) GetUserUUID(ctx context.Context, username, passwordHash string) (string, error) {
+	return "0001", nil
+}
+
 func (u *userUseCases) DeleteUser(ctx context.Context, ID string) error {
 	return u.repository.DeleteUser(ctx, ID)
 }

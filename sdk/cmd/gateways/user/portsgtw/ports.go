@@ -1,4 +1,4 @@
-package gtwports
+package portsgtw
 
 import (
 	"context"
@@ -20,6 +20,6 @@ type MessageBroker interface {
 	SendUser(context.Context) error
 }
 
-type GrpcServer interface {
+type GgrpcServer interface {
 	GetUserUUID(context.Context, *pb.GetUserRequest) (*pb.GetUserResponse, error)
 }

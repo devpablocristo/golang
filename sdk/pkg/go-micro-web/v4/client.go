@@ -6,7 +6,6 @@ import (
 
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
-	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/server"
 	"go-micro.dev/v4/web"
 
@@ -32,24 +31,16 @@ func InitializeGoMicroClient(config portspkg.GoMicroConfig) error {
 		ms := micro.NewService(
 			micro.Name(config.GetName()),
 			micro.Version(config.GetVersion()),
-			micro.Registry(config.GetRegistry().(registry.Registry)),
+			micro.Registry(config.GetRegistry()),
 			micro.Address(config.GetAddress()),
 		)
 
 		ms.Init()
 
-		ws := web.NewService(
-			web.Name(config.GetName()),
-			web.Version(config.GetVersion()),
-			web.Registry(config.GetRegistry().(registry.Registry)),
-			web.Address(config.GetAddress()),
-		)
-
 		instance = &goMicroClient{
-			service:    ms,
-			webService: ws,
-			client:     ms.Client(),
-			server:     ms.Server(),
+			service: ms,
+			client:  ms.Client(),
+			server:  ms.Server(),
 		}
 	})
 	return errInit
@@ -74,7 +65,7 @@ func (c *goMicroClient) Stop() error {
 }
 
 // GetService devuelve la instancia del servicio Go-Micro.
-func (c *goMicroClient) GetService() interface{} {
+func (c *goMicroClient) GetService() micro.Service {
 	return c.service
 }
 

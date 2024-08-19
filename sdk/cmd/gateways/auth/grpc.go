@@ -2,19 +2,25 @@ package auth
 
 import (
 	"context"
-	pb "path/to/proto/user" // Ajusta la ruta según tu proyecto
 
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/gtwports"
+	pb "github.com/devpablocristo/golang/sdk/cmd/gateways/auth/pb"
+
+	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/portsgtw"
+	"github.com/devpablocristo/golang/sdk/pkg/grpc/google/portspkg"
 	"google.golang.org/grpc"
 )
 
-type grpcClient struct{}
-
-func NewGrpcClent() gtwports.GrpcClient {
-	return &grpcClient{}
+type ggrpcClient struct {
+	client portsgtw.GrpcClient
 }
 
-func (g *grpcClient) GetUserUUID(username, password string) (string, error) {
+func NewGGrpcClient(client portspkg.GgrpcClient) portsgtw.GrpcClient {
+	return &ggrpcClient{
+		client: client,
+	}
+}
+
+func (g *ggrpcClient) GetUserUUID(username, password string) (string, error) {
 	conn, err := grpc.Dial("user-service:50051", grpc.WithInsecure())
 	if err != nil {
 		return "", err

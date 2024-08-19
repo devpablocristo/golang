@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-type GrpcConfig interface {
+type GgrpcConfig interface {
 	GetHost() string
 	SetHost(host string)
 	GetPort() int
@@ -22,13 +22,13 @@ type TLSConfig struct {
 	CAFile   string
 }
 
-type GrpcClient interface {
-	InvokeMethod(ctx context.Context, method string, request, response interface{}) error
+type GgrpcClient interface {
+	InvokeMethod(ctx context.Context, method string, request, response any) error
 	Close() error
-} 
+}
 
-type GrpcServer interface {
+type GgrpcServer interface {
 	Start() error
 	Stop() error
-	RegisterService(serviceDesc *grpc.ServiceDesc, impl interface{})
+	RegisterService(serviceDesc *grpc.ServiceDesc, impl any)
 }

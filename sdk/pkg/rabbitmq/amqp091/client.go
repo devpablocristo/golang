@@ -59,7 +59,7 @@ func (client *rabbitMqClient) Close() error {
 	return client.connection.Close()
 }
 
-func (client *rabbitMqClient) Produce(ctx context.Context, queueName string, replyTo string, corrID string, message interface{}) (string, error) {
+func (client *rabbitMqClient) Produce(ctx context.Context, queueName string, replyTo string, corrID string, message any) (string, error) {
 	// Abre un canal
 	ch, err := client.Channel()
 	if err != nil {

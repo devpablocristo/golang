@@ -16,9 +16,9 @@ type EventReportDTO struct {
 
 func (ems *EventMetricsDTO) ToDomain() *report.Report {
 	report := &report.Report{}
-	report.Metrics = make(map[string]interface{})
+	report.Metrics = make(map[string]any)
 	for _, eventReportDTO := range ems.EventMetrics {
-		report.Metrics[eventReportDTO.EventID] = map[string]interface{}{
+		report.Metrics[eventReportDTO.EventID] = map[string]any{
 			"eventName": eventReportDTO.EventName,
 			"visits":    eventReportDTO.Visits,
 		}

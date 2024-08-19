@@ -10,6 +10,7 @@ import (
 type Repository interface {
 	SaveUser(context.Context, *entities.User) error
 	GetUser(context.Context, string) (*entities.User, error)
+	GetUserUUID(context.Context, string, string) (string, error)
 	GetUserByUsername(context.Context, string) (*entities.User, error)
 	DeleteUser(context.Context, string) error
 	ListUsers(context.Context) (*entities.InMemDB, error)
@@ -18,6 +19,7 @@ type Repository interface {
 
 type UserUseCases interface {
 	GetUser(context.Context, string) (*entities.User, error)
+	GetUserUUID(context.Context, string, string) (string, error)
 	DeleteUser(context.Context, string) error
 	ListUsers(context.Context) (*entities.InMemDB, error)
 	UpdateUser(context.Context, *entities.User, string) error

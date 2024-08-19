@@ -47,12 +47,12 @@ func (c *goMicroConfig) SetAddress(address string) {
 	c.address = address
 }
 
-func (c *goMicroConfig) GetRegistry() any {
+func (c *goMicroConfig) GetRegistry() registry.Registry {
 	return c.registry
 }
 
-func (c *goMicroConfig) SetRegistry(reg any) {
-	c.registry = reg.(registry.Registry)
+func (c *goMicroConfig) SetRegistry(reg registry.Registry) {
+	c.registry = reg
 }
 
 func (c *goMicroConfig) Validate() error {

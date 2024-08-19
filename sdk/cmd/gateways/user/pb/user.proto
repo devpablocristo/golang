@@ -16,5 +16,5 @@ message GetUserRequest {
 message GetUserResponse {
   string UUID = 1;
 }
-
+  
 // protoc --go_out=. --go-grpc_out=. user.proto

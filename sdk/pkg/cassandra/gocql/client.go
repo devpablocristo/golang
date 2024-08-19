@@ -5,48 +5,44 @@ import (
 	"sync"
 
 	"github.com/gocql/gocql"
+
+	"github.com/devpablocristo/golang/sdk/pkg/cassandra/gocql/portspkg"
 )
 
 var (
-	instance CassandraClientPort
+	instance portspkg.CassandraClient
 	once     sync.Once
 	errInit  error
 )
 
-type CassandraClientPort interface {
-	Connect(config CassandraConfig) error
-	Close()
-	GetSession() *gocql.Session
-}
-
-type CassandraClient struct {
+type cassandraClient struct {
 	session *gocql.Session
 }
 
-func InitializeCassandraClient(config CassandraConfig) error {
+func InitializeCassandraClient(config portspkg.CassandraConfig) error {
 	once.Do(func() {
-		instance = &CassandraClient{}
-		errInit = instance.Connect(config)
-		if errInit != nil {
-			instance = nil
+		client := &cassandraClient{}
+		errInit = client.Connect(config)
+		if errInit == nil {
+			instance = client
 		}
 	})
 	return errInit
 }
 
-func GetCassandraInstance() (CassandraClientPort, error) {
+func GetCassandraInstance() (portspkg.CassandraClient, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("cassandra client is not initialized")
 	}
 	return instance, nil
 }
 
-func (c *CassandraClient) Connect(config CassandraConfig) error {
-	cluster := gocql.NewCluster(config.Hosts...)
-	cluster.Keyspace = config.Keyspace
+func (c *cassandraClient) Connect(config portspkg.CassandraConfig) error {
+	cluster := gocql.NewCluster(config.GetHosts()...)
+	cluster.Keyspace = config.GetKeyspace()
 	cluster.Authenticator = gocql.PasswordAuthenticator{
-		Username: config.Username,
-		Password: config.Password,
+		Username: config.GetUsername(),
+		Password: config.GetPassword(),
 	}
 	session, err := cluster.CreateSession()
 	if err != nil {
@@ -56,12 +52,12 @@ func (c *CassandraClient) Connect(config CassandraConfig) error {
 	return nil
 }
 
-func (c *CassandraClient) Close() {
+func (c *cassandraClient) Close() {
 	if c.session != nil {
 		c.session.Close()
 	}
 }
 
-func (c *CassandraClient) GetSession() *gocql.Session {
+func (c *cassandraClient) GetSession() *gocql.Session {
 	return c.session
 }

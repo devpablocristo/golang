@@ -11,5 +11,5 @@ type AuthUseCases interface {
 }
 
 type AccessControl interface {
-	GenerateToken(map[string]interface{}) error
+	GenerateToken(map[string]any) error
 }

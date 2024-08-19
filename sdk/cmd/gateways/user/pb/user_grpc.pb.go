@@ -70,7 +70,7 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 	s.RegisterService(&UserService_ServiceDesc, srv)
 }
 
-func _UserService_GetUserUUID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_GetUserUUID_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(GetUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func _UserService_GetUserUUID_Handler(srv interface{}, ctx context.Context, dec 
 		Server:     srv,
 		FullMethod: "/user.UserService/GetUserUUID",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(UserServiceServer).GetUserUUID(ctx, req.(*GetUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)

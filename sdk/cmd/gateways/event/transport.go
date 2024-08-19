@@ -14,7 +14,7 @@ func decodeCreateEventRequest(c *gin.Context) (*EventRequest, error) {
 	return &request, nil
 }
 
-func encodeResponse(c *gin.Context, response interface{}) {
+func encodeResponse(c *gin.Context, response any) {
 	c.JSON(http.StatusOK, response)
 }
 

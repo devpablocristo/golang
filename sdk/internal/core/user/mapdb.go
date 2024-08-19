@@ -47,6 +47,10 @@ func (r *mapDbRepository) GetUser(ctx context.Context, UUID string) (*entities.U
 	return user, nil
 }
 
+func (r *mapDbRepository) GetUserUUID(ctx context.Context, username, passwordHash string) (string, error) {
+	return "0001", nil
+}
+
 // GetUserByUsername obtiene un usuario por su nombre de usuario
 func (r *mapDbRepository) GetUserByUsername(ctx context.Context, username string) (*entities.User, error) {
 	for _, user := range *r.db {

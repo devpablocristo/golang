@@ -210,7 +210,7 @@ func RegisterCalculatorServiceServer(s grpc.ServiceRegistrar, srv CalculatorServ
 	s.RegisterService(&CalculatorService_ServiceDesc, srv)
 }
 
-func _CalculatorService_Sum_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CalculatorService_Sum_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SumRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -222,13 +222,13 @@ func _CalculatorService_Sum_Handler(srv interface{}, ctx context.Context, dec fu
 		Server:     srv,
 		FullMethod: CalculatorService_Sum_FullMethodName,
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CalculatorServiceServer).Sum(ctx, req.(*SumRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CalculatorService_PrimeNumberDecomposition_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _CalculatorService_PrimeNumberDecomposition_Handler(srv any, stream grpc.ServerStream) error {
 	m := new(PrimeNumberDecompositionRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
@@ -249,7 +249,7 @@ func (x *calculatorServicePrimeNumberDecompositionServer) Send(m *PrimeNumberDec
 	return x.ServerStream.SendMsg(m)
 }
 
-func _CalculatorService_ComputeAverage_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _CalculatorService_ComputeAverage_Handler(srv any, stream grpc.ServerStream) error {
 	return srv.(CalculatorServiceServer).ComputeAverage(&calculatorServiceComputeAverageServer{stream})
 }
 
@@ -275,7 +275,7 @@ func (x *calculatorServiceComputeAverageServer) Recv() (*ComputeAverageRequest, 
 	return m, nil
 }
 
-func _CalculatorService_FindMaximum_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _CalculatorService_FindMaximum_Handler(srv any, stream grpc.ServerStream) error {
 	return srv.(CalculatorServiceServer).FindMaximum(&calculatorServiceFindMaximumServer{stream})
 }
 
@@ -301,7 +301,7 @@ func (x *calculatorServiceFindMaximumServer) Recv() (*FindMaximumRequest, error)
 	return m, nil
 }
 
-func _CalculatorService_SquareRoot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CalculatorService_SquareRoot_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(SquareRootRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -313,7 +313,7 @@ func _CalculatorService_SquareRoot_Handler(srv interface{}, ctx context.Context,
 		Server:     srv,
 		FullMethod: CalculatorService_SquareRoot_FullMethodName,
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CalculatorServiceServer).SquareRoot(ctx, req.(*SquareRootRequest))
 	}
 	return interceptor(ctx, in, info, handler)

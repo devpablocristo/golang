@@ -12,4 +12,4 @@ type GinClient interface {
 	WrapH(h http.Handler) gin.HandlerFunc
 }
 
-type GinConfig interface{}
+type GinConfig any

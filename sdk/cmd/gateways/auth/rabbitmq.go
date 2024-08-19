@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/dto"
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/gtwports"
+	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/portsgtw"
 	"github.com/devpablocristo/golang/sdk/internal/core/auth/entities"
 	"github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/portspkg"
 )
@@ -15,7 +15,7 @@ type rabbitMqBroker struct {
 	client portspkg.RabbitMqClient
 }
 
-func NewRabbitMqBroker(client portspkg.RabbitMqClient) gtwports.MessageBroker {
+func NewRabbitMqBroker(client portspkg.RabbitMqClient) portsgtw.MessageBroker {
 	return &rabbitMqBroker{
 		client: client,
 	}

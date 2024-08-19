@@ -4,17 +4,17 @@ import (
 	"context"
 	"time"
 
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/gtwports"
+	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/portsgtw"
 	"github.com/devpablocristo/golang/sdk/internal/core/auth/entities"
 	"github.com/devpablocristo/golang/sdk/internal/core/auth/portscore"
 )
 
 type useAuthCases struct {
-	messageBroker gtwports.MessageBroker
+	messageBroker portsgtw.MessageBroker
 	accessControl portscore.AccessControl
 }
 
-func NewAuthUseCases(mb gtwports.MessageBroker, ac portscore.AccessControl) portscore.AuthUseCases {
+func NewAuthUseCases(mb portsgtw.MessageBroker, ac portscore.AccessControl) portscore.AuthUseCases {
 	return &useAuthCases{
 		messageBroker: mb,
 		accessControl: ac,

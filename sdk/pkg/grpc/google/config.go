@@ -1,4 +1,4 @@
-package grpcpkg
+package ggrpcgpkg
 
 import (
 	"fmt"
@@ -6,16 +6,16 @@ import (
 	portspkg "github.com/devpablocristo/golang/sdk/pkg/grpc/google/portspkg"
 )
 
-// grpcConfig representa la configuración necesaria para conectarse a un servidor gRPC.
-type grpcConfig struct {
+// ggrpcConfig representa la configuración necesaria para conectarse a un servidor gRPC.
+type ggrpcConfig struct {
 	host      string
 	port      int
 	tlsConfig *portspkg.TLSConfig
 }
 
 // NewGrpcConfig crea una nueva configuración gRPC con los valores proporcionados.
-func NewGrpcConfig(host string, port int, tlsConfig *portspkg.TLSConfig) portspkg.GrpcConfig {
-	return &grpcConfig{
+func NewGrpcConfig(host string, port int, tlsConfig *portspkg.TLSConfig) portspkg.GgrpcConfig {
+	return &ggrpcConfig{
 		host:      host,
 		port:      port,
 		tlsConfig: tlsConfig,
@@ -23,37 +23,37 @@ func NewGrpcConfig(host string, port int, tlsConfig *portspkg.TLSConfig) portspk
 }
 
 // GetHost devuelve el host de la configuración.
-func (config *grpcConfig) GetHost() string {
+func (config *ggrpcConfig) GetHost() string {
 	return config.host
 }
 
 // SetHost establece el host de la configuración.
-func (config *grpcConfig) SetHost(host string) {
+func (config *ggrpcConfig) SetHost(host string) {
 	config.host = host
 }
 
 // GetPort devuelve el puerto de la configuración.
-func (config *grpcConfig) GetPort() int {
+func (config *ggrpcConfig) GetPort() int {
 	return config.port
 }
 
 // SetPort establece el puerto de la configuración.
-func (config *grpcConfig) SetPort(port int) {
+func (config *ggrpcConfig) SetPort(port int) {
 	config.port = port
 }
 
 // GetTLSConfig devuelve la configuración TLS.
-func (config *grpcConfig) GetTLSConfig() *portspkg.TLSConfig {
+func (config *ggrpcConfig) GetTLSConfig() *portspkg.TLSConfig {
 	return config.tlsConfig
 }
 
 // SetTLSConfig establece la configuración TLS.
-func (config *grpcConfig) SetTLSConfig(tlsConfig *portspkg.TLSConfig) {
+func (config *ggrpcConfig) SetTLSConfig(tlsConfig *portspkg.TLSConfig) {
 	config.tlsConfig = tlsConfig
 }
 
 // Validate valida la configuración gRPC.
-func (config *grpcConfig) Validate() error {
+func (config *ggrpcConfig) Validate() error {
 	if config.host == "" {
 		return fmt.Errorf("gRPC host is not configured")
 	}

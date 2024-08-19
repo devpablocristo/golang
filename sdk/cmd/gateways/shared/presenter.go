@@ -8,14 +8,14 @@ import (
 
 // ApiResponse representa una respuesta de API con un mensaje opcional y un resultado.
 type ApiResponse struct {
-	Success bool        `json:"success"`
-	Status  int         `json:"status"`
-	Message string      `json:"message,omitempty"`
-	Result  interface{} `json:"result,omitempty"`
+	Success bool   `json:"success"`
+	Status  int    `json:"status"`
+	Message string `json:"message,omitempty"`
+	Result  any    `json:"result,omitempty"`
 }
 
 // NewApiResponse crea una nueva instancia de ApiResponse.
-func NewApiResponse(success bool, status int, message string, result interface{}) *ApiResponse {
+func NewApiResponse(success bool, status int, message string, result any) *ApiResponse {
 	return &ApiResponse{
 		Success: success,
 		Status:  status,
@@ -25,7 +25,7 @@ func NewApiResponse(success bool, status int, message string, result interface{}
 }
 
 // WriteJSONResponse escribe una respuesta JSON al cliente.
-func WriteJSONResponse(w http.ResponseWriter, statusCode int, data interface{}) {
+func WriteJSONResponse(w http.ResponseWriter, statusCode int, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	if err := json.NewEncoder(w).Encode(data); err != nil {

@@ -269,7 +269,7 @@ func file_internal_greeter_proto_greet_proto_rawDescGZIP() []byte {
 }
 
 var file_internal_greeter_proto_greet_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_internal_greeter_proto_greet_proto_goTypes = []interface{}{
+var file_internal_greeter_proto_greet_proto_goTypes = []any{
 	(*HelloRequest)(nil),  // 0: greetsrv.HelloRequest
 	(*HelloResponse)(nil), // 1: greetsrv.HelloResponse
 	(*NamesList)(nil),     // 2: greetsrv.NamesList
@@ -291,7 +291,7 @@ func file_internal_greeter_proto_greet_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_internal_greeter_proto_greet_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_internal_greeter_proto_greet_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*HelloRequest); i {
 			case 0:
 				return &v.state
@@ -303,7 +303,7 @@ func file_internal_greeter_proto_greet_proto_init() {
 				return nil
 			}
 		}
-		file_internal_greeter_proto_greet_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_internal_greeter_proto_greet_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*HelloResponse); i {
 			case 0:
 				return &v.state
@@ -315,7 +315,7 @@ func file_internal_greeter_proto_greet_proto_init() {
 				return nil
 			}
 		}
-		file_internal_greeter_proto_greet_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_internal_greeter_proto_greet_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*NamesList); i {
 			case 0:
 				return &v.state
@@ -327,7 +327,7 @@ func file_internal_greeter_proto_greet_proto_init() {
 				return nil
 			}
 		}
-		file_internal_greeter_proto_greet_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_internal_greeter_proto_greet_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*MessagesList); i {
 			case 0:
 				return &v.state

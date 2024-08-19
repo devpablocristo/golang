@@ -52,8 +52,8 @@ type Event struct {
 
 type InMemDB map[string]*Event
 
-func ToInterface(events []Event) []interface{} {
-	result := make([]interface{}, len(events))
+func ToInterface(events []Event) []any {
+	result := make([]any, len(events))
 	for i, v := range events {
 		result[i] = v
 	}

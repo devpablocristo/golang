@@ -61,11 +61,14 @@ func main() {
 	auth.Routes(r, authHandler, apiVersion, "secret")
 	//user.Routes(r, userHandler)
 	// Manejar rutas HTTP
-	gomicro..GetWebService().Handle("/", r)
+	gomicro.GetWebService().Handle("/", r)
 
 	// Usar gRPC cliente o servidor
-	grpcClient := gomicroInstance.GetGrpcClient()
-	grpcServer := gomicroInstance.GetGrpcServer()
+	grpcClient := gomicro.GetGrpcClient()
+	grpcServer := gomicro.GetGrpcServer()
+
+	_ = grpcClient
+	_ = grpcServer
 	// Ejecuta Gin en la dirección especificada por Go-Micro
 	go func() {
 		if err := r.Run(":8080"); err != nil {
@@ -77,7 +80,7 @@ func main() {
 	go messaging()
 
 	// Ejecutar el servicio Go Micro
-	if err := gomicro.GetService().Run(); err != nil {
+	if err := gomicro.GetWebService().Run(); err != nil {
 		inisetup.MicroLogError("error starting GoMicro service: %v", err)
 	}
 }

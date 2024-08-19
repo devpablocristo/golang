@@ -585,7 +585,7 @@ func file_calculator_pb_calculator_proto_rawDescGZIP() []byte {
 }
 
 var file_calculator_pb_calculator_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
-var file_calculator_pb_calculator_proto_goTypes = []interface{}{
+var file_calculator_pb_calculator_proto_goTypes = []any{
 	(*SumRequest)(nil),                       // 0: calculator.SumRequest
 	(*SumResponse)(nil),                      // 1: calculator.SumResponse
 	(*PrimeNumberDecompositionRequest)(nil),  // 2: calculator.PrimeNumberDecompositionRequest
@@ -621,7 +621,7 @@ func file_calculator_pb_calculator_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_calculator_pb_calculator_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_calculator_pb_calculator_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*SumRequest); i {
 			case 0:
 				return &v.state
@@ -633,7 +633,7 @@ func file_calculator_pb_calculator_proto_init() {
 				return nil
 			}
 		}
-		file_calculator_pb_calculator_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_calculator_pb_calculator_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*SumResponse); i {
 			case 0:
 				return &v.state
@@ -645,7 +645,7 @@ func file_calculator_pb_calculator_proto_init() {
 				return nil
 			}
 		}
-		file_calculator_pb_calculator_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_calculator_pb_calculator_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*PrimeNumberDecompositionRequest); i {
 			case 0:
 				return &v.state
@@ -657,7 +657,7 @@ func file_calculator_pb_calculator_proto_init() {
 				return nil
 			}
 		}
-		file_calculator_pb_calculator_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_calculator_pb_calculator_proto_msgTypes[3].Exporter = func(v any, i int) any {
 			switch v := v.(*PrimeNumberDecompositionResponse); i {
 			case 0:
 				return &v.state
@@ -669,7 +669,7 @@ func file_calculator_pb_calculator_proto_init() {
 				return nil
 			}
 		}
-		file_calculator_pb_calculator_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_calculator_pb_calculator_proto_msgTypes[4].Exporter = func(v any, i int) any {
 			switch v := v.(*ComputeAverageRequest); i {
 			case 0:
 				return &v.state
@@ -681,7 +681,7 @@ func file_calculator_pb_calculator_proto_init() {
 				return nil
 			}
 		}
-		file_calculator_pb_calculator_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_calculator_pb_calculator_proto_msgTypes[5].Exporter = func(v any, i int) any {
 			switch v := v.(*ComputeAverageResponse); i {
 			case 0:
 				return &v.state
@@ -693,7 +693,7 @@ func file_calculator_pb_calculator_proto_init() {
 				return nil
 			}
 		}
-		file_calculator_pb_calculator_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_calculator_pb_calculator_proto_msgTypes[6].Exporter = func(v any, i int) any {
 			switch v := v.(*FindMaximumRequest); i {
 			case 0:
 				return &v.state
@@ -705,7 +705,7 @@ func file_calculator_pb_calculator_proto_init() {
 				return nil
 			}
 		}
-		file_calculator_pb_calculator_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_calculator_pb_calculator_proto_msgTypes[7].Exporter = func(v any, i int) any {
 			switch v := v.(*FindMaximumResponse); i {
 			case 0:
 				return &v.state
@@ -717,7 +717,7 @@ func file_calculator_pb_calculator_proto_init() {
 				return nil
 			}
 		}
-		file_calculator_pb_calculator_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_calculator_pb_calculator_proto_msgTypes[8].Exporter = func(v any, i int) any {
 			switch v := v.(*SquareRootRequest); i {
 			case 0:
 				return &v.state
@@ -729,7 +729,7 @@ func file_calculator_pb_calculator_proto_init() {
 				return nil
 			}
 		}
-		file_calculator_pb_calculator_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_calculator_pb_calculator_proto_msgTypes[9].Exporter = func(v any, i int) any {
 			switch v := v.(*SquareRootResponse); i {
 			case 0:
 				return &v.state
