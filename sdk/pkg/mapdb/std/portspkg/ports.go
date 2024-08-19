@@ -1,5 +1,6 @@
 package portspkg
 
-type MapDbConfig interface{}
 
-type MapDbClient interface{}
+type MapDbClient interface {
+	GetDb() map[string]interface{}
+}

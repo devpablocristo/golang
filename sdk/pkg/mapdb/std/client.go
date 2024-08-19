@@ -7,32 +7,33 @@ import (
 	portspkg "github.com/devpablocristo/golang/sdk/pkg/mapdb/std/portspkg"
 )
 
-type mapDbClient struct {
-	db map[string]interface{}
-}
-
 var (
-	instance portspkg.MapDbConfig
+	instance portspkg.MapDbClient
 	once     sync.Once
 	errInit  error
 )
 
+type mapDbClient struct {
+	db map[string]interface{}
+}
+
 // InitializeMapDbClient inicializa el cliente MapDb con la configuración dada.
-func InitializeMapDbClient(config portspkg.MapDbConfig) error {
+func InitializeMapDbClient() error {
 	once.Do(func() {
 		client := &mapDbClient{}
-		errInit = client.initialize(config)
-		if errInit == nil {
-			instance = client
-		}
+		client.initialize()
 	})
 	return errInit
 }
 
 // Initialize inicializa la base de datos en memoria.
-func (c *mapDbClient) initialize(config portspkg.MapDbConfig) error {
+func (c *mapDbClient) initialize() {
 	c.db = make(map[string]interface{})
-	return nil // No hay validación en este caso, pero podrías agregarla si es necesario.
+}
+
+// GetDB retorna la base de datos en memoria.
+func (c *mapDbClient) GetDb() map[string]interface{} {
+	return c.db
 }
 
 // GetMapDbInstance retorna la instancia inicializada de MapDbClient.

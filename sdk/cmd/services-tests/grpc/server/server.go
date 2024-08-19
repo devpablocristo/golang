@@ -15,46 +15,18 @@ import (
 
 func main() {
 
-	// TODO: probar y crear el generics
 	grpcInst, err := ggrpcsetup.NewGgrpcServerInstance()
 	if err != nil {
 		log.Fatalf("Failed to get gRPC grpcInst instance: %v", err)
 	}
 
-	// users := []entities.User{
-	// 	{
-	// 		UUID: "user1-uuid",
-	// 		Credentials: entities.Credentials{
-	// 			Username:     "user1",
-	// 			PasswordHash: "password1",
-	// 		},
-	// 	},
-	// 	{
-	// 		UUID: "user2-uuid",
-	// 		Credentials: entities.Credentials{
-	// 			Username:     "user2",
-	// 			PasswordHash: "password2",
-	// 		},
-	// 	},
-	// }
-
-	// mapDbClient, err := mapdbsetup.NewMapDbInstance(true, users)
-	// if err != nil {
-	// 	log.Fatalf("Failed to initialize MapDb: %v", err)
-	// }
-
-	mapDbClient, err := mapdbsetup.NewMapDbInstance()
+	mapDbInst, err := mapdbsetup.NewMapDbInstance()
 	if err != nil {
 		log.Fatalf("Failed to initialize MapDb: %v", err)
 	}
 
-	// xxx, err := mysqlsetup.NewMySQLInstance()
-	// if err != nil {
-	// 	log.Fatalf("Failed to initialize MapDb: %v", err)
-	// }
-
-	//mapDbClient := user.NewMapDbRepository()
-	userService := user.NewUserUseCases(mapDbClient)
+	mapDbRepo := user.NewMapDbRepository(mapDbInst)
+	userService := user.NewUserUseCases(mapDbRepo)
 	userGrpc := usergtw.NewGgrpcServer(userService)
 
 	grpcInst.RegisterService(&pb.UserService_ServiceDesc, userGrpc)
