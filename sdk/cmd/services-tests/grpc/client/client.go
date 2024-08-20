@@ -3,7 +3,10 @@ package main
 import (
 	"log"
 
+	pb "github.com/devpablocristo/golang/sdk/cmd/gateways/user/pb"
 	ggrpcsetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/google-grpc"
+
+
 )
 
 func main() {
@@ -13,5 +16,7 @@ func main() {
 	}
 
 	_ = client 
+
+	pb.NewUserServiceClient(client.)
 
 }

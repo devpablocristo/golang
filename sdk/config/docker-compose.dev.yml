@@ -125,7 +125,7 @@ services:
     image: consul:1.15.4
     container_name: consul
     ports:
-      - "${CONSUL_PORT:-8500}:${CONSUL_PORT:-8500}"
+      - "${CONSUL_PORT:-8500}:${CONSUL_TARGET_PORT:-8500}"
     networks:
       - app-network
     restart: on-failure
