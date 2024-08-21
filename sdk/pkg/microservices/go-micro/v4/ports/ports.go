@@ -39,6 +39,11 @@ type Config interface {
 	GetName() string
 	GetVersion() string
 	GetAddress() string
+	GetAuth() auth.Auth
+	GetBroker() broker.Broker
+	GetRegistry() registry.Registry
+	GetLogger() logger.Logger
+	GetWebService() web.Service
 	SetRegistry(reg registry.Registry)
 	SetAuth(auth auth.Auth)
 	SetBroker(broker broker.Broker)

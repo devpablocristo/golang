@@ -1,7 +1,6 @@
 package gomicropkg
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/go-micro/plugins/v4/registry/consul"
@@ -9,6 +8,7 @@ import (
 	"go-micro.dev/v4/auth"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/registry"
+	"go-micro.dev/v4/web"
 
 	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
 )
@@ -25,7 +25,6 @@ func Bootstrap() (ports.Service, error) {
 		consulReg := consul.NewRegistry(func(op *registry.Options) {
 			op.Addrs = []string{reg} // reg:CONSUL_ADDRESS=http://consul:8500
 		})
-		fmt.Println("consulReg:", consulReg)
 		config.SetRegistry(consulReg)
 	}
 
@@ -47,6 +46,16 @@ func Bootstrap() (ports.Service, error) {
 		config.SetLogger(loggerService)
 	}
 
+	// NOTE: el mismo que gin, pq estoy usando gin para las solicitudes
+	if webAddress := viper.GetString("ROUTER_PORT"); webAddress != "" {
+		webService := web.NewService(
+			web.Name(config.GetName()+"-web"),
+			web.Version(config.GetVersion()),
+			web.Address(":"+webAddress),
+		)
+		config.SetWebService(webService)
+	}
+
 	// Configurar el broker si está presente
 	// if brokerAddress := viper.GetString("BROKER_ADDRESS"); brokerAddress != "" {
 	// 	config.SetBroker(broker.NewBroker(
@@ -64,7 +73,7 @@ func Bootstrap() (ports.Service, error) {
 	// // Configurar el servidor si está presente
 	// if serverAddress := viper.GetString("SERVER_ADDRESS"); serverAddress != "" {
 	// 	config.SetServer(server.NewServer(
-	// 		server.Address(serverAddress),
+	// 		seviper.GetString("WEB_ADDRESS");rver.Address(serverAddress),
 	// 	))
 	// }
 
@@ -79,13 +88,6 @@ func Bootstrap() (ports.Service, error) {
 	// if transportType := viper.GetString("TRANSPORT_TYPE"); transportType != "" {
 	// 	config.SetTransport(transport.NewTransport(
 	// 		transport.WithOption(transportType),
-	// 	))
-	// }
-
-	// // Configurar el servicio web si está presente
-	// if webAddress := viper.GetString("WEB_ADDRESS"); webAddress != "" {
-	// 	config.SetWebService(web.NewService(
-	// 		web.Address(webAddress),
 	// 	))
 	// }
 

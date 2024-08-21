@@ -66,21 +66,23 @@ func NewService(config ports.Config) (ports.Service, error) {
 		}
 
 		instance = &service{
-			service:   ms,
-			client:    ms.Client(),
-			server:    ms.Server(),
-			auth:      ms.Options().Auth,
-			broker:    ms.Options().Broker,
-			config:    ms.Options().Config,
-			logger:    ms.Options().Logger,
-			registry:  ms.Options().Registry,
-			store:     ms.Options().Store,
-			transport: ms.Options().Transport,
+			service:    ms,
+			webService: config.GetWebService(),
+			// client:  ms.Client(),
+			// server:  ms.Server(),
+			auth: ms.Options().Auth,
+			// broker:    ms.Options().Broker,
+			// config:    ms.Options().Config,
+			logger:   ms.Options().Logger,
+			registry: config.GetRegistry(),
+			// store:     ms.Options().Store,
+			// transport: ms.Options().Transport,
 			// Estos servicios adicionales deben configurarse según sea necesario
-			sync:     nil,
-			events:   nil,
-			selector: nil,
+			// sync:     nil,
+			// events:   nil,
+			// selector: nil,
 		}
+
 	})
 	if initError != nil {
 		return nil, initError

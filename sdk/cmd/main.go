@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
-
 	loggerpkg "github.com/devpablocristo/golang/sdk/pkg/configurators/logger"
 	viperpkg "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
+	mapdbpkg "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb"
 	gomicropkg "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4"
 	ginpkg "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
+
+	"github.com/devpablocristo/golang/sdk/internal/core/user"
 )
 
 // NOTE: mover examples/go-micro
@@ -20,10 +21,6 @@ func main() {
 		loggerpkg.StdError("GoMicro Service error: %v", err)
 	}
 
-	loggerpkg.GmInfo("Starting application...")
-
-	fmt.Println("Registro de servicios:", gomicroService.GetRegistry())
-
 	ginService, err := ginpkg.Bootstrap()
 	if err != nil {
 		loggerpkg.GmError("Gin Service error: %v", err)
@@ -31,13 +28,12 @@ func main() {
 
 	r := ginService.GetRouter()
 
-	_ = r
+	mapdbService := mapdbpkg.NewService()
+	userRepository := user.NewMapDbRepository(mapdbService)
+	user.NewUserUseCases(userRepository)
 
-	go func() {
-		if err := ginService.RunServer(); err != nil {
-			loggerpkg.GmError("Failed to run Gin: %v", err)
-		}
-	}()
+	//NOTE: gin NO se arranca, pq go-micro maneja esa parte, se pasa de esta forma para que gin maneje las solicitudes
+	gomicroService.GetWebService().Handle("/", r)
 
 	if err := gomicroService.Start(); err != nil {
 		loggerpkg.GmError("Error starting GoMicro Service: %v", err)
