@@ -7,9 +7,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/devpablocristo/golang/sdk/internal/core/user/entities"
-	"github.com/devpablocristo/golang/sdk/internal/core/user/portscore"
-	"github.com/devpablocristo/golang/sdk/pkg/mapdb/std/portspkg"
+	entities "github.com/devpablocristo/golang/sdk/internal/core/user/entities"
+	ports "github.com/devpablocristo/golang/sdk/internal/core/user/ports"
+	mapdbpkgports "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb/ports"
 )
 
 // notas implementacion:
@@ -20,13 +20,12 @@ import (
 // reg(handler) <-- grpc
 
 type mapDbRepository struct {
-	mapDbInst portspkg.MapDbClient
+	service mapdbpkgports.Service
 }
 
-// NewMapDbRepository crea un nuevo repositorio de usuarios en memoria
-func NewMapDbRepository(inst portspkg.MapDbClient) portscore.Repository {
+func NewMapDbRepository(s mapdbpkgports.Service) ports.Repository {
 	return &mapDbRepository{
-		mapDbInst: inst,
+		service: s,
 	}
 }
 
@@ -36,23 +35,18 @@ func (r *mapDbRepository) SaveUser(ctx context.Context, user *entities.User) err
 		return errors.New("username is required")
 	}
 
-	// Generar un nuevo UUID para el usuario
 	user.UUID = uuid.New().String()
 	user.CreatedAt = time.Now()
 
-	// Obtener la base de datos desde la instancia y guardar el usuario
-	db := r.mapDbInst.GetDb()
+	db := r.service.GetDb()
 
-	// Guardar el usuario en la base de datos
 	db[user.UUID] = user
 	return nil
 }
 
-// GetUser obtiene un usuario por su ID (UUID)
 func (r *mapDbRepository) GetUser(ctx context.Context, UUID string) (*entities.User, error) {
-	db := r.mapDbInst.GetDb()
+	db := r.service.GetDb()
 
-	// Intentar obtener el usuario del mapa
 	user, exists := db[UUID].(*entities.User)
 	if !exists {
 		return nil, errors.New("user not found")
@@ -60,9 +54,8 @@ func (r *mapDbRepository) GetUser(ctx context.Context, UUID string) (*entities.U
 	return user, nil
 }
 
-// GetUserUUID obtiene el UUID de un usuario por su nombre de usuario y hash de contraseña
 func (r *mapDbRepository) GetUserUUID(ctx context.Context, username, passwordHash string) (string, error) {
-	db := r.mapDbInst.GetDb()
+	db := r.service.GetDb()
 
 	for _, v := range db {
 		user, ok := v.(*entities.User)
@@ -73,9 +66,8 @@ func (r *mapDbRepository) GetUserUUID(ctx context.Context, username, passwordHas
 	return "", errors.New("user not found")
 }
 
-// GetUserByUsername obtiene un usuario por su nombre de usuario
 func (r *mapDbRepository) GetUserByUsername(ctx context.Context, username string) (*entities.User, error) {
-	db := r.mapDbInst.GetDb()
+	db := r.service.GetDb()
 
 	for _, v := range db {
 		user, ok := v.(*entities.User)
@@ -86,9 +78,8 @@ func (r *mapDbRepository) GetUserByUsername(ctx context.Context, username string
 	return nil, errors.New("user not found")
 }
 
-// DeleteUser elimina un usuario por su ID (UUID)
 func (r *mapDbRepository) DeleteUser(ctx context.Context, UUID string) error {
-	db := r.mapDbInst.GetDb()
+	db := r.service.GetDb()
 
 	if _, exists := db[UUID]; !exists {
 		return errors.New("user not found")
@@ -97,11 +88,9 @@ func (r *mapDbRepository) DeleteUser(ctx context.Context, UUID string) error {
 	return nil
 }
 
-// ListUsers lista todos los usuarios en el repositorio
 func (r *mapDbRepository) ListUsers(ctx context.Context) (*entities.InMemDB, error) {
-	db := r.mapDbInst.GetDb()
+	db := r.service.GetDb()
 
-	// Convertir el mapa a *entities.InMemDB
 	users := entities.InMemDB{}
 	for k, v := range db {
 		user, ok := v.(*entities.User)
@@ -112,9 +101,8 @@ func (r *mapDbRepository) ListUsers(ctx context.Context) (*entities.InMemDB, err
 	return &users, nil
 }
 
-// UpdateUser actualiza la información de un usuario existente
 func (r *mapDbRepository) UpdateUser(ctx context.Context, user *entities.User, UUID string) error {
-	db := r.mapDbInst.GetDb()
+	db := r.service.GetDb()
 
 	existingUser, exists := db[UUID].(*entities.User)
 	if !exists {
@@ -127,7 +115,7 @@ func (r *mapDbRepository) UpdateUser(ctx context.Context, user *entities.User, U
 	if user.Credentials.PasswordHash != "" {
 		existingUser.Credentials.PasswordHash = user.Credentials.PasswordHash
 	}
-	// Mantener la fecha de creación original
+
 	existingUser.CreatedAt = user.CreatedAt
 
 	db[UUID] = existingUser

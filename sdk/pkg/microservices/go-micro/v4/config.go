@@ -6,22 +6,22 @@ import (
 	"go-micro.dev/v4/auth"
 	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/client"
-	"go-micro.dev/v4/config"
+	configx "go-micro.dev/v4/config"
 	"go-micro.dev/v4/events"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/selector"
 	"go-micro.dev/v4/server"
 	"go-micro.dev/v4/store"
-	syncm "go-micro.dev/v4/sync"
+	syncx "go-micro.dev/v4/sync"
 	"go-micro.dev/v4/transport"
 	"go-micro.dev/v4/web"
 
-	portspkg "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/portspkg"
+	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
 )
 
-// goMicroConfig representa la configuración necesaria para un servicio Go Micro.
-type goMicroConfig struct {
+// config representa la configuración necesaria para un servicio Go Micro.
+type config struct {
 	Name       string
 	Version    string
 	Address    string
@@ -34,15 +34,14 @@ type goMicroConfig struct {
 	Store      store.Store
 	Transport  transport.Transport
 	WebService web.Service
-	Config     config.Config
+	Config     configx.Config
 	Selector   selector.Selector
-	Sync       syncm.Sync
+	Sync       syncx.Sync
 	Events     events.Stream
 }
 
-// NewGoMicroConfig crea una nueva configuración de Go Micro con los valores obligatorios.
-func NewGoMicroConfig(name, version, address string) portspkg.GoMicroConfig {
-	return &goMicroConfig{
+func NewConfig(name, version, address string) ports.Config {
+	return &config{
 		Name:    name,
 		Version: version,
 		Address: address,
@@ -50,74 +49,74 @@ func NewGoMicroConfig(name, version, address string) portspkg.GoMicroConfig {
 }
 
 // GetName devuelve el nombre del servicio.
-func (config *goMicroConfig) GetName() string {
+func (config *config) GetName() string {
 	return config.Name
 }
 
 // GetVersion devuelve la versión del servicio.
-func (config *goMicroConfig) GetVersion() string {
+func (config *config) GetVersion() string {
 	return config.Version
 }
 
 // GetAddress devuelve la dirección del servicio.
-func (config *goMicroConfig) GetAddress() string {
+func (config *config) GetAddress() string {
 	return config.Address
 }
 
-func (config *goMicroConfig) SetRegistry(reg registry.Registry) {
+func (config *config) SetRegistry(reg registry.Registry) {
 	config.Registry = reg
 }
 
-func (config *goMicroConfig) SetAuth(auth auth.Auth) {
+func (config *config) SetAuth(auth auth.Auth) {
 	config.Auth = auth
 }
 
-func (config *goMicroConfig) SetBroker(broker broker.Broker) {
+func (config *config) SetBroker(broker broker.Broker) {
 	config.Broker = broker
 }
 
-func (config *goMicroConfig) SetClient(client client.Client) {
+func (config *config) SetClient(client client.Client) {
 	config.Client = client
 }
 
-func (config *goMicroConfig) SetLogger(logger logger.Logger) {
+func (config *config) SetLogger(logger logger.Logger) {
 	config.Logger = logger
 }
 
-func (config *goMicroConfig) SetServer(server server.Server) {
+func (config *config) SetServer(server server.Server) {
 	config.Server = server
 }
 
-func (config *goMicroConfig) SetStore(store store.Store) {
+func (config *config) SetStore(store store.Store) {
 	config.Store = store
 }
 
-func (config *goMicroConfig) SetTransport(transport transport.Transport) {
+func (config *config) SetTransport(transport transport.Transport) {
 	config.Transport = transport
 }
 
-func (config *goMicroConfig) SetWebService(webService web.Service) {
+func (config *config) SetWebService(webService web.Service) {
 	config.WebService = webService
 }
 
-func (config *goMicroConfig) SetConfig(conf config.Config) {
+func (config *config) SetConfig(conf configx.Config) {
 	config.Config = conf
 }
 
-func (config *goMicroConfig) SetSelector(selector selector.Selector) {
+func (config *config) SetSelector(selector selector.Selector) {
 	config.Selector = selector
 }
 
-func (config *goMicroConfig) SetSync(sync syncm.Sync) {
+func (config *config) SetSync(sync syncx.Sync) {
 	config.Sync = sync
 }
 
-func (config *goMicroConfig) SetEvents(events events.Stream) {
+func (config *config) SetEvents(events events.Stream) {
 	config.Events = events
 }
 
 // Validate valida que los valores obligatorios estén configurados.
-func (config *goMicroConfig) Validate() error {
+func (config *config) Validate() error {
 	if config.Name == "" {
 		return fmt.Errorf("service name is not configured")
 	}

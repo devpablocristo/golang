@@ -8,45 +8,44 @@ import (
 	"go-micro.dev/v4/auth"
 	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/client"
-	"go-micro.dev/v4/config"
+	configx "go-micro.dev/v4/config"
 	"go-micro.dev/v4/events"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/selector"
 	"go-micro.dev/v4/server"
 	"go-micro.dev/v4/store"
-	syncm "go-micro.dev/v4/sync"
+	syncx "go-micro.dev/v4/sync"
 	"go-micro.dev/v4/transport"
 	"go-micro.dev/v4/web"
 
-	portspkg "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/portspkg"
+	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
 )
 
 var (
-	instance  portspkg.GoMicroService
+	instance  ports.Service
 	once      sync.Once
 	initError error
 )
 
-type goMicroService struct {
+type service struct {
 	service    micro.Service
 	webService web.Service
 	client     client.Client
 	server     server.Server
 	auth       auth.Auth
 	broker     broker.Broker
-	config     config.Config
+	config     configx.Config
 	logger     logger.Logger
 	registry   registry.Registry
 	store      store.Store
 	transport  transport.Transport
-	sync       syncm.Sync
+	sync       syncx.Sync
 	events     events.Stream
 	selector   selector.Selector
 }
 
-// NewGoMicroService crea una nueva instancia del servicio Go Micro con la configuración proporcionada.
-func NewGoMicroService(config portspkg.GoMicroConfig) (portspkg.GoMicroService, error) {
+func NewService(config ports.Config) (ports.Service, error) {
 	once.Do(func() {
 		if err := config.Validate(); err != nil {
 			initError = fmt.Errorf("config validation error: %w", err)
@@ -66,7 +65,7 @@ func NewGoMicroService(config portspkg.GoMicroConfig) (portspkg.GoMicroService, 
 			return
 		}
 
-		instance = &goMicroService{
+		instance = &service{
 			service:   ms,
 			client:    ms.Client(),
 			server:    ms.Server(),
@@ -90,78 +89,75 @@ func NewGoMicroService(config portspkg.GoMicroConfig) (portspkg.GoMicroService, 
 	return instance, nil
 }
 
-// GetGoMicroInstance devuelve la instancia del servicio Go-Micro.
-func GetGoMicroInstance() (portspkg.GoMicroService, error) {
+func GetInstance() (ports.Service, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("go micro service is not initialized")
 	}
 	return instance, nil
 }
 
-// Implementación de los métodos de la interfaz GoMicroService
-
-func (c *goMicroService) Start() error {
+func (c *service) Start() error {
 	if c.webService != nil {
 		return c.webService.Run()
 	}
 	return fmt.Errorf("web service is not initialized")
 }
 
-func (c *goMicroService) Stop() error {
+func (c *service) Stop() error {
 	if c.webService != nil {
 		return c.webService.Stop()
 	}
 	return fmt.Errorf("web service is not initialized")
 }
 
-func (c *goMicroService) GetService() micro.Service {
+func (c *service) GetService() micro.Service {
 	return c.service
 }
 
-func (c *goMicroService) GetWebService() web.Service {
+func (c *service) GetWebService() web.Service {
 	return c.webService
 }
 
-func (c *goMicroService) GetGrpcClient() client.Client {
+func (c *service) GetGrpcClient() client.Client {
 	return c.client
 }
 
-func (c *goMicroService) GetGrpcServer() server.Server {
+func (c *service) GetGrpcServer() server.Server {
 	return c.server
 }
 
-func (c *goMicroService) GetAuth() auth.Auth {
+func (c *service) GetAuth() auth.Auth {
 	return c.auth
 }
 
-func (c *goMicroService) GetBroker() broker.Broker {
+func (c *service) GetBroker() broker.Broker {
 	return c.broker
 }
 
-func (c *goMicroService) GetConfig() config.Config {
+func (c *service) GetConfig() configx.Config {
 	return c.config
 }
 
-func (c *goMicroService) GetLogger() logger.Logger {
+func (c *service) GetLogger() logger.Logger {
 	return c.logger
 }
 
-func (c *goMicroService) GetRegistry() registry.Registry {
+func (c *service) GetRegistry() registry.Registry {
 	return c.registry
 }
 
-func (c *goMicroService) GetSelector() selector.Selector {
+func (c *service) GetSelector() selector.Selector {
 	return c.selector
 }
 
-func (c *goMicroService) GetStore() store.Store {
+func (c *service) GetStore() store.Store {
 	return c.store
 }
 
-func (c *goMicroService) GetTransport() transport.Transport {
+func (c *service) GetTransport() transport.Transport {
 	return c.transport
 }
 
-func (c *goMicroService) GetEvents() events.Stream {
+func (c *service) GetEvents() events.Stream {
 	return c.events
 }
