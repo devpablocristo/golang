@@ -12,7 +12,7 @@ import (
 	"go-micro.dev/v4/selector"
 	"go-micro.dev/v4/server"
 	"go-micro.dev/v4/store"
-	"go-micro.dev/v4/sync"
+	syncm "go-micro.dev/v4/sync"
 	"go-micro.dev/v4/transport"
 	"go-micro.dev/v4/web"
 )
@@ -50,7 +50,7 @@ type GoMicroConfig interface {
 	SetWebService(webService web.Service)
 	SetConfig(conf config.Config)
 	SetSelector(selector selector.Selector)
-	SetSync(sync sync.Sync)
+	SetSync(sync syncm.Sync)
 	SetEvents(events events.Stream)
 	Validate() error
 }

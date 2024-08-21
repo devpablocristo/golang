@@ -23,8 +23,9 @@ import (
 )
 
 var (
-	instance portspkg.GoMicroService
-	once     sync.Once
+	instance  portspkg.GoMicroService
+	once      sync.Once
+	initError error
 )
 
 type goMicroService struct {
@@ -45,8 +46,13 @@ type goMicroService struct {
 }
 
 // NewGoMicroService crea una nueva instancia del servicio Go Micro con la configuración proporcionada.
-func NewGoMicroService(config portspkg.GoMicroConfig) portspkg.GoMicroService {
+func NewGoMicroService(config portspkg.GoMicroConfig) (portspkg.GoMicroService, error) {
 	once.Do(func() {
+		if err := config.Validate(); err != nil {
+			initError = fmt.Errorf("config validation error: %w", err)
+			return
+		}
+
 		ms := micro.NewService(
 			micro.Name(config.GetName()),
 			micro.Version(config.GetVersion()),
@@ -54,6 +60,11 @@ func NewGoMicroService(config portspkg.GoMicroConfig) portspkg.GoMicroService {
 		)
 
 		ms.Init()
+
+		if ms.Options().Registry == nil || ms.Client() == nil || ms.Server() == nil {
+			initError = fmt.Errorf("failed to initialize Go-Micro service")
+			return
+		}
 
 		instance = &goMicroService{
 			service:   ms,
@@ -72,7 +83,11 @@ func NewGoMicroService(config portspkg.GoMicroConfig) portspkg.GoMicroService {
 			selector: nil,
 		}
 	})
-	return instance
+	if initError != nil {
+		return nil, initError
+	}
+
+	return instance, nil
 }
 
 // GetGoMicroInstance devuelve la instancia del servicio Go-Micro.
@@ -93,7 +108,10 @@ func (c *goMicroService) Start() error {
 }
 
 func (c *goMicroService) Stop() error {
-	return nil
+	if c.webService != nil {
+		return c.webService.Stop()
+	}
+	return fmt.Errorf("web service is not initialized")
 }
 
 func (c *goMicroService) GetService() micro.Service {

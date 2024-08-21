@@ -1,36 +1,35 @@
-package gomicrobtrap
+package gmbtrap
 
 import (
-	"github.com/go-micro/plugins/v4/registry/consul"
-	"github.com/spf13/viper"
-	"go-micro.dev/v4/auth"
-	"go-micro.dev/v4/registry"
-
 	gomicropkg "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4"
 	portspkg "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/portspkg"
 )
 
-func BootstrapGoMicro() portspkg.GoMicroService {
+func BootstrapGoMicro() (portspkg.GoMicroService, error) {
+	// config := gomicropkg.NewGoMicroConfig(
+	// 	viper.GetString("APP_NAME"),
+	// 	viper.GetString("APP_VERSION"),
+	// 	viper.GetString("GOMICRO_MS_PORT"),
+	// )
+
 	config := gomicropkg.NewGoMicroConfig(
-		viper.GetString("APP_NAME"),
-		viper.GetString("APP_VERSION"),
-		viper.GetString("GOMICRO_MS_PORT"),
+		"lala",
+		"1.0",
+		":8086",
 	)
+	// if reg := viper.GetString("CONSUL_ADDRESS"); reg != "" {
+	// 	consulReg := consul.NewRegistry(func(op *registry.Options) {
+	// 		op.Addrs = []string{reg} // reg:CONSUL_ADDRESS=http://consul:8500
+	// 	})
+	// 	config.SetRegistry(consulReg)
+	// }
 
-	if reg := viper.GetString("CONSUL_ADDRESS"); reg != "" {
-		consulReg := consul.NewRegistry(func(op *registry.Options) {
-			op.Addrs = []string{reg} // reg:CONSUL_ADDRESS=http://consul:8500
-		})
-		config.SetRegistry(consulReg)
-	}
-
-	if authEnabled := viper.GetBool("GOMICRO_MS_AUTH"); authEnabled {
-		authService := auth.NewAuth(
-			auth.Credentials(viper.GetString("AUTH_USER"), viper.GetString("AUTH_PASSWORD")),
-		)
-
-		config.SetAuth(authService)
-	}
+	// if authEnabled := viper.GetBool("GOMICRO_MS_AUTH"); authEnabled {
+	// 	authService := auth.NewAuth(
+	// 		auth.Credentials(viper.GetString("AUTH_USER"), viper.GetString("AUTH_PASSWORD")),
+	// 	)
+	// 	config.SetAuth(authService)
+	// }
 
 	// if loggerLevel := viper.GetString("LOGGER_LEVEL"); loggerLevel != "" {
 	// 	config.SetLogger(logger.NewLogger(
@@ -82,5 +81,10 @@ func BootstrapGoMicro() portspkg.GoMicroService {
 	// }
 
 	// Devolver la instancia configurada
-	return gomicropkg.NewGoMicroService(config)
+	inst, err := gomicropkg.NewGoMicroService(config)
+	if err != nil {
+		return nil, err
+	}
+
+	return inst, nil
 }

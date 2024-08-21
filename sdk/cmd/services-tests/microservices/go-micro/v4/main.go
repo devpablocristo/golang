@@ -1,30 +1,32 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
-	"github.com/go-micro/plugins/v4/registry/consul"
-	"go-micro.dev/v4"
-	"go-micro.dev/v4/registry"
+	gmbtrap "github.com/devpablocristo/golang/sdk/internal/bootstrap/go-micro"
+	inisetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/initial"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	// Crear un registro Consul
-	consulReg := consul.NewRegistry(func(op *registry.Options) {
-		op.Addrs = []string{"http://consul:8500"} // Dirección de Consul
-	})
+	if err := inisetup.SetupViperConfig("./config"); err != nil {
+		log.Fatalf("Failed to set up Viper config: %v", err)
+	}
 
-	// Crear un nuevo servicio Micro con Consul como registro
-	ms := micro.NewService(
-		micro.Name("minimal-ms"),
-		micro.Registry(consulReg),
-	)
+	// Ahora puedes acceder a las configuraciones usando Viper
+	fmt.Println("App Name:", viper.GetString("APP_NAME"))
 
-	// Inicializar el servicio
-	ms.Init()
-
-	// Ejecutar el servicio, pero no hace nada útil
-	if err := ms.Run(); err != nil {
+	// Lanzar el servicio Go-Micro
+	gmService, err := gmbtrap.BootstrapGoMicro()
+	if err != nil {
 		log.Fatal(err)
+	}
+
+	fmt.Println("Registro de servicios:", gmService.GetRegistry())
+
+	// Iniciar el servicio
+	if err := gmService.Start(); err != nil {
+		log.Fatalf("Error al iniciar el servicio: %v", err)
 	}
 }
