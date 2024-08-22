@@ -1,10 +1,12 @@
-package pkggomicro
+package gomicropkg
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/go-micro/plugins/v4/registry/consul"
 	"github.com/spf13/viper"
+	"go-micro.dev/v4"
 	"go-micro.dev/v4/auth"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/registry"
@@ -13,83 +15,112 @@ import (
 	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
 )
 
-// NOTE: La idea es configurar solo las .envs o variables desde algun lado y todo lo demas deberia ser automatico.
 func Bootstrap() (ports.Service, error) {
-	config := NewConfig(
-		viper.GetString("APP_NAME"),
-		viper.GetString("APP_VERSION"),
-		viper.GetString("GOMICRO_MS_PORT"),
-	)
+	config := NewConfig()
 
-	if reg := viper.GetString("CONSUL_ADDRESS"); reg != "" {
-		consulReg := consul.NewRegistry(func(op *registry.Options) {
-			op.Addrs = []string{reg} // reg:CONSUL_ADDRESS=http://consul:8500
-		})
-		config.SetRegistry(consulReg)
+	if err := setupService(config); err != nil {
+		return nil, err
 	}
 
-	if authEnabled := viper.GetBool("GOMICRO_MS_AUTH"); authEnabled {
-		authService := auth.NewAuth(
-			auth.Credentials(
-				viper.GetString("AUTHORIZED_USER"),
-				viper.GetString("AUTHORIZED_USER_PASSWORD"),
-			),
-		)
-		config.SetAuth(authService)
+	if err := setupRegistry(config); err != nil {
+		return nil, err
 	}
 
-	if loggerLevel := viper.GetString("LOGGER_LEVEL"); loggerLevel != "" {
-		loggerService := logger.NewLogger(
-			logger.WithLevel(logger.InfoLevel),
-			logger.WithOutput(os.Stdout),
-		)
-		config.SetLogger(loggerService)
+	if err := setupAuth(config); err != nil {
+		return nil, err
 	}
 
-	// NOTE: el mismo que gin, pq estoy usando gin para las solicitudes
-	if webAddress := viper.GetString("ROUTER_PORT"); webAddress != "" {
-		webService := web.NewService(
-			web.Name(config.GetName()+"-web"),
-			web.Version(config.GetVersion()),
-			web.Address(":"+webAddress),
-		)
-		config.SetWebService(webService)
+	if err := setupLogger(config); err != nil {
+		return nil, err
 	}
 
-	// Configurar el broker si está presente
-	// if brokerAddress := viper.GetString("BROKER_ADDRESS"); brokerAddress != "" {
-	// 	config.SetBroker(broker.NewBroker(
-	// 		broker.Addrs(brokerAddress),
-	// 	))
-	// }
-
-	// // Configurar el cliente si está presente
-	// if clientTimeout := viper.GetDuration("CLIENT_TIMEOUT"); clientTimeout > 0 {
-	// 	config.SetClient(client.NewClient(
-	// 		client.RequestTimeout(clientTimeout),
-	// 	))
-	// }
-
-	// // Configurar el servidor si está presente
-	// if serverAddress := viper.GetString("SERVER_ADDRESS"); serverAddress != "" {
-	// 	config.SetServer(server.NewServer(
-	// 		seviper.GetString("WEB_ADDRESS");rver.Address(serverAddress),
-	// 	))
-	// }
-
-	// // Configurar el almacenamiento si está presente
-	// if storeType := viper.GetString("STORE_TYPE"); storeType != "" {
-	// 	config.SetStore(store.NewStore(
-	// 		store.WithBackend(storeType),
-	// 	))
-	// }
-
-	// // Configurar el transporte si está presente
-	// if transportType := viper.GetString("TRANSPORT_TYPE"); transportType != "" {
-	// 	config.SetTransport(transport.NewTransport(
-	// 		transport.WithOption(transportType),
-	// 	))
-	// }
+	if err := setupWebService(config); err != nil {
+		return nil, err
+	}
 
 	return NewService(config)
+}
+
+func setupService(config ports.Config) error {
+	appName := viper.GetString("APP_NAME")
+	appVersion := viper.GetString("APP_VERSION")
+	msPort := viper.GetString("GOMICRO_MS_PORT")
+
+	if appName == "" || appVersion == "" || msPort == "" {
+		return fmt.Errorf("missing required service configuration: APP_NAME, APP_VERSION, or GOMICRO_MS_PORT")
+	}
+
+	service := micro.NewService(
+		micro.Name(appName),
+		micro.Version(appVersion),
+		micro.Address(msPort),
+	)
+
+	config.SetService(service)
+	return nil
+}
+
+func setupRegistry(config ports.Config) error {
+	consulAddress := viper.GetString("CONSUL_ADDRESS")
+	if consulAddress == "" {
+		return nil // Consul no es obligatorio, continuar sin error
+	}
+
+	consulReg := consul.NewRegistry(func(op *registry.Options) {
+		op.Addrs = []string{consulAddress}
+	})
+
+	config.SetRegistry(consulReg)
+	return nil
+}
+
+func setupAuth(config ports.Config) error {
+	if !viper.GetBool("GOMICRO_MS_AUTH") {
+		return nil // Autenticación no habilitada, continuar sin error
+	}
+
+	authUser := viper.GetString("AUTHORIZED_USER")
+	authPassword := viper.GetString("AUTHORIZED_USER_PASSWORD")
+
+	if authUser == "" || authPassword == "" {
+		return fmt.Errorf("missing required authentication configuration: AUTHORIZED_USER or AUTHORIZED_USER_PASSWORD")
+	}
+
+	authService := auth.NewAuth(
+		auth.Credentials(authUser, authPassword),
+	)
+
+	config.SetAuth(authService)
+	return nil
+}
+
+func setupLogger(config ports.Config) error {
+	loggerLevel := viper.GetString("LOGGER_LEVEL")
+	if loggerLevel == "" {
+		return nil // Logger no configurado, continuar sin error
+	}
+
+	loggerService := logger.NewLogger(
+		logger.WithLevel(logger.InfoLevel), // Cambia esto si usas otros niveles
+		logger.WithOutput(os.Stdout),
+	)
+
+	config.SetLogger(loggerService)
+	return nil
+}
+
+func setupWebService(config ports.Config) error {
+	webAddress := viper.GetString("ROUTER_PORT")
+	if webAddress == "" {
+		return nil // WebService no configurado, continuar sin error
+	}
+
+	webService := web.NewService(
+		web.Name(viper.GetString("APP_NAME")+"-web"),
+		web.Version(viper.GetString("APP_VERSION")),
+		web.Address(":"+webAddress),
+	)
+
+	config.SetWebService(webService)
+	return nil
 }

@@ -1,8 +1,9 @@
-package pkggomicro
+package gomicropkg
 
 import (
 	"fmt"
 
+	"go-micro.dev/v4"
 	"go-micro.dev/v4/auth"
 	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/client"
@@ -22,9 +23,7 @@ import (
 
 // config representa la configuración necesaria para un servicio Go Micro.
 type config struct {
-	Name       string
-	Version    string
-	Address    string
+	Service    micro.Service
 	Registry   registry.Registry
 	Logger     logger.Logger
 	Auth       auth.Auth
@@ -40,23 +39,18 @@ type config struct {
 	Events     events.Stream
 }
 
-func NewConfig(name, version, address string) ports.Config {
-	return &config{
-		Name:    name,
-		Version: version,
-		Address: address,
-	}
+func NewConfig() ports.Config {
+	return &config{}
 }
 
-func (config *config) GetName() string                { return config.Name }
-func (config *config) GetVersion() string             { return config.Version }
-func (config *config) GetAddress() string             { return config.Address }
+func (config *config) GetService() micro.Service      { return config.Service }
 func (config *config) GetAuth() auth.Auth             { return config.Auth }
 func (config *config) GetBroker() broker.Broker       { return config.Broker }
 func (config *config) GetRegistry() registry.Registry { return config.Registry }
 func (config *config) GetLogger() logger.Logger       { return config.Logger }
 func (config *config) GetWebService() web.Service     { return config.WebService }
 
+func (config *config) SetService(service micro.Service)           { config.Service = service }
 func (config *config) SetRegistry(reg registry.Registry)          { config.Registry = reg }
 func (config *config) SetAuth(auth auth.Auth)                     { config.Auth = auth }
 func (config *config) SetBroker(broker broker.Broker)             { config.Broker = broker }
@@ -72,13 +66,13 @@ func (config *config) SetSync(sync syncx.Sync)                    { config.Sync 
 func (config *config) SetEvents(events events.Stream)             { config.Events = events }
 
 func (config *config) Validate() error {
-	if config.Name == "" {
+	if config.GetService().Name() == "" {
 		return fmt.Errorf("service name is not configured")
 	}
-	if config.Version == "" {
+	if config.GetService().Server().Options().Version == "" {
 		return fmt.Errorf("service version is not configured")
 	}
-	if config.Address == "" {
+	if config.GetService().Server().Options().Address == "" {
 		return fmt.Errorf("service address is not configured")
 	}
 	return nil

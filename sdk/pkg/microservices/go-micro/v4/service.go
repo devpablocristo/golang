@@ -1,4 +1,4 @@
-package pkggomicro
+package gomicropkg
 
 import (
 	"fmt"
@@ -52,35 +52,12 @@ func NewService(config ports.Config) (ports.Service, error) {
 			return
 		}
 
-		ms := micro.NewService(
-			micro.Name(config.GetName()),
-			micro.Version(config.GetVersion()),
-			micro.Address(config.GetAddress()),
-		)
-
-		ms.Init()
-
-		if ms.Options().Registry == nil || ms.Client() == nil || ms.Server() == nil {
-			initError = fmt.Errorf("failed to initialize Go-Micro service")
-			return
-		}
-
 		instance = &service{
-			service:    ms,
+			service:    config.GetService(),
 			webService: config.GetWebService(),
-			// client:  ms.Client(),
-			// server:  ms.Server(),
-			auth: ms.Options().Auth,
-			// broker:    ms.Options().Broker,
-			// config:    ms.Options().Config,
-			logger:   ms.Options().Logger,
-			registry: config.GetRegistry(),
-			// store:     ms.Options().Store,
-			// transport: ms.Options().Transport,
-			// Estos servicios adicionales deben configurarse según sea necesario
-			// sync:     nil,
-			// events:   nil,
-			// selector: nil,
+			auth:       config.GetAuth(),
+			logger:     config.GetLogger(),
+			registry:   config.GetRegistry(),
 		}
 
 	})

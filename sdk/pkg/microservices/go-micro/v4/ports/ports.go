@@ -1,4 +1,4 @@
-package pkggomicroports
+package gomicropkgports
 
 import (
 	"go-micro.dev/v4"
@@ -36,26 +36,25 @@ type Service interface {
 }
 
 type Config interface {
-	GetName() string
-	GetVersion() string
-	GetAddress() string
+	GetService() micro.Service
 	GetAuth() auth.Auth
 	GetBroker() broker.Broker
 	GetRegistry() registry.Registry
 	GetLogger() logger.Logger
 	GetWebService() web.Service
-	SetRegistry(reg registry.Registry)
-	SetAuth(auth auth.Auth)
-	SetBroker(broker broker.Broker)
-	SetClient(client client.Client)
-	SetLogger(logger logger.Logger)
-	SetServer(server server.Server)
-	SetStore(store store.Store)
-	SetTransport(transport transport.Transport)
-	SetWebService(webService web.Service)
-	SetConfig(conf config.Config)
-	SetSelector(selector selector.Selector)
-	SetSync(sync syncx.Sync)
-	SetEvents(events events.Stream)
+	SetService(micro.Service)
+	SetRegistry(registry.Registry)
+	SetAuth(auth.Auth)
+	SetBroker(broker.Broker)
+	SetClient(client.Client)
+	SetLogger(logger.Logger)
+	SetServer(server.Server)
+	SetStore(store.Store)
+	SetTransport(transport.Transport)
+	SetWebService(web.Service)
+	SetConfig(config.Config)
+	SetSelector(selector.Selector)
+	SetSync(syncx.Sync)
+	SetEvents(events.Stream)
 	Validate() error
 }
