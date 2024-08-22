@@ -1,4 +1,4 @@
-package cassandrapkg
+package pkgcassandra
 
 import (
 	"github.com/spf13/viper"

@@ -34,18 +34,18 @@ func main() {
 	// }
 
 	// Configurar y verificar Gin
-	ginpkg, err := ginsetup.NewGinInstance()
+	pkggin, err := ginsetup.NewGinInstance()
 	if err != nil {
 		inisetup.MicroLogError("error initializing Gin: %v", err)
 	}
 
-	r := ginpkg.GetRouter()
+	r := pkggin.GetRouter()
 
 	// monitoringHandler, err := shared.InitializeMonitoring()
 	// if err != nil {
 	// 	inisetup.MicroLogError("userHandler error: %v", err)
 	// }
-	// monitoring.Routes(ginpkg, monitoringHandler)
+	// monitoring.Routes(pkggin, monitoringHandler)
 
 	// userHandler, err := shared.InitializeUserHandler()
 	// if err != nil {

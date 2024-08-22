@@ -1,4 +1,4 @@
-package gomicropkg
+package pkggomicro
 
 import (
 	"os"

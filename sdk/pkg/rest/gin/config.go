@@ -1,4 +1,4 @@
-package ginpkg
+package pkggin
 
 import (
 	"fmt"

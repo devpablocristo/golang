@@ -1,4 +1,4 @@
-package mapdbpkg
+package pkgmapdb
 
 import (
 	"errors"

@@ -3,9 +3,9 @@ package main
 import (
 	loggerpkg "github.com/devpablocristo/golang/sdk/pkg/configurators/logger"
 	viperpkg "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
-	mapdbpkg "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb"
-	gomicropkg "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4"
-	ginpkg "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
+	pkgmapdb "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb"
+	pkggomicro "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4"
+	pkggin "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
 
 	"github.com/devpablocristo/golang/sdk/internal/core/user"
 )
@@ -16,19 +16,19 @@ func main() {
 		loggerpkg.StdError("Viper Service error: %v", err)
 	}
 
-	gomicroService, err := gomicropkg.Bootstrap()
+	gomicroService, err := pkggomicro.Bootstrap()
 	if err != nil {
 		loggerpkg.StdError("GoMicro Service error: %v", err)
 	}
 
-	ginService, err := ginpkg.Bootstrap()
+	ginService, err := pkggin.Bootstrap()
 	if err != nil {
 		loggerpkg.GmError("Gin Service error: %v", err)
 	}
 
 	r := ginService.GetRouter()
 
-	mapdbService := mapdbpkg.NewService()
+	mapdbService := pkgmapdb.NewService()
 	userRepository := user.NewMapDbRepository(mapdbService)
 	user.NewUserUseCases(userRepository)
 

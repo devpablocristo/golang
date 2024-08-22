@@ -1,4 +1,4 @@
-package cassandrapkgports
+package pkgcassandraports
 
 import (
 	"github.com/gocql/gocql"

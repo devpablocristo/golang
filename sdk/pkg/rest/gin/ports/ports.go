@@ -1,4 +1,4 @@
-package ginpkgports
+package pkgginports
 
 import (
 	"net/http"
