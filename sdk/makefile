@@ -30,37 +30,38 @@ test:
 	@echo "Running tests..."
 	@go test ./...
 
+# NOTE: tuve cambiar de docker-compose a docker compose por un problema con la version de docker compose para ubuntu 24.04
 # Docker build target
 docker-build:
 	@echo "Building Docker images for production mode..."
-	APP_NAME=${APP_NAME} docker-compose -f ${CONFIG_DIR}/docker-compose.yml up --build
+	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.yml up --build
 
 # Docker up target
 docker-up:
 	@echo "Starting Docker containers for production mode..."
-	APP_NAME=${APP_NAME} docker-compose -f ${CONFIG_DIR}/docker-compose.yml up
+	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.yml up
 
 # Docker down target
 docker-down:
 	@echo "Stopping Docker containers for production mode..."
-	APP_NAME=${APP_NAME} docker-compose -f ${CONFIG_DIR}/docker-compose.yml down --remove-orphans
+	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.yml down --remove-orphans
 
 # Docker build target for dev mode
 docker-dbuild:
 	@echo "Building Docker images for dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} docker-compose -f ${CONFIG_DIR}/docker-compose.dev.yml up --build
+	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml up --build
 
 # Docker up target for dev mode
 docker-dup:
 	@echo "Starting Docker containers in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} docker-compose -f ${CONFIG_DIR}/docker-compose.dev.yml up
+	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml up
 
 # Docker down target for dev mode
 docker-ddown:
 	@echo "Stopping Docker containers in dev mode..."
-	APP_NAME=${APP_NAME} docker-compose -f ${CONFIG_DIR}/docker-compose.dev.yml down --remove-orphans
+	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml down --remove-orphans
 
 # Clean target
 clean:
@@ -86,16 +87,16 @@ lint:
 # help: ## Display this help screen
 # 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-# compose-up: ### Run docker-compose
-# 	docker-compose up --build -d postgres rabbitmq && docker-compose logs -f
+# compose-up: ### Run docker compose
+# 	docker compose up --build -d postgres rabbitmq && docker compose logs -f
 # .PHONY: compose-up
 
-# compose-up-integration-test: ### Run docker-compose with integration test
-# 	docker-compose up --build --abort-on-container-exit --exit-code-from integration
+# compose-up-integration-test: ### Run docker compose with integration test
+# 	docker compose up --build --abort-on-container-exit --exit-code-from integration
 # .PHONY: compose-up-integration-test
 
-# compose-down: ### Down docker-compose
-# 	docker-compose down --remove-orphans
+# compose-down: ### Down docker compose
+# 	docker compose down --remove-orphans
 # .PHONY: compose-down
 
 # swag-v1: ### swag init

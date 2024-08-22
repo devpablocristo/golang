@@ -28,35 +28,36 @@ test:
 	@echo "Running tests..."
 	@go test ./...
 
+# NOTE: tuve que cambiar docker-compose a docker compose, por un bug en la version para ubuntu 24.04
 # Docker build target
 docker-build:
 	@echo "Building Docker images for production mode..."
-	APP_NAME=${APP_NAME} docker-compose -f docker-compose.yml up --build
+	APP_NAME=${APP_NAME} docker compose -f docker compose.yml up --build
 
 # Docker up target
 docker-up:
 	@echo "Starting Docker containers for production mode..."
-	APP_NAME=${APP_NAME} docker-compose -f docker-compose.yml up
+	APP_NAME=${APP_NAME} docker compose -f docker compose.yml up
 
 # Docker down target
 docker-down:
 	@echo "Stopping Docker containers for production mode..."
-	APP_NAME=${APP_NAME} docker-compose -f docker-compose.yml down --remove-orphans
+	APP_NAME=${APP_NAME} docker compose -f docker compose.yml down --remove-orphans
 
 # Docker build target for debug mode
 docker-dbuild:
 	@echo "Building Docker images for debug mode..."
-	APP_NAME=${APP_NAME} docker-compose -f docker-compose.debug.yml up --build
+	APP_NAME=${APP_NAME} docker compose -f docker compose.debug.yml up --build
 
 # Docker up target for debug mode
 docker-dup:
 	@echo "Starting Docker containers in debug mode..."
-	APP_NAME=${APP_NAME} docker-compose -f docker-compose.debug.yml up
+	APP_NAME=${APP_NAME} docker compose -f docker compose.debug.yml up
 
 # Docker down target for debug mode
 docker-ddown:
 	@echo "Stopping Docker containers in debug mode..."
-	APP_NAME=${APP_NAME} docker-compose -f docker-compose.debug.yml down --remove-orphans
+	APP_NAME=${APP_NAME} docker compose -f docker compose.debug.yml down --remove-orphans
 
 # Clean target
 clean:
