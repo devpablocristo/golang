@@ -22,7 +22,7 @@
     "HACK",
     "XXX"
   ],
-  //"todo-tree.regex.regex": "(//.*|/\\*[\\s\\S]*?\\*/|((//|#|<!--|;|/\\*)\\s*(TODO|FIXME|NOTE|BUG|HACK|XXX|\\[\\[\\[)))",
+  //"todo-tree.regex.regex": "(//.*|/\\*[\\s\\S]*?\\*/|((//|#|<!--|;|/\\*)\\s*(TODO|FIXME|NOTE|BUG|HACK|INFO|\\[\\[\\[)))",
   "todo-tree.highlights.defaultHighlight": {
     "type": "text-and-comment",
     "foreground": "#000000",
@@ -60,7 +60,7 @@
       "iconColour": "#FFA500",
       "icon": "flame"
     },
-    "XXX": {
+    "INFO": {
       "foreground": "#FFFFFF",
       "background": "#800080",
       "iconColour": "#800080",

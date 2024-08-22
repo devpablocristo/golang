@@ -316,6 +316,7 @@ services:
       - kong-migrations
     networks:
       - app-network
+    restart: on-failure
 
   rabbitmq:
     image: "rabbitmq:4.0.0-beta.3-management-alpine"
