@@ -1,4 +1,4 @@
-package usercoreports
+package coreuserports
 
 import (
 	"context"

@@ -1,4 +1,4 @@
-package usercoreentities
+package coreuserentities
 
 import (
 	"time"
