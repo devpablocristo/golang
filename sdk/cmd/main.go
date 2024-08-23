@@ -14,7 +14,7 @@ import (
 
 // NOTE: mover examples/go-micro
 func main() {
-	if err := viperpkg.LoadConfig("../"); err != nil {
+	if err := viperpkg.LoadConfig(); err != nil {
 		loggerpkg.StdError("Viper Service error: %v", err)
 	}
 

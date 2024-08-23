@@ -54,6 +54,8 @@ func NewService(config ports.Config) (ports.Service, error) {
 			return
 		}
 
+		setupLogger()
+
 		instance = &service{
 			rpcService: setupRcpService(config),
 			webService: setupWebService(config),
@@ -98,15 +100,11 @@ func setupRegistry(config ports.Config) registry.Registry {
 	})
 	return consulReg
 }
-func setupLogger(config ports.Config) logger.Logger {
-	loggerService := logger.NewLogger(
+func setupLogger() {
+	logger.DefaultLogger = logger.NewLogger(
 		logger.WithLevel(logger.InfoLevel),
 		logger.WithOutput(os.Stdout),
 	)
-
-	logger.DefaultLogger = logger.NewLogger(logger.WithLevel(logger.DebugLevel))
-
-	return loggerService
 }
 
 func (s *service) StartRcpService() error {
@@ -133,64 +131,3 @@ func (s *service) StartWebService() error {
 
 func (s *service) GetRcpService() micro.Service { return s.rpcService }
 func (s *service) GetWebService() web.Service   { return s.webService }
-
-// func (s *service) GetAuth() auth.Auth             { return config.Auth }
-// func (s *service) GetBroker() broker.Broker       { return config.Broker }
-// func (s *service) GetRegistry() registry.Registry { return config.Registry }
-// func (s *service) GetLogger() logger.Logger       { return config.Logger }
-// func (s *service) GetWebService() web.Service     { return config.WebService }
-
-// func (s *service) SetService(service micro.Service)           { config.Service = service }
-// func (s *service) SetRegistry(reg registry.Registry)          { config.Registry = reg }
-// func (s *service) SetAuth(auth auth.Auth)                     { config.Auth = auth }
-// func (s *service) SetBroker(broker broker.Broker)             { config.Broker = broker }
-// func (s *service) SetClient(client client.Client)             { config.Client = client }
-// func (s *service) SetLogger(logger logger.Logger)             { config.Logger = logger }
-// func (s *service) SetServer(server server.Server)             { config.Server = server }
-// func (s *service) SetStore(store store.Store)                 { config.Store = store }
-// func (s *service) SetTransport(transport transport.Transport) { config.Transport = transport }
-// func (s *service) SetWebService(webService web.Service)       { config.WebService = webService }
-// func (s *service) SetConfig(conf configx.Config)              { config.Config = conf }
-// func (s *service) SetSelector(selector selector.Selector)     { config.Selector = selector }
-// func (s *service) SetSync(sync syncx.Sync)                    { config.Sync = sync }
-// func (s *service) SetEvents(events events.Stream)             { config.Events = events }
-
-// func (s *service) GetService() micro.Service {
-// 	return s.service
-// }
-
-// func (s *service) GetGrpcClient() client.Client {
-// 	return c.client
-// }
-
-// func (s *service) GetGrpcServer() server.Server {
-// 	return c.server
-// }
-
-// func (s *service) GetAuth() auth.Auth {
-// 	return c.auth
-// }
-
-// func (s *service) GetBroker() broker.Broker {
-// 	return c.broker
-// }
-
-// func (s *service) GetConfig() configx.Config {
-// 	return c.config
-// }
-
-// func (s *service) GetLogger() logger.Logger {
-// 	return c.logger
-// }
-
-// func (s *service) GetRegistry() registry.Registry {
-// 	return c.registry
-// }
-
-// func (s *service) GetSelector() selector.Selector {
-// 	return c.selector
-// }
-
-// func (s *service) GetStore() store.Store {
-// 	return c.store
-// }
