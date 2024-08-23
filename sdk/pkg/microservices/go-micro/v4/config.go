@@ -14,7 +14,7 @@ type config struct {
 	consulAddress     string
 }
 
-func NewConfig(rpcSN, rpcSA, webSN, webSA, cA string) ports.Config {
+func newConfig(rpcSN, rpcSA, webSN, webSA, cA string) ports.Config {
 	return &config{
 		rpcServiceName:    rpcSN,
 		rpcServiceAddress: rpcSA,

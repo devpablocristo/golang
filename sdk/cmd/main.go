@@ -1,57 +1,60 @@
 package main
 
 import (
-	"net/http"
+	"log"
 
-	pkglogger "github.com/devpablocristo/golang/sdk/pkg/configurators/logger"
+	gtwuser "github.com/devpablocristo/golang/sdk/cmd/gateways/user"
+	coreuser "github.com/devpablocristo/golang/sdk/internal/core/user"
 	pkgviper "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
 	pkgmapdb "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb"
 	pkggomicro "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4"
 	pkggin "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
-
-	"github.com/devpablocristo/golang/sdk/internal/core/user"
 )
 
 // NOTE: mover examples/go-micro
-func main() {
+func init() {
 	if err := pkgviper.LoadConfig(); err != nil {
-		pkglogger.StdError("Viper Service error: %v", err)
+		log.Fatalf("Viper Service error: %v", err)
 	}
+}
 
+func main() {
 	gomicroService, err := pkggomicro.Bootstrap()
 	if err != nil {
-		pkglogger.StdError("GoMicro Service error: %v", err)
+		log.Fatalf("GoMicro Service error: %v", err)
 	}
 
-	//NOTE: gin NO se arranca,
+	//NOTE: gin NO se lanza,
 	//NOTE: go-micro webservice si,
 	//NOTE: de esta forma gin maneje las solicitudes
 	//NOTE: y go-micro el resto
 	ginService, err := pkggin.Bootstrap()
 	if err != nil {
-		pkglogger.GmError("Gin Service error: %v", err)
+		log.Fatalf("Gin Service error: %v", err)
 	}
 
 	r := ginService.GetRouter()
 
 	mapdbService := pkgmapdb.NewService()
-	userRepository := user.NewMapDbRepository(mapdbService)
-	user.NewUserUseCases(userRepository)
+	userRepository := coreuser.NewMapDbRepository(mapdbService)
+	userUsecases := coreuser.NewUserUseCases(userRepository)
+	userHandler := gtwuser.NewGinHandler(userUsecases)
 
-	pkglogger.GmInfo("ESTO ES INFO")
+	gtwuser.Routes(r, userHandler)
+
 	go func() {
 		if err := gomicroService.StartRcpService(); err != nil {
-			pkglogger.GmError("Error starting GoMicro RPC Service: %v", err)
+			log.Fatalf("Error starting GoMicro RPC Service: %v", err)
 		}
 	}()
 
 	gomicroService.GetWebService().Handle("/", r)
-	gomicroService.GetWebService().HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
-	})
+	// gomicroService.GetWebService().HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	// 	w.WriteHeader(http.StatusOK)
+	// 	w.Write([]byte("OK"))
+	// })
 
 	if err := gomicroService.StartWebService(); err != nil {
-		pkglogger.GmError("Error starting GoMicro Web Service: %v", err)
+		log.Fatalf("Error starting GoMicro Web Service: %v", err)
 	}
 }

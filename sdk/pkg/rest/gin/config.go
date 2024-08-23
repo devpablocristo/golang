@@ -10,7 +10,7 @@ type config struct {
 	routerPort string
 }
 
-func NewConfig(routerPort string) ports.Config {
+func newConfig(routerPort string) ports.Config {
 	return &config{
 		routerPort: routerPort,
 	}

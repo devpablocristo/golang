@@ -12,7 +12,6 @@ type userUseCases struct {
 	repository ports.Repository
 }
 
-// NewUserUseCases crea una nueva instancia de UserUseCases
 func NewUserUseCases(r ports.Repository) ports.UserUseCases {
 	return &userUseCases{
 		repository: r,
@@ -27,7 +26,7 @@ func (u *userUseCases) GetUser(ctx context.Context, ID string) (*entities.User, 
 	return user, nil
 }
 
-func (r *userUseCases) GetUserUUID(ctx context.Context, username, passwordHash string) (string, error) {
+func (u *userUseCases) GetUserUUID(ctx context.Context, username, passwordHash string) (string, error) {
 	return "0001", nil
 }
 

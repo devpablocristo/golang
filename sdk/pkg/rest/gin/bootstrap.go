@@ -7,7 +7,11 @@ import (
 )
 
 func Bootstrap() (ports.Service, error) {
-	config := NewConfig(viper.GetString("ROUTER_PORT"))
+	config := newConfig(viper.GetString("ROUTER_PORT"))
 
-	return NewService(config)
+	if err := config.Validate(); err != nil {
+		return nil, err
+	}
+
+	return newService(config)
 }

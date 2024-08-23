@@ -5,22 +5,21 @@ import (
 
 	pb "github.com/devpablocristo/golang/sdk/cmd/gateways/user/pb"
 
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/user/portsgtw"
-	"github.com/devpablocristo/golang/sdk/internal/core/user/portscore"
+	ports "github.com/devpablocristo/golang/sdk/internal/core/user/ports"
 )
 
-type ggrpcServer struct {
+type GgrpcServer struct {
 	pb.UnimplementedUserServiceServer
-	ucs portscore.UserUseCases
+	ucs ports.UserUseCases
 }
 
-func NewGgrpcServer(ucs portscore.UserUseCases) portsgtw.GgrpcServer {
-	return &ggrpcServer{
+func NewGgrpcServer(ucs ports.UserUseCases) *GgrpcServer {
+	return &GgrpcServer{
 		ucs: ucs,
 	}
 }
 
-func (s *ggrpcServer) GetUserUUID(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
+func (s *GgrpcServer) GetUserUUID(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 
 	userUUID, err := s.ucs.GetUserUUID(ctx, req.Username, req.PasswordHash)
 	if err != nil {

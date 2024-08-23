@@ -7,7 +7,7 @@ import (
 )
 
 func Bootstrap() (ports.Service, error) {
-	config := NewConfig(
+	config := newConfig(
 		viper.GetString("GOMICRO_RPC_SERVICE_NAME"),
 		":"+viper.GetString("GOMICRO_RPC_SERVICE_ADDRESS"),
 		viper.GetString("GOMICRO_WEB_SERVICE_NAME"),
@@ -19,5 +19,5 @@ func Bootstrap() (ports.Service, error) {
 		return nil, err
 	}
 
-	return NewService(config)
+	return newService(config)
 }

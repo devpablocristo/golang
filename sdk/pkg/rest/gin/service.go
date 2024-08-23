@@ -21,7 +21,7 @@ type service struct {
 	config ports.Config
 }
 
-func NewService(config ports.Config) (ports.Service, error) {
+func newService(config ports.Config) (ports.Service, error) {
 	once.Do(func() {
 		err := config.Validate()
 		if err != nil {

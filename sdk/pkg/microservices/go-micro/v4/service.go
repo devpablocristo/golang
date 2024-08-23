@@ -47,7 +47,7 @@ type service struct {
 	selector   selector.Selector
 }
 
-func NewService(config ports.Config) (ports.Service, error) {
+func newService(config ports.Config) (ports.Service, error) {
 	once.Do(func() {
 		if err := config.Validate(); err != nil {
 			initError = fmt.Errorf("config validation error: %w", err)
@@ -96,6 +96,7 @@ func setupRegistry(config ports.Config) registry.Registry {
 	})
 	return consulReg
 }
+
 func setupLogger() {
 	logger.DefaultLogger = logger.NewLogger(
 		logger.WithLevel(logger.InfoLevel),
