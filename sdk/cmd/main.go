@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	pkglogger "github.com/devpablocristo/golang/sdk/pkg/configurators/logger"
 	pkgviper "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
 	pkgmapdb "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb"
@@ -44,10 +46,10 @@ func main() {
 	}()
 
 	gomicroService.GetWebService().Handle("/", r)
-	// gomicroService.GetWebService().HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-	// 	w.WriteHeader(http.StatusOK)
-	// 	w.Write([]byte("OK"))
-	// })
+	gomicroService.GetWebService().HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
 
 	if err := gomicroService.StartWebService(); err != nil {
 		pkglogger.GmError("Error starting GoMicro Web Service: %v", err)
