@@ -35,9 +35,7 @@ validateEnv() {
     log "ERROR: DEBUG is not set. Please check ./config/.env file."
     exit 1
   fi
-consulReg := consul.NewRegistry(func(op *registry.Options) {
-		op.Addrs = []string{config.GetConsulAddress()}
-	})
+
   log "Environment variables loaded successfully."
   log "App Name: ${APP_NAME}"
   log "Debug: ${DEBUG}"

@@ -53,19 +53,15 @@ func NewService(config ports.Config) (ports.Service, error) {
 			initError = fmt.Errorf("config validation error: %w", err)
 			return
 		}
-
 		setupLogger()
-
 		instance = &service{
 			rpcService: setupRcpService(config),
 			webService: setupWebService(config),
 		}
-
 	})
 	if initError != nil {
 		return nil, initError
 	}
-
 	return instance, nil
 }
 
@@ -98,10 +94,6 @@ func setupRegistry(config ports.Config) registry.Registry {
 	consulReg := consul.NewRegistry(func(op *registry.Options) {
 		op.Addrs = []string{config.GetConsulAddress()}
 	})
-
-	// consulReg := consul.NewRegistry(func(opts *registry.Options) {
-	// 	opts.Addrs = []string{"consul:8500"}
-	// })
 	return consulReg
 }
 func setupLogger() {
