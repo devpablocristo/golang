@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	loggerpkg "github.com/devpablocristo/golang/sdk/pkg/configurators/logger"
 	viperpkg "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
 	pkgmapdb "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb"
@@ -21,6 +23,12 @@ func main() {
 		loggerpkg.StdError("GoMicro Service error: %v", err)
 	}
 
+	fmt.Println("Starting service with config:", gomicroService)
+
+	//NOTE: gin NO se arranca,
+	//NOTE: go-micro webservice si,
+	//NOTE: de esta forma gin maneje las solicitudes
+	//NOTE: y go-micro el resto
 	ginService, err := pkggin.Bootstrap()
 	if err != nil {
 		loggerpkg.GmError("Gin Service error: %v", err)
@@ -32,10 +40,15 @@ func main() {
 	userRepository := user.NewMapDbRepository(mapdbService)
 	user.NewUserUseCases(userRepository)
 
-	//NOTE: gin NO se arranca, pq go-micro maneja esa parte, se pasa de esta forma para que gin maneje las solicitudes
+	go func() {
+		if err := gomicroService.StartRcpService(); err != nil {
+			loggerpkg.GmError("Error starting GoMicro Service: %v", err)
+		}
+	}()
+
 	gomicroService.GetWebService().Handle("/", r)
 
-	if err := gomicroService.Start(); err != nil {
+	if err := gomicroService.StartWebService(); err != nil {
 		loggerpkg.GmError("Error starting GoMicro Service: %v", err)
 	}
 }

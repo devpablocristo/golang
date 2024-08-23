@@ -363,11 +363,147 @@ Las interfaces definidas en tu código cubren la mayoría de las funcionalidades
 ### **Conclusión:**
 Tu implementación cubre la mayoría de las características principales de Go Micro, pero hay algunos aspectos que podrías ajustar o expandir, dependiendo de los requisitos específicos de tu proyecto y la profundidad con la que quieras implementar ciertas características.
 
+Sí, tanto `client.Client` como `server.Server` pueden ser opciones (`options`) que se configuran dentro de un servicio creado con `micro.NewService()` o `web.NewService()` en `go-micro`. Estas opciones te permiten personalizar cómo se comporta el cliente o el servidor dentro del servicio.
 
+### Configuración de `client.Client` y `server.Server` como Opciones
 
+Cuando creas un servicio con `micro.NewService()` o `web.NewService()`, puedes pasar configuraciones personalizadas para el cliente y el servidor usando las funciones `micro.Client()` y `micro.Server()` como opciones. Esto te da control sobre aspectos como el transporte utilizado, la configuración de tiempos de espera, y otras opciones avanzadas.
 
+#### Ejemplo de Uso
 
+Aquí hay un ejemplo de cómo podrías configurar un servicio en `go-micro` especificando un cliente y un servidor personalizados:
 
+```go
+package main
 
+import (
+    "go-micro.dev/v4"
+    "go-micro.dev/v4/client"
+    "go-micro.dev/v4/server"
+)
 
+func main() {
+    // Crear un cliente personalizado con un tiempo de espera específico
+    customClient := client.NewClient(
+        client.RequestTimeout(10 * time.Second),
+    )
 
+    // Crear un servidor personalizado con un transporte específico
+    customServer := server.NewServer(
+        server.Name("custom.rpc.server"),
+        server.Address(":8085"),
+    )
+
+    // Crear el servicio usando el cliente y el servidor personalizados
+    service := micro.NewService(
+        micro.Name("example.service"),
+        micro.Client(customClient), // Usar el cliente personalizado
+        micro.Server(customServer), // Usar el servidor personalizado
+    )
+
+    // Inicializar y ejecutar el servicio
+    service.Init()
+    if err := service.Run(); err != nil {
+        log.Fatal(err)
+    }
+}
+```
+
+### Explicación del Código:
+
+1. **Cliente Personalizado (`customClient`)**:
+   - Se crea un cliente con un tiempo de espera de solicitud personalizado usando `client.NewClient()`.
+   - Este cliente se pasa como una opción al servicio usando `micro.Client(customClient)`.
+
+2. **Servidor Personalizado (`customServer`)**:
+   - Se crea un servidor con un nombre y dirección personalizados usando `server.NewServer()`.
+   - Este servidor se pasa como una opción al servicio usando `micro.Server(customServer)`.
+
+3. **Configuración del Servicio**:
+   - El servicio se configura con las opciones `micro.Client()` y `micro.Server()`, lo que permite usar el cliente y servidor personalizados dentro del servicio.
+
+### ¿Por Qué Usar Clientes y Servidores Personalizados?
+
+- **Control Fino**: Permite ajustar configuraciones específicas como tiempos de espera, protocolos de transporte, y otros parámetros avanzados que no están disponibles en la configuración predeterminada.
+- **Optimización**: Puedes optimizar el comportamiento del cliente y el servidor para necesidades específicas de tu aplicación, como alta disponibilidad, baja latencia, etc.
+- **Integración con Otros Sistemas**: Si necesitas integrar el servicio con sistemas externos que requieren configuraciones específicas (como un balanceador de carga personalizado o un middleware específico), esto se puede hacer a través de clientes y servidores personalizados.
+
+### Resumen
+
+- **`client.Client`** y **`server.Server`** son opciones que puedes pasar al crear un servicio con `micro.NewService()` o `web.NewService()`.
+- Estas opciones permiten personalizar cómo funciona el cliente y el servidor dentro de un servicio `go-micro`.
+- Utilizar clientes y servidores personalizados te da un control más preciso sobre el comportamiento del servicio, lo que puede ser crucial para casos de uso avanzados o específicos.
+
+Este enfoque modular y configurable es una de las fortalezas de `go-micro`, permitiendo adaptar cada servicio a las necesidades específicas de tu aplicación.
+
+Los `Address` (direcciones) en `go-micro` son importantes porque determinan en qué dirección y puerto un servicio RPC o un servidor web escuchará las solicitudes entrantes. Sin embargo, si no los configuras explícitamente, `go-micro` maneja estos valores por defecto. A continuación te explico cómo funcionan y qué sucede si no los configuras.
+
+### 1. **`Address` en `micro.Service` (RPC)**
+
+- **Propósito**: El `Address` especifica la dirección (`host:port`) en la que el servicio RPC escuchará las solicitudes entrantes. Esto es importante para que otros servicios puedan comunicarse con este servicio a través de la red.
+
+- **Configuración Explícita**:
+  ```go
+  service := micro.NewService(
+      micro.Name("example.rpc.service"),
+      micro.Address(":8085"),  // Configurando explícitamente el puerto 8085
+  )
+  ```
+
+- **Comportamiento Predeterminado**:
+  - Si no configuras el `Address`, `go-micro` asignará automáticamente un puerto disponible al servicio.
+  - El servicio escuchará en todas las interfaces (`0.0.0.0`) en un puerto aleatorio.
+  
+  **Ejemplo sin configurar `Address`:**
+  ```go
+  service := micro.NewService(
+      micro.Name("example.rpc.service"),
+  )
+  ```
+
+  En este caso, el servicio se iniciará en un puerto aleatorio y escuchará en todas las interfaces.
+
+### 2. **`Address` en `web.Service` (HTTP)**
+
+- **Propósito**: El `Address` para un `web.Service` especifica la dirección (`host:port`) donde el servicio web (que maneja peticiones HTTP) escuchará. Esto es fundamental para exponer endpoints como APIs REST.
+
+- **Configuración Explícita**:
+  ```go
+  webService := web.NewService(
+      web.Name("example.web.service"),
+      web.Address(":8080"),  // Configurando explícitamente el puerto 8080
+  )
+  ```
+
+- **Comportamiento Predeterminado**:
+  - Si no configuras el `Address`, `go-micro` también asignará un puerto disponible de manera automática.
+  - Similar a `micro.Service`, el servicio escuchará en todas las interfaces (`0.0.0.0`) en un puerto aleatorio.
+  
+  **Ejemplo sin configurar `Address`:**
+  ```go
+  webService := web.NewService(
+      web.Name("example.web.service"),
+  )
+  ```
+
+  Aquí, el servicio web se ejecutará en un puerto aleatorio asignado por el sistema.
+
+### ¿Qué Ocurre si No Configuras `Address`?
+
+1. **Puertos Aleatorios**: Si no configuras el `Address`, `go-micro` hará que el servicio escuche en un puerto aleatorio disponible. Esto es útil en entornos de desarrollo o cuando no te importa en qué puerto exacto se ejecuta el servicio.
+
+2. **Descubrimiento de Servicios**: En un entorno donde usas un registro de servicios como Consul, el servicio se registrará con el puerto asignado automáticamente, y otros servicios pueden descubrirlo a través del registro, independientemente del puerto específico.
+
+3. **Control Limitado**: Si no configuras explícitamente el `Address`, tienes menos control sobre la configuración de red del servicio, lo que puede ser problemático en entornos de producción donde los puertos específicos son importantes (por ejemplo, cuando necesitas exponer servicios a través de un firewall o balanceador de carga).
+
+### ¿Cuándo Deberías Configurar `Address`?
+
+- **Entornos de Producción**: Configura explícitamente el `Address` para garantizar que el servicio se ejecute en un puerto específico que sepas que está disponible y que se puede acceder desde otros servicios o clientes.
+- **Desarrollo Local**: Puedes omitir el `Address` para simplificar la configuración, especialmente si solo estás probando o desarrollando y no te importa el puerto específico.
+- **Integración con Otros Sistemas**: Si tu servicio debe integrarse con otros componentes que esperan que esté disponible en un puerto específico, deberías configurar el `Address`.
+
+### Resumen
+
+- **`Address` es opcional pero útil**: Si no configuras el `Address`, `go-micro` asignará automáticamente un puerto aleatorio.
+- **Configurar `Address` te da control**: Es recomendable configurarlo explícitamente en entornos de producción o cuando necesitas exponer el servicio en un puerto específico.
+- **Omisión del `Address`**: En entornos de desarrollo, puedes omitirlo para que `go-micro` maneje automáticamente la asignación de puertos, lo que puede simplificar la configuración.

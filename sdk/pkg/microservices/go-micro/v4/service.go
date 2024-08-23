@@ -2,8 +2,10 @@ package gomicropkg
 
 import (
 	"fmt"
+	"os"
 	"sync"
 
+	"github.com/go-micro/plugins/v4/registry/consul"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/auth"
 	"go-micro.dev/v4/broker"
@@ -29,7 +31,7 @@ var (
 )
 
 type service struct {
-	service    micro.Service
+	rpcService micro.Service
 	webService web.Service
 	client     client.Client
 	server     server.Server
@@ -53,11 +55,8 @@ func NewService(config ports.Config) (ports.Service, error) {
 		}
 
 		instance = &service{
-			service:    config.GetService(),
-			webService: config.GetWebService(),
-			auth:       config.GetAuth(),
-			logger:     config.GetLogger(),
-			registry:   config.GetRegistry(),
+			rpcService: setupRcpService(config),
+			webService: setupWebService(config),
 		}
 
 	})
@@ -75,68 +74,123 @@ func GetInstance() (ports.Service, error) {
 	return instance, nil
 }
 
-func (c *service) Start() error {
-	if c.webService != nil {
-		return c.webService.Run()
+func setupRcpService(config ports.Config) micro.Service {
+	rcpService := micro.NewService(
+		micro.Name(config.GetRcpServiceName()),
+		micro.Address(config.GetRcpServiceAddress()),
+		micro.Registry(setupRegistry(config)),
+	)
+	return rcpService
+}
+
+func setupWebService(config ports.Config) web.Service {
+	webService := web.NewService(
+		web.Name(config.GetWebServiceName()),
+		web.Address(config.GetWebServiceAddress()),
+		web.Registry(setupRegistry(config)),
+	)
+	return webService
+}
+
+func setupRegistry(config ports.Config) registry.Registry {
+	consulReg := consul.NewRegistry(func(op *registry.Options) {
+		op.Addrs = []string{config.GetConsulAddress()}
+	})
+	return consulReg
+}
+func setupLogger(config ports.Config) logger.Logger {
+	loggerService := logger.NewLogger(
+		logger.WithLevel(logger.InfoLevel),
+		logger.WithOutput(os.Stdout),
+	)
+
+	logger.DefaultLogger = logger.NewLogger(logger.WithLevel(logger.DebugLevel))
+
+	return loggerService
+}
+
+func (s *service) StartRcpService() error {
+	if s.rpcService != nil {
+		err := s.rpcService.Run()
+		if err != nil {
+			return fmt.Errorf("failed to start rcp service: %w", err)
+		}
+		return nil
+	}
+	return fmt.Errorf("rpc service is not initialized")
+}
+
+func (s *service) StartWebService() error {
+	if s.webService != nil {
+		err := s.webService.Run()
+		if err != nil {
+			return fmt.Errorf("failed to start web service: %w", err)
+		}
+		return nil
 	}
 	return fmt.Errorf("web service is not initialized")
 }
 
-func (c *service) Stop() error {
-	if c.webService != nil {
-		return c.webService.Stop()
-	}
-	return fmt.Errorf("web service is not initialized")
-}
+func (s *service) GetRcpService() micro.Service { return s.rpcService }
+func (s *service) GetWebService() web.Service   { return s.webService }
 
-func (c *service) GetService() micro.Service {
-	return c.service
-}
+// func (s *service) GetAuth() auth.Auth             { return config.Auth }
+// func (s *service) GetBroker() broker.Broker       { return config.Broker }
+// func (s *service) GetRegistry() registry.Registry { return config.Registry }
+// func (s *service) GetLogger() logger.Logger       { return config.Logger }
+// func (s *service) GetWebService() web.Service     { return config.WebService }
 
-func (c *service) GetWebService() web.Service {
-	return c.webService
-}
+// func (s *service) SetService(service micro.Service)           { config.Service = service }
+// func (s *service) SetRegistry(reg registry.Registry)          { config.Registry = reg }
+// func (s *service) SetAuth(auth auth.Auth)                     { config.Auth = auth }
+// func (s *service) SetBroker(broker broker.Broker)             { config.Broker = broker }
+// func (s *service) SetClient(client client.Client)             { config.Client = client }
+// func (s *service) SetLogger(logger logger.Logger)             { config.Logger = logger }
+// func (s *service) SetServer(server server.Server)             { config.Server = server }
+// func (s *service) SetStore(store store.Store)                 { config.Store = store }
+// func (s *service) SetTransport(transport transport.Transport) { config.Transport = transport }
+// func (s *service) SetWebService(webService web.Service)       { config.WebService = webService }
+// func (s *service) SetConfig(conf configx.Config)              { config.Config = conf }
+// func (s *service) SetSelector(selector selector.Selector)     { config.Selector = selector }
+// func (s *service) SetSync(sync syncx.Sync)                    { config.Sync = sync }
+// func (s *service) SetEvents(events events.Stream)             { config.Events = events }
 
-func (c *service) GetGrpcClient() client.Client {
-	return c.client
-}
+// func (s *service) GetService() micro.Service {
+// 	return s.service
+// }
 
-func (c *service) GetGrpcServer() server.Server {
-	return c.server
-}
+// func (s *service) GetGrpcClient() client.Client {
+// 	return c.client
+// }
 
-func (c *service) GetAuth() auth.Auth {
-	return c.auth
-}
+// func (s *service) GetGrpcServer() server.Server {
+// 	return c.server
+// }
 
-func (c *service) GetBroker() broker.Broker {
-	return c.broker
-}
+// func (s *service) GetAuth() auth.Auth {
+// 	return c.auth
+// }
 
-func (c *service) GetConfig() configx.Config {
-	return c.config
-}
+// func (s *service) GetBroker() broker.Broker {
+// 	return c.broker
+// }
 
-func (c *service) GetLogger() logger.Logger {
-	return c.logger
-}
+// func (s *service) GetConfig() configx.Config {
+// 	return c.config
+// }
 
-func (c *service) GetRegistry() registry.Registry {
-	return c.registry
-}
+// func (s *service) GetLogger() logger.Logger {
+// 	return c.logger
+// }
 
-func (c *service) GetSelector() selector.Selector {
-	return c.selector
-}
+// func (s *service) GetRegistry() registry.Registry {
+// 	return c.registry
+// }
 
-func (c *service) GetStore() store.Store {
-	return c.store
-}
+// func (s *service) GetSelector() selector.Selector {
+// 	return c.selector
+// }
 
-func (c *service) GetTransport() transport.Transport {
-	return c.transport
-}
-
-func (c *service) GetEvents() events.Stream {
-	return c.events
-}
+// func (s *service) GetStore() store.Store {
+// 	return c.store
+// }

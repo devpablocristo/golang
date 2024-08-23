@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+  services:
   golang-sdk:
     container_name: "${APP_NAME:-golang-sdk}"
     build:
@@ -64,13 +65,14 @@ services:
       - RABBITMQ_MANAGEMENT_PORT=${RABBITMQ_MANAGEMENT_PORT:-15672} 
       - RABBITMQ_USER=${RABBITMQ_USER:-guest}        
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}    
-      - RABBITMQ_VHOST=${RABBITMQ_VHOS:-/} 
+      - RABBITMQ_VHOST=${RABBITMQ_VHOST:-/} 
       - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT:-http://dynamodb:8765} 
       - DYNAMODB_PORT=${DYNAMODB_PORT:-8765}          
       - DYNAMODB_REGION=${DYNAMODB_REGION:-us-west-2} 
-      - MICRO_SERVICE_NAME=${MICRO_SERVICE_NAME:-golang-sdk}
-      - MICRO_SERVICE_VERSION=${MICRO_SERVICE_VERSION:-1.0.0}
-      - MICRO_SERVICE_ADDRESS=${MICRO_SERVICE_ADDRESS:-8085}
+      - GOMICRO_RPC_SERVICE_NAME=${GOMICRO_RPC_SERVICE_NAME:-golang-sdk-rpc}
+      - GOMICRO_RPC_SERVICE_ADDRESS=${GOMICRO_RPC_SERVICE_ADDRESS:-8085}
+      - GOMICRO_WEB_SERVICE_NAME=${GOMICRO_WEB_SERVICE_NAME:-golang-sdk-web}
+      - GOMICRO_WEB_SERVICE_ADDRESS=${GOMICRO_WEB_SERVICE_ADDRESS:-8086}
     depends_on:
       - postgres
       - consul
