@@ -98,6 +98,10 @@ func setupRegistry(config ports.Config) registry.Registry {
 	consulReg := consul.NewRegistry(func(op *registry.Options) {
 		op.Addrs = []string{config.GetConsulAddress()}
 	})
+
+	// consulReg := consul.NewRegistry(func(opts *registry.Options) {
+	// 	opts.Addrs = []string{"consul:8500"}
+	// })
 	return consulReg
 }
 func setupLogger() {

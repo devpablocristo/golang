@@ -41,7 +41,7 @@ func (config *config) GetWebServiceAddress() string {
 }
 
 func (config *config) GetConsulAddress() string {
-	return config.webServiceAddress
+	return config.consulAddress
 }
 
 func (config *config) Validate() error {

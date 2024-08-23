@@ -2,7 +2,7 @@ FROM golang:1.22.3-alpine3.20
 
 # Install dependencies and Delve for debugging
 RUN apk update && \
-    apk add --no-cache bash git libc-dev g++ inotify-tools && \
+    apk add --no-cache bash git libc-dev g++ inotify-tools curl && \
     go install github.com/go-delve/delve/cmd/dlv@latest
 
 # Set the working directory inside the container
