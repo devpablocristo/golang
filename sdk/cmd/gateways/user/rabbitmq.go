@@ -11,10 +11,10 @@ package user
 // )
 
 // type rabbitMqBroker struct {
-// 	client portspkg.RabbitMqClient
+// 	client portspkg.Service
 // }
 
-// func NewRabbitMqBroker(client portspkg.RabbitMqClient) portsgtw.MessageBroker {
+// func NewRabbitMqBroker(client portspkg.Service) portsgtw.MessageBroker {
 // 	return &rabbitMqBroker{
 // 		client: client,
 // 	}

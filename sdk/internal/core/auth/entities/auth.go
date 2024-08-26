@@ -1,4 +1,4 @@
-package entities
+package coreauthentities
 
 import (
 	"time"

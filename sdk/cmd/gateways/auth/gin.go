@@ -6,30 +6,28 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/dto"
-
-	mdw "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
-
-	"github.com/devpablocristo/golang/sdk/internal/core/auth/portscore"
+	ports "github.com/devpablocristo/golang/sdk/internal/core/auth/ports"
+	mware "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 )
 
 type GinHandler struct {
-	authUseCases portscore.AuthUseCases
+	ucs ports.AuthUseCases
 }
 
-func NewGinHandler(auc portscore.AuthUseCases) *GinHandler {
+func NewGinHandler(u ports.AuthUseCases) *GinHandler {
 	return &GinHandler{
-		authUseCases: auc,
+		ucs: u,
 	}
 }
 
 func (h *GinHandler) Login(c *gin.Context) {
-	var req *mdw.LoginRequest
+	var req *mware.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
 
-	token, err := h.authUseCases.Login(c.Request.Context(), dto.LoginRequestToDomain(req))
+	token, err := h.ucs.Login(c.Request.Context(), dto.LoginRequestToDomain(req))
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return

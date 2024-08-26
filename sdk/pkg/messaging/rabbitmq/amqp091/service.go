@@ -1,4 +1,4 @@
-package rabbitpkg
+package pkgrabbitmq
 
 import (
 	"context"
@@ -7,12 +7,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/devpablocristo/golang/sdk/pkg/rabbitmq/amqp091/portspkg"
 	"github.com/rabbitmq/amqp091-go"
+
+	ports "github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/ports"
 )
 
 var (
-	instance  portspkg.RabbitMqClient
+	instance  ports.Service
 	once      sync.Once
 	initError error
 )
@@ -21,8 +22,7 @@ type rabbitMqClient struct {
 	connection *amqp091.Connection
 }
 
-// InitializeRabbitMQClient inicializa una conexión única a RabbitMQ.
-func InitializeRabbitMQClient(config portspkg.RabbitMqConfig) error {
+func newService(config ports.Config) (ports.Service, error) {
 	once.Do(func() {
 		connString := fmt.Sprintf("amqp://%s:%s@%s:%d%s",
 			config.GetUser(), config.GetPassword(), config.GetHost(), config.GetPort(), config.GetVHost())
@@ -35,18 +35,16 @@ func InitializeRabbitMQClient(config portspkg.RabbitMqConfig) error {
 
 		instance = &rabbitMqClient{connection: conn}
 	})
-	return initError
+	return instance, initError
 }
 
-// GetRabbitMQInstance devuelve la instancia del cliente RabbitMQ.
-func GetRabbitMQInstance() (portspkg.RabbitMqClient, error) {
+func GetInstance() (ports.Service, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("rabbitmq client is not initialized")
 	}
 	return instance, nil
 }
 
-// Channel devuelve un nuevo canal de comunicación con RabbitMQ.
 func (client *rabbitMqClient) Channel() (*amqp091.Channel, error) {
 	if client.connection == nil {
 		return nil, fmt.Errorf("rabbitmq connection is not open")
@@ -54,30 +52,29 @@ func (client *rabbitMqClient) Channel() (*amqp091.Channel, error) {
 	return client.connection.Channel()
 }
 
-// Close cierra la conexión con RabbitMQ.
 func (client *rabbitMqClient) Close() error {
-	return client.connection.Close()
+	if client.connection != nil {
+		return client.connection.Close()
+	}
+	return nil
 }
 
-func (client *rabbitMqClient) Produce(ctx context.Context, queueName string, replyTo string, corrID string, message any) (string, error) {
-	// Abre un canal
+func (client *rabbitMqClient) Produce(ctx context.Context, queueName, replyTo, corrID string, message any) (string, error) {
 	ch, err := client.Channel()
 	if err != nil {
 		return "", fmt.Errorf("failed to open RabbitMQ channel: %w", err)
 	}
 	defer ch.Close()
 
-	// Convertir el mensaje a formato JSON
 	body, err := json.Marshal(message)
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal message: %w", err)
 	}
 
-	if corrID == "" { // Genera un correl_id para rastrear la respuesta
+	if corrID == "" {
 		corrID = fmt.Sprintf("%d", time.Now().UnixNano())
 	}
 
-	// Publica el mensaje en la cola original
 	err = ch.PublishWithContext(ctx,
 		"",        // exchange
 		queueName, // routing key
@@ -96,7 +93,7 @@ func (client *rabbitMqClient) Produce(ctx context.Context, queueName string, rep
 	return corrID, nil
 }
 
-func (client *rabbitMqClient) Consume(ctx context.Context, queueName string, corrID string) ([]byte, string, error) {
+func (client *rabbitMqClient) Consume(ctx context.Context, queueName, corrID string) ([]byte, string, error) {
 	ch, err := client.Channel()
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to open RabbitMQ channel: %w", err)

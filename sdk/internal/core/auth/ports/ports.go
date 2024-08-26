@@ -1,9 +1,9 @@
-package portscore
+package coreauthports
 
 import (
 	"context"
 
-	"github.com/devpablocristo/golang/sdk/internal/core/auth/entities"
+	entities "github.com/devpablocristo/golang/sdk/internal/core/auth/entities"
 )
 
 type AuthUseCases interface {

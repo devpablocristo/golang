@@ -1,22 +1,19 @@
-package auth
+package coreauth
 
 import (
 	"context"
 	"time"
 
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/portsgtw"
-	"github.com/devpablocristo/golang/sdk/internal/core/auth/entities"
-	"github.com/devpablocristo/golang/sdk/internal/core/auth/portscore"
+	entities "github.com/devpablocristo/golang/sdk/internal/core/auth/entities"
+	ports "github.com/devpablocristo/golang/sdk/internal/core/auth/ports"
 )
 
 type useAuthCases struct {
-	messageBroker portsgtw.MessageBroker
-	accessControl portscore.AccessControl
+	accessControl ports.AccessControl
 }
 
-func NewAuthUseCases(mb portsgtw.MessageBroker, ac portscore.AccessControl) portscore.AuthUseCases {
+func NewAuthUseCases(ac ports.AccessControl) ports.AuthUseCases {
 	return &useAuthCases{
-		messageBroker: mb,
 		accessControl: ac,
 	}
 }

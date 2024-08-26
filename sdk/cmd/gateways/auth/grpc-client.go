@@ -5,22 +5,22 @@ import (
 
 	pb "github.com/devpablocristo/golang/sdk/cmd/gateways/auth/pb"
 
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/auth/portsgtw"
-	"github.com/devpablocristo/golang/sdk/pkg/grpc/google/portspkg"
 	"google.golang.org/grpc"
+
+	ports "github.com/devpablocristo/golang/sdk/internal/core/user/ports"
 )
 
-type ggrpcClient struct {
-	client portsgtw.GrpcClient
+type GgrpcClient struct {
+	ucs ports.UserUseCases
 }
 
-func NewGGrpcClient(client portspkg.GgrpcClient) portsgtw.GrpcClient {
-	return &ggrpcClient{
-		client: client,
+func NewGGrpcClient(u ports.UserUseCases) *GgrpcClient {
+	return &GgrpcClient{
+		ucs: u,
 	}
 }
 
-func (g *ggrpcClient) GetUserUUID(username, password string) (string, error) {
+func (g *GgrpcClient) GetUserUUID(username, password string) (string, error) {
 	conn, err := grpc.Dial("user-service:50051", grpc.WithInsecure())
 	if err != nil {
 		return "", err

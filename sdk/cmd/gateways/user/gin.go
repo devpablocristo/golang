@@ -13,9 +13,9 @@ type GinHandler struct {
 	ucs ports.UserUseCases
 }
 
-func NewGinHandler(ucs ports.UserUseCases) *GinHandler {
+func NewGinHandler(u ports.UserUseCases) *GinHandler {
 	return &GinHandler{
-		ucs: ucs,
+		ucs: u,
 	}
 }
 

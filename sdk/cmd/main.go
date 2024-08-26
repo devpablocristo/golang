@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	gtwuser "github.com/devpablocristo/golang/sdk/cmd/gateways/user"
 	coreuser "github.com/devpablocristo/golang/sdk/internal/core/user"
@@ -49,10 +50,10 @@ func main() {
 	}()
 
 	gomicroService.GetWebService().Handle("/", r)
-	// gomicroService.GetWebService().HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-	// 	w.WriteHeader(http.StatusOK)
-	// 	w.Write([]byte("OK"))
-	// })
+	gomicroService.GetWebService().HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
 
 	if err := gomicroService.StartWebService(); err != nil {
 		log.Fatalf("Error starting GoMicro Web Service: %v", err)
