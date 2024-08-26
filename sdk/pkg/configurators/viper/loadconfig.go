@@ -1,4 +1,4 @@
-package pkgviper
+package sdkviper
 
 import (
 	"fmt"

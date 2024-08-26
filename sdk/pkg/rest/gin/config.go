@@ -1,4 +1,4 @@
-package pkggin
+package sdkgin
 
 import (
 	"fmt"

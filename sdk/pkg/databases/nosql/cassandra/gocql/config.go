@@ -1,4 +1,4 @@
-package pkgcassandra
+package sdkcassandra
 
 import (
 	"fmt"

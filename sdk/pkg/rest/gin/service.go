@@ -1,4 +1,4 @@
-package pkggin
+package sdkgin
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	instance  ports.Service
+	instance  ports.Server
 	once      sync.Once
 	initError error
 )
@@ -21,7 +21,7 @@ type service struct {
 	config ports.Config
 }
 
-func newService(config ports.Config) (ports.Service, error) {
+func newServer(config ports.Config) (ports.Server, error) {
 	once.Do(func() {
 		err := config.Validate()
 		if err != nil {
@@ -39,7 +39,7 @@ func newService(config ports.Config) (ports.Service, error) {
 	return instance, initError
 }
 
-func GetInstance() (ports.Service, error) {
+func GetInstance() (ports.Server, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("gin client is not initialized")
 	}

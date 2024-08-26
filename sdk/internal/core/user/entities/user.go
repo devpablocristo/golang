@@ -1,4 +1,4 @@
-package coreuserentities
+package entities
 
 import (
 	"time"

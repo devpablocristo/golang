@@ -1,4 +1,4 @@
-package pkggomicroports
+package ports
 
 import (
 	"go-micro.dev/v4"

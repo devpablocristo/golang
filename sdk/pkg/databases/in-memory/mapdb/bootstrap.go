@@ -1,10 +1,10 @@
-package pkgmapdb
+package sdkmapdb
 
 import (
 	ports "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb/ports"
 )
 
-func Boostrap() (ports.Service, error) {
-	NewService()
+func Boostrap() (ports.Repository, error) {
+	newRepository()
 	return GetInstance()
 }

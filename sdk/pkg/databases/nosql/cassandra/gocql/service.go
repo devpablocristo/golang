@@ -1,4 +1,4 @@
-package pkgcassandra
+package sdkcassandra
 
 import (
 	"fmt"
@@ -10,18 +10,18 @@ import (
 )
 
 var (
-	instance  ports.Service
+	instance  ports.Repository
 	once      sync.Once
 	initError error
 )
 
-type service struct {
+type Repository struct {
 	session *gocql.Session
 }
 
-func NewService(config ports.Config) (ports.Service, error) {
+func NewRepository(config ports.Config) (ports.Repository, error) {
 	once.Do(func() {
-		client := &service{}
+		client := &Repository{}
 		initError = client.Connect(config)
 		if initError == nil {
 			instance = client
@@ -30,14 +30,14 @@ func NewService(config ports.Config) (ports.Service, error) {
 	return instance, initError
 }
 
-func GetInstance() (ports.Service, error) {
+func GetInstance() (ports.Repository, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("cassandra client is not initialized")
 	}
 	return instance, nil
 }
 
-func (c *service) Connect(config ports.Config) error {
+func (c *Repository) Connect(config ports.Config) error {
 	cluster := gocql.NewCluster(config.GetHosts()...)
 	cluster.Keyspace = config.GetKeyspace()
 	cluster.Authenticator = gocql.PasswordAuthenticator{
@@ -52,12 +52,12 @@ func (c *service) Connect(config ports.Config) error {
 	return nil
 }
 
-func (c *service) Close() {
+func (c *Repository) Close() {
 	if c.session != nil {
 		c.session.Close()
 	}
 }
 
-func (c *service) GetSession() *gocql.Session {
+func (c *Repository) GetSession() *gocql.Session {
 	return c.session
 }

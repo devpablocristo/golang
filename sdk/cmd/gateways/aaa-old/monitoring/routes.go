@@ -7,8 +7,8 @@ import (
 	"github.com/devpablocristo/golang/sdk/pkg/gin-gonic/gin/portspkg"
 )
 
-func Routes(pkggin portspkg.GinClient, handler *GinHandler) {
-	r := pkggin.GetRouter()
+func Routes(sdkgin portspkg.GinClient, handler *GinHandler) {
+	r := sdkgin.GetRouter()
 
 	pprof.Register(r) // Registra las rutas de pprof en el enrutador de Gin
 
@@ -17,7 +17,7 @@ func Routes(pkggin portspkg.GinClient, handler *GinHandler) {
 	r.GET("/ping", handler.Ping)
 
 	// Prometheus
-	r.GET("/metrics", pkggin.WrapH(promhttp.Handler()))
+	r.GET("/metrics", sdkgin.WrapH(promhttp.Handler()))
 
 	// TODO: Falta Kong
 

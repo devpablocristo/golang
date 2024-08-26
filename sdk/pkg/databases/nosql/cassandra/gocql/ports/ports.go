@@ -1,4 +1,4 @@
-package pkgcassandraports
+package ports
 
 import (
 	"github.com/gocql/gocql"
@@ -16,7 +16,7 @@ type Config interface {
 	Validate() error
 }
 
-type Service interface {
+type Repository interface {
 	Connect(config Config) error
 	Close()
 	GetSession() *gocql.Session

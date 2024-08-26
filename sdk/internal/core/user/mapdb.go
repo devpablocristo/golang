@@ -9,7 +9,7 @@ import (
 
 	entities "github.com/devpablocristo/golang/sdk/internal/core/user/entities"
 	ports "github.com/devpablocristo/golang/sdk/internal/core/user/ports"
-	pkgmapdbports "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb/ports"
+	sdkmapdbports "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb/ports"
 )
 
 // notas implementacion:
@@ -20,10 +20,10 @@ import (
 // reg(handler) <-- grpc
 
 type mapDbRepository struct {
-	service pkgmapdbports.Service
+	service sdkmapdbports.Repository
 }
 
-func NewMapDbRepository(s pkgmapdbports.Service) ports.Repository {
+func NewMapDbRepository(s sdkmapdbports.Repository) ports.Repository {
 	return &mapDbRepository{
 		service: s,
 	}

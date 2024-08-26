@@ -3,24 +3,23 @@ package auth
 import (
 	"context"
 
-	pb "github.com/devpablocristo/golang/sdk/cmd/gateways/auth/pb"
-
 	"google.golang.org/grpc"
 
+	pb "github.com/devpablocristo/golang/sdk/cmd/gateways/auth/pb"
 	ports "github.com/devpablocristo/golang/sdk/internal/core/user/ports"
 )
 
-type GgrpcClient struct {
+type GrpcClient struct {
 	ucs ports.UserUseCases
 }
 
-func NewGGrpcClient(u ports.UserUseCases) *GgrpcClient {
-	return &GgrpcClient{
+func NewGrpcClient(u ports.UserUseCases) *GrpcClient {
+	return &GrpcClient{
 		ucs: u,
 	}
 }
 
-func (g *GgrpcClient) GetUserUUID(username, password string) (string, error) {
+func (g *GrpcClient) GetUserUUID(username, password string) (string, error) {
 	conn, err := grpc.Dial("user-service:50051", grpc.WithInsecure())
 	if err != nil {
 		return "", err

@@ -1,9 +1,9 @@
-package pkgrabbitmq
+package consumer
 
 import (
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/ports"
+	ports "github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/consumer/ports"
 )
 
 type config struct {
@@ -24,19 +24,19 @@ func newConfig(host string, port int, user, password, vhost string) ports.Config
 	}
 }
 
-func (c *config) GetHost() string    { return c.host }
+func (c *config) GetHost() string     { return c.host }
 func (c *config) SetHost(host string) { c.host = host }
 
-func (c *config) GetPort() int    { return c.port }
+func (c *config) GetPort() int     { return c.port }
 func (c *config) SetPort(port int) { c.port = port }
 
-func (c *config) GetUser() string    { return c.user }
+func (c *config) GetUser() string     { return c.user }
 func (c *config) SetUser(user string) { c.user = user }
 
-func (c *config) GetPassword() string    { return c.password }
+func (c *config) GetPassword() string         { return c.password }
 func (c *config) SetPassword(password string) { c.password = password }
 
-func (c *config) GetVHost() string    { return c.vhost }
+func (c *config) GetVHost() string      { return c.vhost }
 func (c *config) SetVHost(vhost string) { c.vhost = vhost }
 
 func (c *config) Validate() error {

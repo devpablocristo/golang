@@ -8,14 +8,14 @@ import (
 
 	entities "github.com/devpablocristo/golang/sdk/internal/core/user/entities"
 	ports "github.com/devpablocristo/golang/sdk/internal/core/user/ports"
-	pkgcassandraports "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/cassandra/gocql/ports"
+	sdkcassandraports "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/cassandra/gocql/ports"
 )
 
 type cassandraRepository struct {
-	service pkgcassandraports.Service
+	service sdkcassandraports.Repository
 }
 
-func NewCassandraRepository(inst pkgcassandraports.Service) ports.Repository {
+func NewCassandraRepository(inst sdkcassandraports.Repository) ports.Repository {
 	return &cassandraRepository{
 		service: inst,
 	}

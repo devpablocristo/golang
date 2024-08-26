@@ -1,4 +1,4 @@
-package portspkg
+package ports
 
 import (
 	"context"
@@ -6,13 +6,14 @@ import (
 	"github.com/rabbitmq/amqp091-go"
 )
 
-type Service interface {
+// ConsumerService define las operaciones específicas para un consumidor de RabbitMQ.
+type Consumer interface {
 	Channel() (*amqp091.Channel, error)
 	Close() error
-	Produce(context.Context, string, string, string, any) (string, error)
-	Consume(context.Context, string, string) ([]byte, string, error)
+	Consume(ctx context.Context, queueName string, corrID string) ([]byte, string, error)
 }
 
+// ConsumerConfig define la configuración específica para un consumidor de RabbitMQ.
 type Config interface {
 	GetHost() string
 	SetHost(host string)

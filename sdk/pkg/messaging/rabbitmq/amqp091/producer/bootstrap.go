@@ -1,13 +1,12 @@
-// pkgrabbitmq/bootstrap.go
-package pkgrabbitmq
+package producer
 
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/ports"
+	ports "github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/producer/ports"
 )
 
-func Bootstrap() (ports.Service, error) {
+func Bootstrap() (ports.Producer, error) {
 	config := newConfig(
 		viper.GetString("RABBITMQ_HOST"),
 		viper.GetInt("RABBITMQ_PORT"),
@@ -20,5 +19,5 @@ func Bootstrap() (ports.Service, error) {
 		return nil, err
 	}
 
-	return newService(config)
+	return newProducer(config)
 }

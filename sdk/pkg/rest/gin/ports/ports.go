@@ -1,4 +1,4 @@
-package pkgginports
+package ports
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Service interface {
+type Server interface {
 	RunServer() error
 	GetRouter() *gin.Engine
 	WrapH(h http.Handler) gin.HandlerFunc

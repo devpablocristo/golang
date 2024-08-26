@@ -1,4 +1,4 @@
-package pkggomicro
+package sdkgomicro
 
 import (
 	"github.com/spf13/viper"

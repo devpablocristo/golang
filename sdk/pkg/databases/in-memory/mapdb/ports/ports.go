@@ -1,5 +1,5 @@
-package pkgmapdbports
+package ports
 
-type Service interface {
+type Repository interface {
 	GetDb() map[string]any
 }

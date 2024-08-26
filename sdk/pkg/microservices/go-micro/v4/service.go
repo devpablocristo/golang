@@ -1,4 +1,4 @@
-package pkggomicro
+package sdkgomicro
 
 import (
 	"fmt"
