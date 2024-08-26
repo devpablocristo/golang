@@ -50,6 +50,14 @@ func newClient(config ports.Config) (ports.Client, error) {
 	return clientInstance, clientInitErr
 }
 
+// Implementación de GetConnection
+func (client *ggrpcClient) GetConnection() (*grpc.ClientConn, error) {
+	if client.conn == nil {
+		return nil, fmt.Errorf("gRPC client connection is not initialized")
+	}
+	return client.conn, nil
+}
+
 // GetClientInstance devuelve la instancia de cliente gRPC
 func GetClientInstance() (ports.Client, error) {
 	if clientInstance == nil {

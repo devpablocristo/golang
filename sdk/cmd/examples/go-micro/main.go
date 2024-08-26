@@ -12,9 +12,9 @@ import (
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
 )
 
-// NOTE: mover examples/go-micro
+// CMND: docker compose -f ../../../config/docker-compose.dev.yml up --build
 func init() {
-	if err := sdkviper.LoadConfig(); err != nil {
+	if err := sdkviper.LoadConfig("../../../"); err != nil {
 		log.Fatalf("Viper Service error: %v", err)
 	}
 }
@@ -25,10 +25,10 @@ func main() {
 		log.Fatalf("GoMicro Service error: %v", err)
 	}
 
-	//NOTE: gin NO se lanza,
-	//NOTE: go-micro webservice si,
-	//NOTE: de esta forma gin maneje las solicitudes
-	//NOTE: y go-micro el resto
+	//INFO: gin NO se lanza,
+	//INFO: go-micro webservice si,
+	//INFO: de esta forma gin maneje las solicitudes
+	//INFO: y go-micro el resto
 	ginServer, err := sdkgin.Bootstrap()
 	if err != nil {
 		log.Fatalf("Gin Service error: %v", err)

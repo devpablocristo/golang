@@ -2,6 +2,8 @@ package ports
 
 import (
 	"context"
+
+	"google.golang.org/grpc"
 )
 
 type Config interface {
@@ -23,4 +25,5 @@ type TLSConfig struct {
 type Client interface {
 	InvokeMethod(ctx context.Context, method string, request, response any) error
 	Close() error
+	GetConnection() (*grpc.ClientConn, error) // Añadir este método
 }

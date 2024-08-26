@@ -5,20 +5,22 @@ import (
 	"encoding/json"
 	"fmt"
 
+	rabbitports "github/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/consumer/ports"
+
 	dto "github.com/devpablocristo/golang/sdk/cmd/gateways/auth/dto"
 	entities "github.com/devpablocristo/golang/sdk/internal/core/auth/entities"
 	ports "github.com/devpablocristo/golang/sdk/internal/core/auth/ports"
 )
 
 type RabbitMq struct {
-	ucs    ports.AuthUseCases
-	broker ports.Service // Asumimos que ports.Service es la interfaz del cliente RabbitMQ
+	ucs      ports.AuthUseCases
+	consumer rabbitports.Consumer
 }
 
-func NewRabbitMq(u ports.AuthUseCases, broker ports.Service) *RabbitMq {
+func NewRabbitMq(u ports.AuthUseCases, c rabbitports.Consumer) *RabbitMq {
 	return &RabbitMq{
-		ucs:    u,
-		broker: broker,
+		ucs:      u,
+		consumer: c,
 	}
 }
 
@@ -31,13 +33,13 @@ func (b *RabbitMq) GetUserUUID(ctx context.Context, lc *entities.LoginCredential
 	replyTo := "getuseruuid_res_queue"
 
 	// Enviar el mensaje usando el Producer del SDK
-	corrID, err := b.broker.Produce(ctx, queueName, replyTo, "", loginCredentials)
+	corrID, err := b.consumer.Produce(ctx, queueName, replyTo, "", loginCredentials)
 	if err != nil {
 		return "", fmt.Errorf("failed to send login request: %w", err)
 	}
 
 	// Consumir la respuesta de la cola de respuestas
-	responseBody, returnedCorrID, err := b.broker.Consume(ctx, replyTo, corrID)
+	responseBody, returnedCorrID, err := b.consumer.Consume(ctx, replyTo, corrID)
 	if err != nil {
 		return "", fmt.Errorf("failed to consume response from RabbitMQ: %w", err)
 	}

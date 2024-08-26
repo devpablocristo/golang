@@ -50,7 +50,8 @@
         "NOTE",
         "BUG",
         "HACK",
-        "INFO"
+        "INFO",
+        "CMND"
     ],
     "todo-tree.highlights.defaultHighlight": {
         "type": "text-and-comment",
@@ -94,6 +95,12 @@
             "background": "#800080",
             "iconColour": "#800080",
             "icon": "info"
+        },
+        "CMND": {
+            "foreground": "#38f000",
+            "background": "#000000",
+            "iconColour": "#38f000",
+            "icon": "terminal"
         }
     }
 }

@@ -2,39 +2,38 @@ package auth
 
 import (
 	"context"
+	"fmt"
 
-	"google.golang.org/grpc"
-
-	pb "github.com/devpablocristo/golang/sdk/cmd/gateways/auth/pb"
-	ports "github.com/devpablocristo/golang/sdk/internal/core/user/ports"
+	pb "github.com/devpablocristo/golang/sdk/pb"
+	sdkggrpc "github.com/devpablocristo/golang/sdk/pkg/grpc/google/client/ports"
 )
 
 type GrpcClient struct {
-	ucs ports.UserUseCases
+	client pb.UserServiceClient
+	conn   sdkggrpc.Client
 }
 
-func NewGrpcClient(u ports.UserUseCases) *GrpcClient {
-	return &GrpcClient{
-		ucs: u,
-	}
-}
-
-func (g *GrpcClient) GetUserUUID(username, password string) (string, error) {
-	conn, err := grpc.Dial("user-service:50051", grpc.WithInsecure())
+func NewGrpcClient(grpcClient sdkggrpc.Client) (*GrpcClient, error) {
+	conn, err := grpcClient.GetConnection()
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("failed to get gRPC connection: %v", err)
 	}
-	defer conn.Close()
 
 	client := pb.NewUserServiceClient(conn)
 
-	// Hacer la solicitud al servicio user
-	resp, err := client.GetUserUUID(context.Background(), &pb.GetUserRequest{
+	return &GrpcClient{
+		client: client,
+		conn:   grpcClient,
+	}, nil
+}
+
+func (g *GrpcClient) GetUserUUID(ctx context.Context, username, passwordHash string) (string, error) {
+	resp, err := g.client.GetUserUUID(ctx, &pb.GetUserRequest{
 		Username:     username,
-		PasswordHash: password, // Aquí debería ir el hash de la contraseña
+		PasswordHash: passwordHash,
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error calling GetUserUUID: %v", err)
 	}
 
 	return resp.UUID, nil

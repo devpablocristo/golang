@@ -3,9 +3,8 @@ package user
 import (
 	"context"
 
-	pb "github.com/devpablocristo/golang/sdk/cmd/gateways/user/pb"
-
 	ports "github.com/devpablocristo/golang/sdk/internal/core/user/ports"
+	pb "github.com/devpablocristo/golang/sdk/pb"
 )
 
 type GgrpcServer struct {
