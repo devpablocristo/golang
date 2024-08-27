@@ -12,9 +12,8 @@ import (
 	portsgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
 
-// CMND: docker compose -f ../../../config/docker-compose.dev.yml up --build
 func init() {
-	if err := sdkviper.LoadConfig("../../../"); err != nil {
+	if err := sdkviper.LoadConfig(); err != nil {
 		log.Fatalf("Viper Service error: %v", err)
 	}
 }
@@ -23,9 +22,12 @@ func main() {
 	ginServer, mysqlRepository := lauchBootstraps()
 
 	monRepository := coremon.NewMySqlRepository(mysqlRepository)
-	userUsecases := coremon.NewUserUseCases(monRepository)
-	userHandler := gtwmon.NewGinHandler(userUsecases, ginServer)
-	userHandler.Start("v1")
+	monUsecases := coremon.NewUseCases(monRepository)
+	monHandler := gtwmon.NewGinHandler(monUsecases, ginServer)
+
+	if err := monHandler.Start("v1"); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 
 }
 

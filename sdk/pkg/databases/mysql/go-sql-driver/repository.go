@@ -1,6 +1,7 @@
 package sdkmysql
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"sync"
@@ -19,6 +20,7 @@ type Repository struct {
 	db *sql.DB
 }
 
+// newRepository crea una nueva instancia de Repository con configuración proporcionada.
 func newRepository(c config) (ports.Repository, error) {
 	once.Do(func() {
 		client := &Repository{}
@@ -32,6 +34,7 @@ func newRepository(c config) (ports.Repository, error) {
 	return instance, initError
 }
 
+// GetInstance devuelve la instancia única de Repository.
 func GetInstance() (ports.Repository, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("MySQL client is not initialized")
@@ -39,6 +42,7 @@ func GetInstance() (ports.Repository, error) {
 	return instance, nil
 }
 
+// connect establece la conexión a la base de datos MySQL.
 func (r *Repository) connect(c config) error {
 	dsn := c.dsn()
 	conn, err := sql.Open("mysql", dsn)
@@ -52,12 +56,19 @@ func (r *Repository) connect(c config) error {
 	return nil
 }
 
+// Ping verifica la conexión a la base de datos.
+func (r *Repository) Ping(ctx context.Context) error {
+	return r.db.PingContext(ctx)
+}
+
+// Close cierra la conexión a la base de datos.
 func (r *Repository) Close() {
 	if r.db != nil {
 		r.db.Close()
 	}
 }
 
+// DB devuelve la instancia *sql.DB.
 func (r *Repository) DB() *sql.DB {
 	return r.db
 }

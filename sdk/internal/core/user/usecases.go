@@ -8,17 +8,17 @@ import (
 	ports "github.com/devpablocristo/golang/sdk/internal/core/user/ports"
 )
 
-type userUseCases struct {
+type useCases struct {
 	repository ports.Repository
 }
 
-func NewUserUseCases(r ports.Repository) ports.UserUseCases {
-	return &userUseCases{
+func NewUseCases(r ports.Repository) ports.UseCases {
+	return &useCases{
 		repository: r,
 	}
 }
 
-func (u *userUseCases) GetUser(ctx context.Context, ID string) (*entities.User, error) {
+func (u *useCases) GetUser(ctx context.Context, ID string) (*entities.User, error) {
 	user, err := u.repository.GetUser(ctx, ID)
 	if err != nil {
 		return nil, err
@@ -26,28 +26,28 @@ func (u *userUseCases) GetUser(ctx context.Context, ID string) (*entities.User, 
 	return user, nil
 }
 
-func (u *userUseCases) GetUserUUID(ctx context.Context, username, passwordHash string) (string, error) {
+func (u *useCases) GetUserUUID(ctx context.Context, username, passwordHash string) (string, error) {
 	return "0001", nil
 }
 
-func (u *userUseCases) DeleteUser(ctx context.Context, ID string) error {
+func (u *useCases) DeleteUser(ctx context.Context, ID string) error {
 	return u.repository.DeleteUser(ctx, ID)
 }
 
-func (u *userUseCases) ListUsers(ctx context.Context) (*entities.InMemDB, error) {
+func (u *useCases) ListUsers(ctx context.Context) (*entities.InMemDB, error) {
 	db, err := u.repository.ListUsers(ctx)
 	return db, err
 }
 
-func (u *userUseCases) UpdateUser(ctx context.Context, usr *entities.User, ID string) error {
+func (u *useCases) UpdateUser(ctx context.Context, usr *entities.User, ID string) error {
 	return u.repository.UpdateUser(ctx, usr, ID)
 }
 
-func (u *userUseCases) CreateUser(ctx context.Context, ucs *entities.User) error {
+func (u *useCases) CreateUser(ctx context.Context, ucs *entities.User) error {
 	return u.repository.SaveUser(ctx, ucs)
 }
 
-func (u *userUseCases) PublishMessage(ctx context.Context, msg string) (string, error) {
+func (u *useCases) PublishMessage(ctx context.Context, msg string) (string, error) {
 	fmt.Println("Message:", msg)
 	return msg, nil
 }

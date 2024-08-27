@@ -12,11 +12,11 @@ import (
 )
 
 type GinHandler struct {
-	ucs       ports.UserUseCases
+	ucs       ports.UseCases
 	ginServer sdkgin.Server
 }
 
-func NewGinHandler(u ports.UserUseCases, ginServer sdkgin.Server) *GinHandler {
+func NewGinHandler(u ports.UseCases, ginServer sdkgin.Server) *GinHandler {
 	return &GinHandler{
 		ucs:       u,
 		ginServer: ginServer,

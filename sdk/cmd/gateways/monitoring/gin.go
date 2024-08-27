@@ -12,51 +12,61 @@ import (
 )
 
 type GinHandler struct {
-	ucs       ports.UserUseCases
-	ginServer sdkgin.Server
+	ucs ports.UseCases
+	gs  sdkgin.Server
 }
 
-func NewGinHandler(u ports.UserUseCases, ginServer sdkgin.Server) *GinHandler {
+func NewGinHandler(u ports.UseCases, s sdkgin.Server) *GinHandler {
 	return &GinHandler{
-		ucs:       u,
-		ginServer: ginServer,
+		ucs: u,
+		gs:  s,
 	}
 }
 
 func (h *GinHandler) Start(apiVersion string) error {
 	h.Routes(apiVersion)
-	return h.ginServer.RunServer()
+	return h.gs.RunServer()
 }
 
 func (h *GinHandler) Routes(apiVersion string) {
-	r := h.ginServer.GetRouter()
+	r := h.gs.GetRouter()
 
-	pprof.Register(r) // Registra las rutas de pprof en el enrutador de Gin
+	// Registra las rutas de pprof en el enrutador de Gin
+	pprof.Register(r)
 
-	// Ruta de Salud
-	r.GET("/health", h.Health)
-	r.GET("/ping", h.Ping)
+	apiPrefix := "/api/" + apiVersion
+
+	// Rutas de Salud
+	r.GET(apiPrefix+"/health", h.Health)
+	r.GET(apiPrefix+"/db-health", h.DbHealth)
+	r.GET(apiPrefix+"/ping", h.Ping)
 
 	// Prometheus
-	r.GET("/metrics", h.ginServer.WrapH(promhttp.Handler()))
-
-	// TODO: Falta Kong
+	r.GET("/metrics", h.gs.WrapH(promhttp.Handler()))
 }
 
 // Health verifica el estado del servicio y la conexión a la base de datos
 func (h *GinHandler) Health(c *gin.Context) {
-	// TODO: Implementar la verificación de la conexión a la base de datos
-	// dbErr := h.ucs.CheckDatabaseConnection()
-	// if dbErr != nil {
-	//     c.JSON(http.StatusServiceUnavailable, gin.H{
-	//         "status": "DOWN",
-	//         "database": "unreachable",
-	//     })
-	//     return
-	// }
-
 	c.JSON(http.StatusOK, gin.H{
-		"status": "up",
+		"status": "UP",
+	})
+}
+
+func (h *GinHandler) DbHealth(c *gin.Context) {
+	// Verificar la conexión a la base de datos
+	dbErr := h.ucs.CheckDbConn(c.Request.Context())
+	if dbErr != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"status":   "DOWN",
+			"database": "unreachable",
+		})
+		return
+	}
+
+	// Si la base de datos está accesible
+	c.JSON(http.StatusOK, gin.H{
+		"status":   "UP",
+		"database": "reachable",
 	})
 }
 

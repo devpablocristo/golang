@@ -12,12 +12,6 @@ import (
 	sdkmapdbports "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb/ports"
 )
 
-// notas implementacion:
-// instancia := setup
-// repo := repo(instancia)
-// usecases =usecases(repo)
-// handler:= handler(usecases)
-// reg(handler) <-- grpc
 
 type mapDbRepository struct {
 	service sdkmapdbports.Repository

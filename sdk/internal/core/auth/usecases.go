@@ -8,17 +8,17 @@ import (
 	ports "github.com/devpablocristo/golang/sdk/internal/core/auth/ports"
 )
 
-type useAuthCases struct {
+type useCases struct {
 	accessControl ports.AccessControl
 }
 
-func NewAuthUseCases(ac ports.AccessControl) ports.AuthUseCases {
-	return &useAuthCases{
+func NewUseCases(ac ports.AccessControl) ports.UseCases {
+	return &useCases{
 		accessControl: ac,
 	}
 }
 
-func (s *useAuthCases) Login(ctx context.Context, credentials *entities.LoginCredentials) (*entities.Token, error) {
+func (s *useCases) Login(ctx context.Context, credentials *entities.LoginCredentials) (*entities.Token, error) {
 	// _, err := s.messageBroker.GetUserUUID(ctx, credentials)
 	// if err != nil {
 	// 	return nil, err
