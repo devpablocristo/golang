@@ -6,6 +6,8 @@ import (
 	gtwmon "github.com/devpablocristo/golang/sdk/cmd/gateways/monitoring"
 	coremon "github.com/devpablocristo/golang/sdk/internal/core/monitoring"
 	sdkviper "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
+	sdkmysql "github.com/devpablocristo/golang/sdk/pkg/databases/mysql/go-sql-driver"
+	portsmysql "github.com/devpablocristo/golang/sdk/pkg/databases/mysql/go-sql-driver/ports"
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
 	portsgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
