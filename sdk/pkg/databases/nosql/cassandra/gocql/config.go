@@ -13,7 +13,7 @@ type config struct {
 	password string
 }
 
-func NewConfig(hosts []string, keyspace string, username string, password string) ports.Config {
+func newConfig(hosts []string, keyspace string, username string, password string) ports.Config {
 	h := make([]string, len(hosts))
 	copy(h, hosts)
 	return &config{

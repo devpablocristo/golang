@@ -1,4 +1,4 @@
-package sdkggrpcclient
+package sdkclient
 
 import (
 	"crypto/tls"

@@ -7,7 +7,7 @@ import (
 )
 
 func Bootstrap() (ports.Repository, error) {
-	config := NewConfig(
+	config := newConfig(
 		viper.GetStringSlice("CASSANDRA_HOSTS"),
 		viper.GetString("CASSANDRA_KEYSPACE"),
 		viper.GetString("CASSANDRA_USERNAME"),
@@ -18,5 +18,5 @@ func Bootstrap() (ports.Repository, error) {
 		return nil, err
 	}
 
-	return NewRepository(config)
+	return newRepository(config)
 }

@@ -1,1 +1,1 @@
-go-micro, consul, gin
+go-micro, consul, gin, mapdb

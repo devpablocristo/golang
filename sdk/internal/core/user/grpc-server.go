@@ -7,18 +7,18 @@ import (
 	pb "github.com/devpablocristo/golang/sdk/pb"
 )
 
-type GgrpcServer struct {
+type Server struct {
 	pb.UnimplementedUserServiceServer
 	ucs ports.UserUseCases
 }
 
-func NewGgrpcServer(ucs ports.UserUseCases) *GgrpcServer {
-	return &GgrpcServer{
+func NewServer(ucs ports.UserUseCases) *Server {
+	return &Server{
 		ucs: ucs,
 	}
 }
 
-func (s *GgrpcServer) GetUserUUID(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
+func (s *Server) GetUserUUID(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 
 	userUUID, err := s.ucs.GetUserUUID(ctx, req.Username, req.PasswordHash)
 	if err != nil {

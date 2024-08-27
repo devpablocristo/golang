@@ -1,12 +1,13 @@
-package sdkggrpcclient
+package sdkcserver
 
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/grpc/google/client/ports"
+	ports "github.com/devpablocristo/golang/sdk/pkg/grpc/google/server/ports"
 )
 
-func Bootstrap() (ports.Client, error) {
+// Bootstrap inicializa y devuelve una instancia de servidor gRPC
+func Bootstrap() (ports.Server, error) {
 	config := newConfig(
 		viper.GetString("GRPC_SERVER_HOST"),
 		viper.GetInt("GRPC_SERVER_PORT"),
@@ -17,5 +18,5 @@ func Bootstrap() (ports.Client, error) {
 		return nil, err
 	}
 
-	return newClient(config)
+	return newServer(config)
 }

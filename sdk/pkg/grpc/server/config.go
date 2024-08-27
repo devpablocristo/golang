@@ -1,4 +1,4 @@
-package sdkggrpccserver
+package sdkcserver
 
 import (
 	"crypto/tls"

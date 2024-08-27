@@ -1,4 +1,4 @@
-package sdkggrpcclient
+package sdkclient
 
 import (
 	"context"
@@ -18,8 +18,8 @@ var (
 	clientInitErr  error
 )
 
-// ggrpcClient estructura que representa un cliente gRPC
-type ggrpcClient struct {
+// Client estructura que representa un cliente gRPC
+type Client struct {
 	conn *grpc.ClientConn
 }
 
@@ -45,13 +45,13 @@ func newClient(config ports.Config) (ports.Client, error) {
 			return
 		}
 
-		clientInstance = &ggrpcClient{conn: conn}
+		clientInstance = &Client{conn: conn}
 	})
 	return clientInstance, clientInitErr
 }
 
 // Implementación de GetConnection
-func (client *ggrpcClient) GetConnection() (*grpc.ClientConn, error) {
+func (client *Client) GetConnection() (*grpc.ClientConn, error) {
 	if client.conn == nil {
 		return nil, fmt.Errorf("gRPC client connection is not initialized")
 	}
@@ -66,10 +66,10 @@ func GetClientInstance() (ports.Client, error) {
 	return clientInstance, nil
 }
 
-func (client *ggrpcClient) InvokeMethod(ctx context.Context, method string, request, response any) error {
+func (client *Client) InvokeMethod(ctx context.Context, method string, request, response any) error {
 	return client.conn.Invoke(ctx, method, request, response)
 }
 
-func (client *ggrpcClient) Close() error {
+func (client *Client) Close() error {
 	return client.conn.Close()
 }

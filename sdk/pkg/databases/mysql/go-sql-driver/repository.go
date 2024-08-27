@@ -1,50 +1,46 @@
-package gosqldriver
+package sdkmysql
 
 import (
 	"database/sql"
 	"fmt"
 	"sync"
 
+	"github.com/devpablocristo/golang/sdk/pkg/databases/mysql/go-sql-driver/ports"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
-	instance  MySQLClientPort
+	instance  ports.Repository
 	once      sync.Once
 	initError error
 )
 
-type MySQLClientPort interface {
-	DB() *sql.DB
-	Close()
-}
-
-type MySQLClient struct {
+type Repository struct {
 	db *sql.DB
 }
 
-func InitializeMySQLClient(config MySQLClientConfig) error {
+func newRepository(c config) (ports.Repository, error) {
 	once.Do(func() {
-		client := &MySQLClient{}
-		initError = client.connect(config)
+		client := &Repository{}
+		initError = client.connect(c)
 		if initError != nil {
 			instance = nil
 		} else {
 			instance = client
 		}
 	})
-	return initError
+	return instance, initError
 }
 
-func GetMySQLInstance() (MySQLClientPort, error) {
+func GetInstance() (ports.Repository, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("MySQL client is not initialized")
 	}
 	return instance, nil
 }
 
-func (client *MySQLClient) connect(config MySQLClientConfig) error {
-	dsn := config.dsn()
+func (r *Repository) connect(c config) error {
+	dsn := c.dsn()
 	conn, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return fmt.Errorf("failed to connect to MySQL: %w", err)
@@ -52,16 +48,16 @@ func (client *MySQLClient) connect(config MySQLClientConfig) error {
 	if err := conn.Ping(); err != nil {
 		return fmt.Errorf("failed to ping MySQL: %w", err)
 	}
-	client.db = conn
+	r.db = conn
 	return nil
 }
 
-func (client *MySQLClient) Close() {
-	if client.db != nil {
-		client.db.Close()
+func (r *Repository) Close() {
+	if r.db != nil {
+		r.db.Close()
 	}
 }
 
-func (client *MySQLClient) DB() *sql.DB {
-	return client.db
+func (r *Repository) DB() *sql.DB {
+	return r.db
 }

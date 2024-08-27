@@ -7,15 +7,38 @@ import (
 
 	entities "github.com/devpablocristo/golang/sdk/internal/core/user/entities"
 	ports "github.com/devpablocristo/golang/sdk/internal/core/user/ports"
+	mware "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
+	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
 
 type GinHandler struct {
-	ucs ports.UserUseCases
+	ucs       ports.UserUseCases
+	ginServer sdkgin.Server
 }
 
-func NewGinHandler(u ports.UserUseCases) *GinHandler {
+func NewGinHandler(u ports.UserUseCases, ginServer sdkgin.Server) *GinHandler {
 	return &GinHandler{
-		ucs: u,
+		ucs:       u,
+		ginServer: ginServer,
+	}
+}
+func (h *GinHandler) Start(apiVersion string, secret string) error {
+	h.Routes(apiVersion, secret)
+	return h.ginServer.RunServer()
+}
+
+func (h *GinHandler) Routes(apiVersion string, secret string) {
+	router := h.ginServer.GetRouter()
+
+	apiPrefix := "/api/" + apiVersion
+
+	router.GET(apiPrefix+"/health", h.Health)
+
+	s := secret
+	authorized := router.Group(apiPrefix + "/user/protected")
+	authorized.Use(mware.JWTAuthMiddleware(s))
+	{
+		authorized.GET("/user-protected", h.CreateUser)
 	}
 }
 
@@ -75,4 +98,8 @@ func (h *GinHandler) DeleteUser(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusNoContent)
+}
+
+func (h *GinHandler) Health(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "healthy"})
 }

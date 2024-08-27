@@ -1,4 +1,4 @@
-package sdkggrpccserver
+package sdkcserver
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ var (
 	serverInitErr  error
 )
 
-type ggrpcServer struct {
+type Server struct {
 	server   *grpc.Server
 	listener net.Listener
 }
@@ -45,7 +45,7 @@ func newServer(config ports.Config) (ports.Server, error) {
 		server := grpc.NewServer(opts...)
 		reflection.Register(server) // Registro de reflexión gRPC
 
-		serverInstance = &ggrpcServer{server: server, listener: listener}
+		serverInstance = &Server{server: server, listener: listener}
 	})
 	return serverInstance, serverInitErr
 }
@@ -58,15 +58,15 @@ func GetServerInstance() (ports.Server, error) {
 	return serverInstance, nil
 }
 
-func (s *ggrpcServer) Start() error {
+func (s *Server) Start() error {
 	return s.server.Serve(s.listener)
 }
 
-func (s *ggrpcServer) Stop() error {
+func (s *Server) Stop() error {
 	s.server.GracefulStop()
 	return s.listener.Close()
 }
 
-func (s *ggrpcServer) RegisterService(serviceDesc *grpc.ServiceDesc, impl any) {
+func (s *Server) RegisterService(serviceDesc *grpc.ServiceDesc, impl any) {
 	s.server.RegisterService(serviceDesc, impl)
 }

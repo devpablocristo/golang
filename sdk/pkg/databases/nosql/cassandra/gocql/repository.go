@@ -19,7 +19,7 @@ type Repository struct {
 	session *gocql.Session
 }
 
-func NewRepository(config ports.Config) (ports.Repository, error) {
+func newRepository(config ports.Config) (ports.Repository, error) {
 	once.Do(func() {
 		client := &Repository{}
 		initError = client.Connect(config)

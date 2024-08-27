@@ -1,13 +1,14 @@
-package mysqlsetup
+package sdkmysql
 
 import (
 	"github.com/spf13/viper"
 
-	gosqldriver "github.com/devpablocristo/golang/sdk/pkg/mysql/go-sql-driver"
+	"github.com/devpablocristo/golang/sdk/pkg/databases/mysql/go-sql-driver/ports"
 )
 
-func NewMySQLInstance() (gosqldriver.MySQLClientPort, error) {
-	config := gosqldriver.MySQLClientConfig{
+// Bootstrap inicializa la configuración y crea una instancia de repositorio MySQL.
+func Bootstrap() (ports.Repository, error) {
+	config := config{
 		User:     viper.GetString("MYSQL_USER"),
 		Password: viper.GetString("MYSQL_PASSWORD"),
 		Host:     viper.GetString("MYSQL_HOST"),
@@ -19,9 +20,5 @@ func NewMySQLInstance() (gosqldriver.MySQLClientPort, error) {
 		return nil, err
 	}
 
-	if err := gosqldriver.InitializeMySQLClient(config); err != nil {
-		return nil, err
-	}
-
-	return gosqldriver.GetMySQLInstance()
+	return newRepository(config)
 }

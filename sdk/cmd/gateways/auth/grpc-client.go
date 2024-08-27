@@ -5,15 +5,15 @@ import (
 	"fmt"
 
 	pb "github.com/devpablocristo/golang/sdk/pb"
-	sdkggrpc "github.com/devpablocristo/golang/sdk/pkg/grpc/google/client/ports"
+	sdk "github.com/devpablocristo/golang/sdk/pkg/grpc/google/client/ports"
 )
 
 type GrpcClient struct {
 	client pb.UserServiceClient
-	conn   sdkggrpc.Client
+	conn   sdk.Client
 }
 
-func NewGrpcClient(grpcClient sdkggrpc.Client) (*GrpcClient, error) {
+func NewGrpcClient(grpcClient sdk.Client) (*GrpcClient, error) {
 	conn, err := grpcClient.GetConnection()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get gRPC connection: %v", err)
