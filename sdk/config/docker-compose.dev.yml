@@ -323,8 +323,8 @@ services:
     image: "rabbitmq:4.0.0-beta.3-management-alpine"
     container_name: rabbitmq
     environment:
-      - RABBITMQ_USER=${RABBITMQ_USER:-user}
-      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-password}
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
       - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_VHOST:-/}
     ports:
       - "${RABBITMQ_PORT:-5672}:${RABBITMQ_TARGET_PORT:-5672}"

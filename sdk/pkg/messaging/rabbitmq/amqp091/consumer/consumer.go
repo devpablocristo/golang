@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"sync"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/consumer/ports"
 	"github.com/rabbitmq/amqp091-go"
+
+	ports "github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/consumer/ports"
 )
 
 var (

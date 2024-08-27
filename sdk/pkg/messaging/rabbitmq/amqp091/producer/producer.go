@@ -8,8 +8,9 @@ import (
 	"sync"
 	"time"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/producer/ports"
 	"github.com/rabbitmq/amqp091-go"
+
+	ports "github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/producer/ports"
 )
 
 var (
