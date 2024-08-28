@@ -14,7 +14,11 @@ import (
 	portsgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
 
+// INFO: esta API es mas general de todas, donde en teoria deberia correr TODO lo posible a la vez.
+// INFO: corresponde al servicio de docker compose "golang-sdk"
+// INFO: este el unico que funciona correctamente de todos hasta ahora, esta posicion, monitoring y go-micro, ambos levantan bien, pero siempre y cuando sea en esta posicion.
 func init() {
+	// hola
 	if err := sdkviper.LoadConfig(); err != nil {
 		log.Fatalf("Viper Service error: %v", err)
 	}

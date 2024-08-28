@@ -87,6 +87,38 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - golang-sdk
+
+  monitoring-api:
+    container_name: "monitoring-api"
+    build:
+      context: ..
+      dockerfile: config/Dockerfile.dev
+    image: "monitoring-api:${APP_VERSION:-1.0}"
+    working_dir: /app/cmd/examples/monitoring
+    command: go run main.go
+    ports:
+      - "${ROUTER_PORT:-8080}:${ROUTER_TARGET_PORT:-8080}"
+      - "${DELVE_PORT:-2345}:${DELVE_TARGET_PORT:-2345}"
+    volumes:
+      - type: bind
+        source: ..
+        target: /app
+    environment:
+      - APP_NAME=monitoring-api
+      - APP_VERSION=${APP_VERSION:-1.0}
+      - DEBUG=${DEBUG:-true}
+      - PROMETHEUS_URL=http://prometheus:9090
+    depends_on:
+      - mysql
+      - prometheus
+      - grafana
+    networks:
+      - app-network
+    restart: on-failure
+    profiles:
+      - monitoring      
 
   postgres:
     image: postgres:16.3
@@ -199,7 +231,7 @@ services:
       - mysql
     networks:
       - app-network
-    restart: on-failure
+    restart: on-failure 
 
   prometheus:
     image: prom/prometheus:v2.45.6
@@ -274,8 +306,6 @@ services:
       - "${NGROK_PORT:-5050}:${NGROK_PORT:-5050}"
     networks:
       - app-network
-    depends_on:
-      - golang-sdk
     restart: on-failure
 
   kong-migrations:
@@ -364,7 +394,7 @@ services:
       - app-network
     restart: on-failure
     cap_add:
-      - IPC_LOCK    
+      - IPC_LOCK      
 
 networks:
   app-network:

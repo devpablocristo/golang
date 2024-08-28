@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	if err := sdkviper.LoadConfig(); err != nil {
+	if err := sdkviper.LoadConfig("../../../"); err != nil {
 		log.Fatalf("Viper Service error: %v", err)
 	}
 }

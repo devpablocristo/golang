@@ -73,14 +73,14 @@ lint:
 	@echo "Linting the project..."
 	@golangci-lint run --config .golangci.yml --verbose
 
-# INFO: no funcionan estos comandos, revisar mas adelante
+# INFO: solo monitoring fue configurado
+# FIXME: el debugger se cae tras 1 segundo
 # Monitoring example
 monitoring:
 	@echo "Running monitoring example..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml up --build
-	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml exec ${APP_NAME} go run ./cmd/examples/monitoring/main.go
-
+	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile monitoring up --build
+	
 # gRPC example
 grpc:
 	@echo "Running gRPC example..."
@@ -95,8 +95,6 @@ go-micro:
 rabbitmq:
 	@echo "Running RabbitMQ example..."
 	docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml run --rm --build golang-sdk go run ./cmd/examples/rabbitmq/main.go
-
-# INFO: fin comandos
 
 # include .env.example
 # export
