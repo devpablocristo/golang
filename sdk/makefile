@@ -75,26 +75,16 @@ lint:
 
 # INFO: solo monitoring fue configurado
 # FIXME: el debugger se cae tras 1 segundo
-# Monitoring example
-monitoring:
-	@echo "Running monitoring example..."
+monitoring-up:
+	@echo "Running monitoring API..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile monitoring up --build
-	
-# gRPC example
-grpc:
-	@echo "Running gRPC example..."
-	docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml run --rm --build golang-sdk go run ./cmd/examples/grpc/server/main.go
+	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile monitoring up
 
-# Go-micro example
-go-micro:
-	@echo "Running go-micro example..."
-	docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml exec ${APP_NAME} go run ./cmd/examples/go-micro/main.go
+sdk-up:
+	@echo "Running cmd API..."
+	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
+	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile golang-sdk up
 
-# RabbitMQ example
-rabbitmq:
-	@echo "Running RabbitMQ example..."
-	docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml run --rm --build golang-sdk go run ./cmd/examples/rabbitmq/main.go
 
 # include .env.example
 # export

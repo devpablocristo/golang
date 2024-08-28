@@ -96,8 +96,8 @@ services:
       context: ..
       dockerfile: config/Dockerfile.dev
     image: "monitoring-api:${APP_VERSION:-1.0}"
-    working_dir: /app/cmd/examples/monitoring
-    command: go run main.go
+    # working_dir: /app/cmd/examples/monitoring
+    # command: go run main.go
     ports:
       - "${ROUTER_PORT:-8080}:${ROUTER_TARGET_PORT:-8080}"
       - "${DELVE_PORT:-2345}:${DELVE_TARGET_PORT:-2345}"
