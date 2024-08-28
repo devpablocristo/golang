@@ -1,12 +1,12 @@
 version: "3.8"
 
 services:
-  golang-sdk:
-    container_name: "${APP_NAME:-golang-sdk}"
+  initial-api:
+    container_name: "initial"
     build:
       context: ..
       dockerfile: config/Dockerfile.dev
-    image: "${APP_NAME:-golang-sdk}:${APP_VERSION:-1.0}"
+    image: "initial-api:${APP_VERSION:-1.0}"
     ports:
       - "${ROUTER_PORT:-8080}:${ROUTER_TARGET_PORT:-8080}"
       - "${DELVE_PORT:-2345}:${DELVE_TARGET_PORT:-2345}"
@@ -21,6 +21,7 @@ services:
       - APP_NAME=${APP_NAME:-golang-sdk}
       - APP_VERSION=${APP_VERSION:-1.0}
       - DEBUG=${DEBUG:-true}
+      - MAIN_DIR=${MAIN_DIR:-/app/cmd/examples/initial/main.go} # INFO: configurar en cada servicio
       - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
       - POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT:-5432}
       - POSTGRES_DATABASE=${POSTGRES_DATABASE:-dev_events_db}
@@ -88,16 +89,104 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - golang-sdk
+      - initial
+
+  go-micro-api:
+    container_name: "go-micro"
+    build:
+      context: ..
+      dockerfile: config/Dockerfile.dev
+    image: "go-micro-api:${APP_VERSION:-1.0}"
+    ports:
+      - "${ROUTER_PORT:-8080}:${ROUTER_TARGET_PORT:-8080}"
+      - "${DELVE_PORT:-2345}:${DELVE_TARGET_PORT:-2345}"
+    volumes:
+      - type: bind
+        source: ..
+        target: /app
+      - type: bind
+        source: ../migrations
+        target: /app/migrations
+    environment:
+      - APP_NAME=${APP_NAME:-golang-sdk}
+      - APP_VERSION=${APP_VERSION:-1.0}
+      - DEBUG=${DEBUG:-true}
+      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
+      - POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT:-5432}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE:-dev_events_db}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME:-postgres}
+      - POSTGRES_USER_PASSWORD=${POSTGRES_USER_PASSWORD:-root}
+      - CONSUL_ADDRESS=${CONSUL_ADDRESS:-consul:8500}
+      - CONSUL_ID=${CONSUL_ID:-ms-1}
+      - CONSUL_NAME=${CONSUL_NAME:-golang-sdk}
+      - CONSUL_SERVICE_NAME=${CONSUL_SERVICE_NAME:-golang-sdk}
+      - CONSUL_HEALTH_CHECK=${CONSUL_HEALTH_CHECK:-http://golang-sdk:8080/health}
+      - CONSUL_CHECK_INTERVAL=${CONSUL_CHECK_INTERVAL:-10s}
+      - CONSUL_CHECK_TIMEOUT=${CONSUL_CHECK_TIMEOUT:-1s}
+      - CONSUL_PORT=${CONSUL_PORT:-8500}
+      - CONSUL_TAGS=${CONSUL_TAGS:-version:v1,env:development,team:backend}
+      - CASSANDRA_HOST=${CASSANDRA_HOST:-cassandra}
+      - CASSANDRA_PORT=${CASSANDRA_PORT:-9042}
+      - CASSANDRA_USERNAME=${CASSANDRA_USERNAME:-cassandra}
+      - CASSANDRA_PASSWORD=${CASSANDRA_PASSWORD:-cassandra}
+      - CASSANDRA_KEYSPACE=${CASSANDRA_KEYSPACE:-dev_keyspace}
+      - CASSANDRA_REPLICATION_FACTOR=${CASSANDRA_REPLICATION_FACTOR:-3}
+      - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME:-CassandraCluster}
+      - CASSANDRA_DC=${CASSANDRA_DC:-datacenter1}
+      - CASSANDRA_RACK=${CASSANDRA_RACK:-rack1}
+      - CASSANDRA_ENDPOINT_SNITCH=${CASSANDRA_ENDPOINT_SNITCH:-GossipingPropertyFileSnitch}
+      - REDIS_ADDRESS=${REDIS_ADDRESS:-redis:6379}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-defaultpassword}
+      - REDIS_DB=${REDIS_DB:-0}
+      - MYSQL_HOST=${MYSQL_HOST:-mysql}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-dev_events_db}
+      - MYSQL_USER=${MYSQL_USER:-root}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-root}
+      - PYROSCOPE_SERVER_ADDRESS=${PYROSCOPE_SERVER_ADDRESS:-http://pyroscope-server:4040}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-rootpassword}
+      - MONGO_HOST=${MONGO_HOST:-mongodb}
+      - MONGO_PORT=${MONGO_PORT:-27017}
+      - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}      
+      - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}          
+      - RABBITMQ_MANAGEMENT_PORT=${RABBITMQ_MANAGEMENT_PORT:-15672} 
+      - RABBITMQ_USER=${RABBITMQ_USER:-guest}        
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}    
+      - RABBITMQ_VHOST=${RABBITMQ_VHOST:-/} 
+      - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT:-http://dynamodb:8765} 
+      - DYNAMODB_PORT=${DYNAMODB_PORT:-8765}          
+      - DYNAMODB_REGION=${DYNAMODB_REGION:-us-west-2} 
+      - GOMICRO_RPC_SERVICE_NAME=${GOMICRO_RPC_SERVICE_NAME:-golang-sdk-rpc}
+      - GOMICRO_RPC_SERVICE_ADDRESS=${GOMICRO_RPC_SERVICE_ADDRESS:-8082}
+      - GOMICRO_WEB_SERVICE_NAME=${GOMICRO_WEB_SERVICE_NAME:-golang-sdk-web}
+      - GOMICRO_WEB_SERVICE_ADDRESS=${GOMICRO_WEB_SERVICE_ADDRESS:-8080}
+      - MAIN_DIR=${MAIN_DIR:-/app/cmd/examples/go-micro/main.go} 
+    depends_on:
+      - postgres
+      - consul
+      - cassandra
+      - mysql
+      - redis
+      - prometheus
+      - grafana
+      - pyroscope
+      - mongodb
+      - rabbitmq
+      - dynamodb
+    networks:
+      - app-network
+    restart: on-failure
+    profiles:
+      - go-micro      
 
   monitoring-api:
-    container_name: "monitoring-api"
+    container_name: "monitoring"
     build:
       context: ..
       dockerfile: config/Dockerfile.dev
     image: "monitoring-api:${APP_VERSION:-1.0}"
-    # working_dir: /app/cmd/examples/monitoring
-    # command: go run main.go
     ports:
       - "${ROUTER_PORT:-8080}:${ROUTER_TARGET_PORT:-8080}"
       - "${DELVE_PORT:-2345}:${DELVE_TARGET_PORT:-2345}"

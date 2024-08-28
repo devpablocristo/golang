@@ -7,13 +7,10 @@ VERSION := 1.0
 BUILD_DIR := ${ROOT_DIR}/bin
 CONFIG_DIR := ${ROOT_DIR}/config
 SCRIPTS_DIR := ${ROOT_DIR}/scripts
-
-# Examples directory for APIs
 EXAMPLES_DIR := /app/cmd/examples
 
-
 # Phony targets
-.PHONY: all build run test docker-up docker-down clean lint
+.PHONY: all build run test docker-up docker-build docker-down clean lint initial-up initial-build initial-down monitoring-up monitoring-build monitoring-down go-micro-up go-micro-build go-micro-down
 
 # Default target
 all: build run
@@ -34,20 +31,48 @@ test:
 	@echo "Running tests..."
 	@go test ./...
 
-# Docker targets for Monitoring API
-monitoring-up:
-	@echo "Starting Monitoring API in dev mode..."
+# Generic Docker commands
+docker-up:
+	@echo "Starting $(PROFILE) API in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/monitoring/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile monitoring up
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile $(PROFILE) up
+
+docker-build:
+	@echo "Building $(PROFILE) API in dev mode..."
+	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile $(PROFILE) up --build
+
+docker-down:
+	@echo "Stopping $(PROFILE) API in dev mode..."
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile $(PROFILE) down --remove-orphans
+
+# Specific Docker targets using generic commands
+initial-up:
+	@$(MAKE) docker-up PROFILE=initial
+
+initial-build:
+	@$(MAKE) docker-build PROFILE=initial
+
+initial-down:
+	@$(MAKE) docker-down PROFILE=initial
+
+monitoring-up:
+	@$(MAKE) docker-up PROFILE=monitoring
 
 monitoring-build:
-	@echo "Building Monitoring API in dev mode..."
-	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/monitoring/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile monitoring up --build
+	@$(MAKE) docker-build PROFILE=monitoring
 
 monitoring-down:
-	@echo "Stopping Monitoring API in dev mode..."
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/monitoring/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile monitoring down --remove-orphans
+	@$(MAKE) docker-down PROFILE=monitoring
+
+go-micro-up:
+	@$(MAKE) docker-up PROFILE=go-micro
+
+go-micro-build:
+	@$(MAKE) docker-build PROFILE=go-micro
+
+go-micro-down:
+	@$(MAKE) docker-down PROFILE=go-micro
 
 # Clean target
 clean:
