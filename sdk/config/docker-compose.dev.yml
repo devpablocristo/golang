@@ -18,10 +18,10 @@ services:
         source: ../migrations
         target: /app/migrations
     environment:
+      - MAIN_DIR=/app/cmd/examples/initial/main.go
       - APP_NAME=${APP_NAME:-golang-sdk}
       - APP_VERSION=${APP_VERSION:-1.0}
       - DEBUG=${DEBUG:-true}
-      - MAIN_DIR=${MAIN_DIR:-/app/cmd/examples/initial/main.go} # INFO: configurar en cada servicio
       - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
       - POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT:-5432}
       - POSTGRES_DATABASE=${POSTGRES_DATABASE:-dev_events_db}
@@ -108,6 +108,7 @@ services:
         source: ../migrations
         target: /app/migrations
     environment:
+      - MAIN_DIR=/app/cmd/examples/go-micro/main.go
       - APP_NAME=${APP_NAME:-golang-sdk}
       - APP_VERSION=${APP_VERSION:-1.0}
       - DEBUG=${DEBUG:-true}
@@ -162,7 +163,6 @@ services:
       - GOMICRO_RPC_SERVICE_ADDRESS=${GOMICRO_RPC_SERVICE_ADDRESS:-8082}
       - GOMICRO_WEB_SERVICE_NAME=${GOMICRO_WEB_SERVICE_NAME:-golang-sdk-web}
       - GOMICRO_WEB_SERVICE_ADDRESS=${GOMICRO_WEB_SERVICE_ADDRESS:-8080}
-      - MAIN_DIR=${MAIN_DIR:-/app/cmd/examples/go-micro/main.go} 
     depends_on:
       - postgres
       - consul
@@ -195,11 +195,11 @@ services:
         source: ..
         target: /app
     environment:
+      - MAIN_DIR=/app/cmd/examples/monitoring/main.go
       - APP_NAME=monitoring-api
       - APP_VERSION=${APP_VERSION:-1.0}
       - DEBUG=${DEBUG:-true}
       - PROMETHEUS_URL=http://prometheus:9090
-      - MAIN_DIR=${MAIN_DIR:-/app/cmd/examples/monitoring/main.go}  # Nueva línea para pasar el directorio
     depends_on:
       - mysql
       - prometheus

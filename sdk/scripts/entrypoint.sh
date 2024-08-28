@@ -36,7 +36,7 @@ validateEnv() {
     exit 1
   fi
 
-  log "Environment variables loaded successfully."
+  log "Environment variables loaded successfully"
   log "App Name: ${APP_NAME}"
   log "Debug: ${DEBUG}"
 }
