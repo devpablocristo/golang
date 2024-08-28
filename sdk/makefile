@@ -8,8 +8,12 @@ BUILD_DIR := ${ROOT_DIR}/bin
 CONFIG_DIR := ${ROOT_DIR}/config
 SCRIPTS_DIR := ${ROOT_DIR}/scripts
 
+# Examples directory for APIs
+EXAMPLES_DIR := /app/cmd/examples
+
+
 # Phony targets
-.PHONY: all build run test docker-build docker-up docker-down docker-dbuild docker-dup docker-ddown clean lint
+.PHONY: all build run test docker-up docker-down clean lint
 
 # Default target
 all: build run
@@ -30,38 +34,20 @@ test:
 	@echo "Running tests..."
 	@go test ./...
 
-# NOTE: tuve cambiar de docker-compose a docker compose por un problema con la version de docker compose para ubuntu 24.04
-# Docker build target
-docker-build:
-	@echo "Building Docker images for production mode..."
-	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.yml up --build
-
-# Docker up target
-docker-up:
-	@echo "Starting Docker containers for production mode..."
-	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.yml up
-
-# Docker down target
-docker-down:
-	@echo "Stopping Docker containers for production mode..."
-	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.yml down --remove-orphans
-
-# Docker build target for dev mode
-docker-dbuild:
-	@echo "Building Docker images for dev mode..."
+# Docker targets for Monitoring API
+monitoring-up:
+	@echo "Starting Monitoring API in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml up --build
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/monitoring/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile monitoring up
 
-# Docker up target for dev mode
-docker-dup:
-	@echo "Starting Docker containers in dev mode..."
+monitoring-build:
+	@echo "Building Monitoring API in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml up
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/monitoring/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile monitoring up --build
 
-# Docker down target for dev mode
-docker-ddown:
-	@echo "Stopping Docker containers in dev mode..."
-	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml down --remove-orphans
+monitoring-down:
+	@echo "Stopping Monitoring API in dev mode..."
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/monitoring/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile monitoring down --remove-orphans
 
 # Clean target
 clean:
@@ -72,84 +58,3 @@ clean:
 lint:
 	@echo "Linting the project..."
 	@golangci-lint run --config .golangci.yml --verbose
-
-# INFO: solo monitoring fue configurado
-# FIXME: el debugger se cae tras 1 segundo
-monitoring-up:
-	@echo "Running monitoring API..."
-	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile monitoring up
-
-sdk-up:
-	@echo "Running cmd API..."
-	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile golang-sdk up
-
-
-# include .env.example
-# export
-
-# # HELP =================================================================================================================
-# # This will output the help for each task
-# # thanks to https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
-# .PHONY: help
-
-# help: ## Display this help screen
-# 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
-
-# compose-up: ### Run docker compose
-# 	docker compose up --build -d postgres rabbitmq && docker compose logs -f
-# .PHONY: compose-up
-
-# compose-up-integration-test: ### Run docker compose with integration test
-# 	docker compose up --build --abort-on-container-exit --exit-code-from integration
-# .PHONY: compose-up-integration-test
-
-# compose-down: ### Down docker compose
-# 	docker compose down --remove-orphans
-# .PHONY: compose-down
-
-# swag-v1: ### swag init
-# 	swag init -g internal/controller/http/v1/router.go
-# .PHONY: swag-v1
-
-# run: swag-v1 ### swag run
-# 	go mod tidy && go mod download && \
-# 	DISABLE_SWAGGER_HTTP_HANDLER='' GIN_MODE=debug CGO_ENABLED=0 go run -tags migrate ./cmd/app
-# .PHONY: run
-
-# docker-rm-volume: ### remove docker volume
-# 	docker volume rm my-hexagonal-go_pg-data
-# .PHONY: docker-rm-volume
-
-# linter-golangci: ### check by golangci linter
-# 	golangci-lint run
-# .PHONY: linter-golangci
-
-# linter-hadolint: ### check by hadolint linter
-# 	git ls-files --exclude='Dockerfile*' --ignored | xargs hadolint
-# .PHONY: linter-hadolint
-
-# linter-dotenv: ### check by dotenv linter
-# 	dotenv-linter
-# .PHONY: linter-dotenv
-
-# test: ### run test
-# 	go test -v -cover -race ./internal/...
-# .PHONY: test
-
-# integration-test: ### run integration-test
-# 	go clean -testcache && go test -v ./integration-test/...
-# .PHONY: integration-test
-
-# mock: ### run mockery
-# 	mockery --all -r --case snake
-# .PHONY: mock
-
-# migrate-create:  ### create new migration
-# 	migrate create -ext sql -dir migrations 'migrate_name'
-# .PHONY: migrate-create
-
-# migrate-up: ### migration up
-# 	migrate -path migrations -database '$(PG_URL)?sslmode=disable' up
-# .PHONY: migrate-up

@@ -44,7 +44,7 @@ validateEnv() {
 # Function to build the server binary
 buildServer() {
   log "Building server binary"
-  go build -gcflags "all=-N -l" -buildvcs=false -o "/app/bin/${APP_NAME}" "/app/cmd/main.go"
+  go build -gcflags "all=-N -l" -buildvcs=false -o "/app/bin/${APP_NAME}" "${MAIN_DIR}"
   # Verify if the binary file has been created and is executable
   if [ -f "/app/bin/${APP_NAME}" ]; then
     log "Binary file created successfully"

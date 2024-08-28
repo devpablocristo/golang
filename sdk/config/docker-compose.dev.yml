@@ -110,6 +110,7 @@ services:
       - APP_VERSION=${APP_VERSION:-1.0}
       - DEBUG=${DEBUG:-true}
       - PROMETHEUS_URL=http://prometheus:9090
+      - MAIN_DIR=${MAIN_DIR:-/app/cmd/examples/monitoring/main.go}  # Nueva línea para pasar el directorio
     depends_on:
       - mysql
       - prometheus
