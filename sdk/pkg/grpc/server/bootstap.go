@@ -3,7 +3,7 @@ package sdkcserver
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/grpc/google/server/ports"
+	ports "github.com/devpablocristo/golang/sdk/pkg/grpc/server/ports"
 )
 
 // Bootstrap inicializa y devuelve una instancia de servidor gRPC
