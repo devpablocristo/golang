@@ -23,7 +23,7 @@ func NewGrpcServer(ucs ports.UseCases, gsv sdkgrpcserverport.Server) *GreeterGrp
 }
 
 func (s *GreeterGrpcServer) Start() error {
-	s.grpcServer.RegisterService(&pb.Greeter_ServiceDesc, s.grpcServer)
+	s.grpcServer.RegisterService(&pb.Greeter_ServiceDesc, s)
 	if err := s.grpcServer.Start(); err != nil {
 		return err
 	}

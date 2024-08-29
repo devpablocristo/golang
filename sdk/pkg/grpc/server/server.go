@@ -3,7 +3,6 @@ package sdkgrpcserver
 import (
 	"fmt"
 	"net"
-	"reflect"
 	"sync"
 
 	"google.golang.org/grpc"
@@ -74,16 +73,6 @@ func (s *Server) RegisterService(serviceDesc any, impl any) {
 		panic("serviceDesc must be of type *grpc.ServiceDesc")
 	}
 
-	// Validar que impl tenga los métodos que sd espera
-	for _, method := range sd.Methods {
-		implType := reflect.TypeOf(impl)
-		methodName := method.MethodName
-		if _, found := implType.MethodByName(methodName); !found {
-			panic("impl does not satisfy the service definition: missing method " + methodName)
-		}
-	}
-
 	// Registrar el servicio con el servidor gRPC
 	s.server.RegisterService(sd, impl)
 }
-
