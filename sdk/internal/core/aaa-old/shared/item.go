@@ -1,4 +1,4 @@
-package utils
+package shared
 
 type Item struct {
 	ItemID   string

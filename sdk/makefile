@@ -11,7 +11,7 @@ EXAMPLES_DIR := /app/cmd/examples
 DOCKER_COMPOSE := docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml
 
 # Phony targets
-.PHONY: all build run test docker-up docker-build docker-down clean lint greeter-server-up greeter-server-build greeter-server-down monitoring-up monitoring-build monitoring-down go-micro-up go-micro-build go-micro-down
+.PHONY: all build run test docker-up docker-build docker-down clean lint greeter-server-up greeter-server-build greeter-server-down monitoring-up monitoring-build monitoring-down go-micro-up go-micro-build go-micro-down start-and-logs
 
 # Default target
 all: build run
@@ -36,53 +36,53 @@ test:
 docker-up:
 	@echo "Starting $(PROFILE) API in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go ${DOCKER_COMPOSE} --profile $(PROFILE) up -d
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go ${DOCKER_COMPOSE} --profile $(PROFILE) up -d && ${DOCKER_COMPOSE} logs -f $(SERVICE_NAME)
 
 docker-build:
 	@echo "Building $(PROFILE) API in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go ${DOCKER_COMPOSE} --profile $(PROFILE) up --build -d
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go ${DOCKER_COMPOSE} --profile $(PROFILE) up --build -d && ${DOCKER_COMPOSE} logs -f $(SERVICE_NAME)
 
 docker-down:
 	@echo "Stopping $(PROFILE) API in dev mode..."
 	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go ${DOCKER_COMPOSE} --profile $(PROFILE) down --remove-orphans
 
 # Specific Docker targets using generic commands
-greeter-server-up: PROFILE = greeter-server
-greeter-server-up: docker-up
+greeter-server-up:
+	@$(MAKE) docker-up PROFILE=greeter-server SERVICE_NAME=greeter-server-api
 
-greeter-server-build: PROFILE = greeter-server
-greeter-server-build: docker-build
+greeter-server-build:
+	@$(MAKE) docker-build PROFILE=greeter-server SERVICE_NAME=greeter-server-api
 
-greeter-server-down: PROFILE = greeter-server
-greeter-server-down: docker-down
+greeter-server-down:
+	@$(MAKE) docker-down PROFILE=greeter-server SERVICE_NAME=greeter-server-api
 
-greeter-client-up: PROFILE = greeter-client
-greeter-client-up: docker-up
+greeter-client-up:
+	@$(MAKE) docker-up PROFILE=greeter-client SERVICE_NAME=greeter-client-api
 
-greeter-client-build: PROFILE = greeter-client
-greeter-client-build: docker-build
+greeter-client-build:
+	@$(MAKE) docker-build PROFILE=greeter-client SERVICE_NAME=greeter-client-api
 
-greeter-client-down: PROFILE = greeter-client
-greeter-client-down: docker-down
+greeter-client-down:
+	@$(MAKE) docker-down PROFILE=greeter-client SERVICE_NAME=greeter-client-api
 
-monitoring-up: PROFILE = monitoring
-monitoring-up: docker-up
+monitoring-up:
+	@$(MAKE) docker-up PROFILE=monitoring SERVICE_NAME=monitoring-api
 
-monitoring-build: PROFILE = monitoring
-monitoring-build: docker-build
+monitoring-build:
+	@$(MAKE) docker-build PROFILE=monitoring SERVICE_NAME=monitoring-api
 
-monitoring-down: PROFILE = monitoring
-monitoring-down: docker-down
+monitoring-down:
+	@$(MAKE) docker-down PROFILE=monitoring SERVICE_NAME=monitoring-api
 
-go-micro-up: PROFILE = go-micro
-go-micro-up: docker-up
+go-micro-up:
+	@$(MAKE) docker-up PROFILE=go-micro SERVICE_NAME=go-micro-api
 
-go-micro-build: PROFILE = go-micro
-go-micro-build: docker-build
+go-micro-build:
+	@$(MAKE) docker-build PROFILE=go-micro SERVICE_NAME=go-micro-api
 
-go-micro-down: PROFILE = go-micro
-go-micro-down: docker-down
+go-micro-down:
+	@$(MAKE) docker-down PROFILE=go-micro SERVICE_NAME=go-micro-api
 
 # Clean target
 clean:
@@ -92,5 +92,4 @@ clean:
 # Lint target
 lint:
 	@echo "Linting the project..."
-	@command -v golangci-lint >/dev/null 2>&1 || { echo >&2 "golangci-lint is not installed. Aborting."; exit 1; }
 	@golangci-lint run --config .golangci.yml --verbose

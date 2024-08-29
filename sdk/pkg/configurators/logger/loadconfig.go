@@ -7,33 +7,40 @@ import (
 )
 
 const (
-	ColorRed    = "\033[31m"
-	ColorYellow = "\033[33m"
-	ColorGreen  = "\033[32m"
-	ColorBlue   = "\033[34m"
-	ColorReset  = "\033[0m"
+	red    = "\033[31m"
+	yellow = "\033[33m"
+	green  = "\033[32m"
+	blue   = "\033[34m"
+	reset  = "\033[0m"
 )
 
-func StdInfo(format string, v ...any) {
-	log.Printf(ColorBlue+format+ColorReset, v...)
+// applyColor applies a color to a string format.
+func applyColor(color, format string) string {
+	return color + format + reset
 }
 
-func StdWarning(format string, v ...any) {
-	log.Printf(ColorYellow+format+ColorReset, v...)
+// Standard log functions using the default log package
+func Info(format string, v ...any) {
+	log.Printf(applyColor(blue, format), v...)
 }
 
-func StdError(format string, v ...any) {
-	log.Printf(ColorRed+format+ColorReset, v...)
+func Warning(format string, v ...any) {
+	log.Printf(applyColor(yellow, format), v...)
 }
 
-func GmInfo(format string, v ...any) {
-	logger.Infof(ColorBlue+format+ColorReset, v...)
+func Error(format string, v ...any) {
+	log.Printf(applyColor(red, format), v...)
 }
 
-func GmWarning(format string, v ...any) {
-	logger.Warnf(ColorYellow+format+ColorReset, v...)
+// Go-Micro log functions using the go-micro logger
+func Minfo(format string, v ...any) {
+	logger.Infof(applyColor(blue, format), v...)
 }
 
-func GmError(format string, v ...any) {
-	logger.Errorf(ColorRed+format+ColorReset, v...)
+func Mwarning(format string, v ...any) {
+	logger.Warnf(applyColor(yellow, format), v...)
+}
+
+func Merror(format string, v ...any) {
+	logger.Errorf(applyColor(red, format), v...)
 }
