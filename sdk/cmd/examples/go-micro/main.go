@@ -22,7 +22,7 @@ func init() {
 
 func main() {
 
-	gomicroService, ginServer, mapdbService := lauchBootstraps()
+	gomicroService, ginServer, mapdbService := setupServices()
 
 	userRepository := coreuser.NewMapDbRepository(mapdbService)
 	userUsecases := coreuser.NewUseCases(userRepository)
@@ -42,7 +42,7 @@ func main() {
 	}
 }
 
-func lauchBootstraps() (portsgm.Service, portsgin.Server, portsmdb.Repository) {
+func setupServices() (portsgm.Service, portsgin.Server, portsmdb.Repository) {
 	gomicroService, err := sdkgomicro.Bootstrap()
 	if err != nil {
 		log.Fatalf("GoMicro Service error: %v", err)

@@ -4,21 +4,22 @@ import (
 	"context"
 	"time"
 
-	"github.com/devpablocristo/golang/sdk/pb"
-	ports "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
+	coreports "github.com/devpablocristo/golang/sdk/internal/core/greeter/ports"
+	pb "github.com/devpablocristo/golang/sdk/pb"
+	sdkports "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
 )
 
-type GrpcClient struct {
-	client ports.Client
+type grpcClient struct {
+	client sdkports.Client
 }
 
-func NewGrpcClient(client ports.Client) *GrpcClient {
-	return &GrpcClient{
-		client: client,
+func NewGrpcClient(c sdkports.Client) coreports.GrpcClient {
+	return &grpcClient{
+		client: c,
 	}
 }
 
-func (c *GrpcClient) SayHello(name string) (string, error) {
+func (c *grpcClient) SayHello(name string) (string, error) {
 	// Crear un contexto con un tiempo de espera
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()

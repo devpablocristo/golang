@@ -8,25 +8,38 @@ import (
 
 	ports "github.com/devpablocristo/golang/sdk/internal/core/greeter/ports"
 	pb "github.com/devpablocristo/golang/sdk/pb"
+	sdkgrpcserverport "github.com/devpablocristo/golang/sdk/pkg/grpc/server/ports"
 )
 
-// Implementación del servidor Greeter
-type GreeterServer struct {
+type GreeterGrpcServer struct {
 	pb.UnimplementedGreeterServer // NOTE: que es esto?
+	useCases                      ports.UseCases
+	grpcServer                    sdkgrpcserverport.Server
 }
 
-func NewGrpcServer() ports.GrpcServer {
-	return &GreeterServer{}
+func NewGrpcServer(ucs ports.UseCases, gsv sdkgrpcserverport.Server) *GreeterGrpcServer {
+	return &GreeterGrpcServer{
+		useCases:   ucs,
+		grpcServer: gsv,
+	}
+}
+
+func (s *GreeterGrpcServer) Start() error {
+	s.grpcServer.RegisterService(&pb.Greeter_ServiceDesc, s.grpcServer)
+	if err := s.grpcServer.Start(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Unary RPC: responde con un mensaje de saludo
-func (s *GreeterServer) SayHelloUnary(ctx context.Context, req *pb.HelloRequest) (*pb.HelloResponse, error) {
+func (s *GreeterGrpcServer) SayHelloUnary(ctx context.Context, req *pb.HelloRequest) (*pb.HelloResponse, error) {
 	message := fmt.Sprintf("Hello, %s!", req.Name)
 	return &pb.HelloResponse{Message: message}, nil
 }
 
 // Server Streaming RPC: envía varios mensajes de saludo al cliente
-func (s *GreeterServer) SayHelloServerStreaming(req *pb.HelloRequest, stream pb.Greeter_SayHelloServerStreamingServer) error {
+func (s *GreeterGrpcServer) SayHelloServerStreaming(req *pb.HelloRequest, stream pb.Greeter_SayHelloServerStreamingServer) error {
 	for i := 0; i < 5; i++ {
 		message := fmt.Sprintf("Hello, %s! Count: %d", req.Name, i)
 		if err := stream.Send(&pb.HelloResponse{Message: message}); err != nil {
@@ -38,7 +51,7 @@ func (s *GreeterServer) SayHelloServerStreaming(req *pb.HelloRequest, stream pb.
 }
 
 // Client Streaming RPC: recibe múltiples solicitudes de saludo y responde con un solo mensaje
-func (s *GreeterServer) SayHelloClientStreaming(stream pb.Greeter_SayHelloClientStreamingServer) error {
+func (s *GreeterGrpcServer) SayHelloClientStreaming(stream pb.Greeter_SayHelloClientStreamingServer) error {
 	var names []string
 	for {
 		req, err := stream.Recv()
@@ -55,7 +68,7 @@ func (s *GreeterServer) SayHelloClientStreaming(stream pb.Greeter_SayHelloClient
 }
 
 // Bidirectional Streaming RPC: el servidor y el cliente envían un flujo de mensajes
-func (s *GreeterServer) SayHelloBidirectionalStreaming(stream pb.Greeter_SayHelloBidirectionalStreamingServer) error {
+func (s *GreeterGrpcServer) SayHelloBidirectionalStreaming(stream pb.Greeter_SayHelloBidirectionalStreamingServer) error {
 	for {
 		req, err := stream.Recv()
 		if err == io.EOF {
