@@ -1,4 +1,4 @@
-package sdkclient
+package sdkcgrpcclient
 
 import (
 	"github.com/spf13/viper"

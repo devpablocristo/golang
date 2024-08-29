@@ -14,9 +14,6 @@ import (
 )
 
 func main() {
-
-	
-
 	userService := user.NewUserUseCases(mapDbRepo)
 	userGrpc := usergtw.NewServer(userService)
 

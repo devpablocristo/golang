@@ -1,4 +1,4 @@
-package sdkcserver
+package sdkgrpcserver
 
 import (
 	"fmt"
@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	serverInstance ports.Server
-	serverOnce     sync.Once
-	serverInitErr  error
+	instance ports.Server
+	once     sync.Once
+	initErr  error
 )
 
 type Server struct {
@@ -24,12 +24,12 @@ type Server struct {
 }
 
 func newServer(config ports.Config) (ports.Server, error) {
-	serverOnce.Do(func() {
+	once.Do(func() {
 		var opts []grpc.ServerOption
 		if config.GetTLSConfig() != nil {
 			tlsConfig, err := loadTLSConfig(config.GetTLSConfig())
 			if err != nil {
-				serverInitErr = fmt.Errorf("failed to load TLS config: %v", err)
+				initErr = fmt.Errorf("failed to load TLS config: %v", err)
 				return
 			}
 			creds := credentials.NewTLS(tlsConfig)
@@ -38,24 +38,24 @@ func newServer(config ports.Config) (ports.Server, error) {
 
 		listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", config.GetHost(), config.GetPort()))
 		if err != nil {
-			serverInitErr = fmt.Errorf("failed to listen: %v", err)
+			initErr = fmt.Errorf("failed to listen: %v", err)
 			return
 		}
 
 		server := grpc.NewServer(opts...)
 		reflection.Register(server) // Registro de reflexión gRPC
 
-		serverInstance = &Server{server: server, listener: listener}
+		instance = &Server{server: server, listener: listener}
 	})
-	return serverInstance, serverInitErr
+	return instance, initErr
 }
 
-// GetServerInstance devuelve la instancia de servidor gRPC
-func GetServerInstance() (ports.Server, error) {
-	if serverInstance == nil {
+// Getinstance devuelve la instancia de servidor gRPC
+func Getinstance() (ports.Server, error) {
+	if instance == nil {
 		return nil, fmt.Errorf("gRPC server is not initialized")
 	}
-	return serverInstance, nil
+	return instance, nil
 }
 
 func (s *Server) Start() error {
@@ -67,6 +67,12 @@ func (s *Server) Stop() error {
 	return s.listener.Close()
 }
 
-func (s *Server) RegisterService(serviceDesc *grpc.ServiceDesc, impl any) {
-	s.server.RegisterService(serviceDesc, impl)
+func (s *Server) RegisterService(serviceDesc any, impl any) {
+	sd, ok := serviceDesc.(*grpc.ServiceDesc)
+	if !ok {
+		panic("serviceDesc must be of type *grpc.ServiceDesc")
+	}
+
+	// Registrar el servicio con el servidor gRPC
+	s.server.RegisterService(sd, impl)
 }

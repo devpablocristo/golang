@@ -1,19 +1,17 @@
-package core
+package greeter
 
 import (
 	"context"
+
+	ports "github.com/devpablocristo/golang/sdk/internal/core/greeter/ports"
 )
 
-type GreaterUseCases interface {
-	Hello(context.Context) (string, error)
+type useCases struct{}
+
+func NewUseCases() ports.UseCases {
+	return &useCases{}
 }
 
-type greeterUseCases struct{}
-
-func NewGreaterUseCases() GreaterUseCases {
-	return &greeterUseCases{}
-}
-
-func (s *greeterUseCases) Hello(ctx context.Context) (string, error) {
+func (s *useCases) Hello(ctx context.Context) (string, error) {
 	return "hello", nil
 }

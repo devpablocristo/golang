@@ -210,6 +210,30 @@ services:
     profiles:
       - monitoring      
 
+  simple-grpc-server:
+    container_name: "simple-grpc-server"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: "simple-grpc-server:${APP_VERSION:-1.0}"
+    ports:
+      - "${GRPC_SERVER_PORT:-50051}:${GRPC_SERVER_TARGET_PORT:-50051}"
+      - "${DELVE_PORT:-2345}:${DELVE_TARGET_PORT:-2345}"
+    environment:
+      - GRPC_SERVER_HOST=${GRPC_SERVER_HOST:-0.0.0.0}
+      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT:-50051}
+      - MAIN_DIR=/app/cmd/examples/monitoring/main.go
+      - APP_NAME=monitoring-api
+      - APP_VERSION=${APP_VERSION:-1.0}
+      - DEBUG=${DEBUG:-true}
+    networks:
+      - app-network
+    volumes:
+      - .:/app
+    restart: on-failure
+    profiles:
+      - simple-grpc-service   
+
   postgres:
     image: postgres:16.3
     container_name: postgres

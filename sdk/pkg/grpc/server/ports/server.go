@@ -1,9 +1,5 @@
 package ports
 
-import (
-	"google.golang.org/grpc"
-)
-
 type Config interface {
 	GetHost() string
 	SetHost(host string)
@@ -23,5 +19,5 @@ type TLSConfig struct {
 type Server interface {
 	Start() error
 	Stop() error
-	RegisterService(serviceDesc *grpc.ServiceDesc, impl any)
+	RegisterService(serviceDesc any, impl any)
 }
