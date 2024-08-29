@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	ports "github.com/devpablocristo/golang/sdk/internal/core/greeter/ports"
+	ports "github.com/devpablocristo/golang/sdk/internal/core/greeter-client/ports"
 )
 
 type useCases struct {
@@ -17,8 +17,8 @@ func NewUseCases(gc ports.GrpcClient) ports.UseCases {
 	}
 }
 
-func (c *useCases) SayHello(ctx context.Context) (string, error) {
-	message, err := c.grpcClient.SayHello(ctx, "World")
+func (c *useCases) Greet(ctx context.Context) (string, error) {
+	message, err := c.grpcClient.Greet(ctx, "World")
 	if err != nil {
 		log.Fatalf("Error calling gRPC method: %v", err)
 	}

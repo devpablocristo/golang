@@ -2,7 +2,6 @@ package greeter
 
 import (
 	"context"
-	"fmt"
 
 	ports "github.com/devpablocristo/golang/sdk/internal/core/greeter-server/ports"
 	pb "github.com/devpablocristo/golang/sdk/pb"
@@ -31,17 +30,17 @@ func (s *GreeterGrpcServer) Start() error {
 }
 
 // Unary RPC: responde con un mensaje de saludo
-func (s *GreeterGrpcServer) SayHelloUnary(ctx context.Context, req *pb.SayHelloRequest) (*pb.SayHelloResponse, error) {
-
-	message := fmt.Sprintf("Hello, %s!", req.GetName())
-	return &pb.SayHelloResponse{Message: message}, nil
+func (s *GreeterGrpcServer) GreetUnary(ctx context.Context, req *pb.GreetUnaryRequest) (*pb.GreetUnaryResponse, error) {
+	firstName := req.GetGreeting().GetFirstName()
+	result := "Hello " + firstName
+	return &pb.GreetUnaryResponse{Result: result}, nil
 }
 
 // Server Streaming RPC: envía varios mensajes de saludo al cliente
-// func (s *GreeterGrpcServer) SayHelloServerStreaming(req *pb.SayHelloRequest, stream pb.Greeter_SayHelloServerStreamingServer) error {
+// func (s *GreeterGrpcServer) GreetServerStreaming(req *pb.GreetRequest, stream pb.Greeter_GreetServerStreamingServer) error {
 // 	for i := 0; i < 5; i++ {
 // 		message := fmt.Sprintf("Hello, %s! Count: %d", req.Name, i)
-// 		if err := stream.Send(&pb.SayHelloResponse{Message: message}); err != nil {
+// 		if err := stream.Send(&pb.GreetResponse{Message: message}); err != nil {
 // 			return err
 // 		}
 // 		time.Sleep(1 * time.Second) // Simulación de una operación larga
@@ -50,14 +49,14 @@ func (s *GreeterGrpcServer) SayHelloUnary(ctx context.Context, req *pb.SayHelloR
 // }
 
 // // Client Streaming RPC: recibe múltiples solicitudes de saludo y responde con un solo mensaje
-// func (s *GreeterGrpcServer) SayHelloClientStreaming(stream pb.Greeter_SayHelloClientStreamingServer) error {
+// func (s *GreeterGrpcServer) GreetClientStreaming(stream pb.Greeter_GreetClientStreamingServer) error {
 // 	var names []string
 // 	for {
 // 		req, err := stream.Recv()
 // 		if err == io.EOF {
 // 			// Cuando el cliente ha terminado de enviar solicitudes, enviar una respuesta
 // 			message := fmt.Sprintf("Hello, %s!", names)
-// 			return stream.SendAndClose(&pb.SayHelloResponse{Message: message})
+// 			return stream.SendAndClose(&pb.GreetResponse{Message: message})
 // 		}
 // 		if err != nil {
 // 			return err
@@ -67,7 +66,7 @@ func (s *GreeterGrpcServer) SayHelloUnary(ctx context.Context, req *pb.SayHelloR
 // }
 
 // // Bidirectional Streaming RPC: el servidor y el cliente envían un flujo de mensajes
-// func (s *GreeterGrpcServer) SayHelloBidirectionalStreaming(stream pb.Greeter_SayHelloBidirectionalStreamingServer) error {
+// func (s *GreeterGrpcServer) GreetBidirectionalStreaming(stream pb.Greeter_GreetBidirectionalStreamingServer) error {
 // 	for {
 // 		req, err := stream.Recv()
 // 		if err == io.EOF {
@@ -77,7 +76,7 @@ func (s *GreeterGrpcServer) SayHelloUnary(ctx context.Context, req *pb.SayHelloR
 // 			return err
 // 		}
 // 		message := fmt.Sprintf("Hello, %s!", req.Name)
-// 		if err := stream.Send(&pb.SayHelloResponse{Message: message}); err != nil {
+// 		if err := stream.Send(&pb.GreetResponse{Message: message}); err != nil {
 // 			return err
 // 		}
 // 	}
