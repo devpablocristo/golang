@@ -15,9 +15,6 @@ type GreeterServer struct {
 	pb.UnimplementedGreeterServer // NOTE: que es esto?
 }
 
-// NOTE: como se usa con el usecases?
-// NOTE: no es necesaria una funcion constructura???
-
 func NewGrpcServer() ports.GrpcServer {
 	return &GreeterServer{}
 }

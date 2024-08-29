@@ -16,7 +16,6 @@ func init() {
 }
 
 func main() {
-	// Inicializar el servidor gRPC usando el SDK
 	server, err := sdkgrpcserver.Bootstrap()
 	if err != nil {
 		log.Fatalf("failed to initialize gRPC server: %v", err)
