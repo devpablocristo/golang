@@ -10,7 +10,7 @@ SCRIPTS_DIR := ${ROOT_DIR}/scripts
 EXAMPLES_DIR := /app/cmd/examples
 
 # Phony targets
-.PHONY: all build run test docker-up docker-build docker-down clean lint initial-up initial-build initial-down monitoring-up monitoring-build monitoring-down go-micro-up go-micro-build go-micro-down
+.PHONY: all build run test docker-up docker-build docker-down clean lint greeter-service-up greeter-service-build greeter-service-down monitoring-up monitoring-build monitoring-down go-micro-up go-micro-build go-micro-down
 
 # Default target
 all: build run
@@ -35,27 +35,36 @@ test:
 docker-up:
 	@echo "Starting $(PROFILE) API in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile $(PROFILE) up
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile $(PROFILE) up -d
 
 docker-build:
 	@echo "Building $(PROFILE) API in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile $(PROFILE) up --build
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile $(PROFILE) up --build -d
 
 docker-down:
 	@echo "Stopping $(PROFILE) API in dev mode..."
 	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml --profile $(PROFILE) down --remove-orphans
 
 # Specific Docker targets using generic commands
-initial-up:
-	@$(MAKE) docker-up PROFILE=initial
+greeter-server-up:
+	@$(MAKE) docker-up PROFILE=greeter-server
 
-initial-build:
-	@$(MAKE) docker-build PROFILE=initial
+greeter-server-build:
+	@$(MAKE) docker-build PROFILE=greeter-server
 
-initial-down:
-	@$(MAKE) docker-down PROFILE=initial
+greeter-server-down:
+	@$(MAKE) docker-down PROFILE=greeter-server
 
+greeter-client-up:
+	@$(MAKE) docker-up PROFILE=greeter-client
+
+greeter-client-build:
+	@$(MAKE) docker-build PROFILE=greeter-client
+
+greeter-client-down:
+	@$(MAKE) docker-down PROFILE=greeter-client	
+###
 monitoring-up:
 	@$(MAKE) docker-up PROFILE=monitoring
 
@@ -65,6 +74,7 @@ monitoring-build:
 monitoring-down:
 	@$(MAKE) docker-down PROFILE=monitoring
 
+###
 go-micro-up:
 	@$(MAKE) docker-up PROFILE=go-micro
 
@@ -73,6 +83,7 @@ go-micro-build:
 
 go-micro-down:
 	@$(MAKE) docker-down PROFILE=go-micro
+###
 
 # Clean target
 clean:

@@ -19,18 +19,18 @@ func NewGrpcClient(c sdkports.Client) coreports.GrpcClient {
 	}
 }
 
-func (c *grpcClient) SayHello(name string) (string, error) {
+func (c *grpcClient) SayHello(ctx context.Context, name string) (string, error) {
 	// Crear un contexto con un tiempo de espera
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
 	// Crear una solicitud de tipo HelloRequest
-	request := &pb.HelloRequest{
+	request := &pb.SayHelloRequest{
 		Name: name,
 	}
 
 	// Crear una variable para almacenar la respuesta de tipo HelloResponse
-	var response pb.HelloResponse
+	var response pb.SayHelloResponse
 
 	// Invocar el método SayHelloUnary del servicio Greeter
 	err := c.client.InvokeMethod(ctx, "/greeter.Greeter/SayHelloUnary", request, &response)

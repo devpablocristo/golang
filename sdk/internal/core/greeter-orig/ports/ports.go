@@ -7,5 +7,5 @@ type GrpcClient interface {
 }
 
 type UseCases interface {
-	Hello(context.Context) (string, error)
+	SayHello(context.Context) (string, error)
 }

@@ -17,8 +17,8 @@ func NewUseCases(gc ports.GrpcClient) ports.UseCases {
 	}
 }
 
-func (c *useCases) Hello(ctx context.Context) (string, error) {
-	message, err := ports.GrpcClient.SayHello("World")
+func (c *useCases) SayHello(ctx context.Context) (string, error) {
+	message, err := c.grpcClient.SayHello(ctx, "World")
 	if err != nil {
 		log.Fatalf("Error calling gRPC method: %v", err)
 	}

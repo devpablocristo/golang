@@ -1,10 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
-	gtwgreeter "github.com/devpablocristo/golang/sdk/cmd/gateways/greeter"
-	greeter "github.com/devpablocristo/golang/sdk/internal/core/greeter"
+	gtwgreeter "github.com/devpablocristo/golang/sdk/cmd/gateways/greeter-server"
+	greeter "github.com/devpablocristo/golang/sdk/internal/core/greeter-server"
 	sdkviper "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
 	sdkgrpcserver "github.com/devpablocristo/golang/sdk/pkg/grpc/server"
 	sdkgrpcserverport "github.com/devpablocristo/golang/sdk/pkg/grpc/server/ports"
@@ -19,9 +20,11 @@ func init() {
 func main() {
 	gServer := setupServices()
 
-	greeterUseCases := greeter.NewUseCases(nil)
+	greeterUseCases := greeter.NewUseCases()
 	greeterGrpcServer := gtwgreeter.NewGrpcServer(greeterUseCases, gServer)
 	greeterGrpcServer.Start()
+
+	fmt.Println("Hola!")
 
 	if err := greeterGrpcServer.Start(); err != nil {
 		log.Fatalf("Failed to start gRPC server: %v", err)
