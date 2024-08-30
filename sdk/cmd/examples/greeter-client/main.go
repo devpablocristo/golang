@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	greeter "github.com/devpablocristo/golang/sdk/internal/core/greeter-client"
+	sdklogger "github.com/devpablocristo/golang/sdk/pkg/configurators/logger"
 	sdkviper "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
 	sdkgrpcclient "github.com/devpablocristo/golang/sdk/pkg/grpc/client"
 	sdkgrpcclientport "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
-	"go-micro.dev/v4/logger"
 )
 
 func init() {
@@ -20,10 +21,12 @@ func init() {
 func main() {
 	gClient := setupServices()
 
+	fmt.Println("Holassss")
+
 	greeterGrpcClient := greeter.NewGrpcClient(gClient)
 	greeterUseCases := greeter.NewUseCases(greeterGrpcClient)
 
-	logger.Info(greeterUseCases.Greet(context.Background()))  
+	sdklogger.Info(greeterUseCases.Greet(context.Background()))
 }
 
 func setupServices() sdkgrpcclientport.Client {
