@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	greeter "github.com/devpablocristo/golang/sdk/internal/core/greeter-client"
@@ -13,7 +12,9 @@ import (
 )
 
 func init() {
-	if err := sdkviper.LoadConfig(); err != nil {
+	// if err := sdkviper.LoadConfig("../../../"); err != nil { // en local
+	if err := sdkviper.LoadConfig(); err != nil { // con docker
+
 		log.Fatalf("Viper Service error: %v", err)
 	}
 }
@@ -21,9 +22,10 @@ func init() {
 func main() {
 	gClient := setupServices()
 
-	fmt.Println("Holassss")
+	log.Println("Holassss")
 
 	greeterGrpcClient := greeter.NewGrpcClient(gClient)
+
 	greeterUseCases := greeter.NewUseCases(greeterGrpcClient)
 
 	sdklogger.Info(greeterUseCases.Greet(context.Background()))
