@@ -50,9 +50,6 @@ func (c *config) SetTLSConfig(tlsConfig *ports.TLSConfig) {
 }
 
 func (c *config) Validate() error {
-	if c.host == "" {
-		return fmt.Errorf("gRPC server host is not configured")
-	}
 	if c.port == 0 {
 		return fmt.Errorf("gRPC server port is not configured")
 	}

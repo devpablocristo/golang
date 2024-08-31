@@ -7,7 +7,7 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceRoot}/cmd/examples/greeter-client/main.go",
-        "envFile": "${workspaceRoot}./config/.env"
+        "envFile": "${workspaceRoot}/config/.env"
     },      
     {
       "name": "Docker",

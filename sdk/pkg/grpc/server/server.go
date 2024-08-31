@@ -36,7 +36,8 @@ func newServer(config ports.Config) (ports.Server, error) {
 			opts = append(opts, grpc.Creds(creds))
 		}
 
-		listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", config.GetHost(), config.GetPort()))
+		address := fmt.Sprintf("%s:%d", config.GetHost(), config.GetPort())
+		listener, err := net.Listen("tcp", address)
 		if err != nil {
 			initErr = fmt.Errorf("failed to listen: %v", err)
 			return

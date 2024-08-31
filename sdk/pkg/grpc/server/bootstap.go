@@ -9,7 +9,7 @@ import (
 // Bootstrap inicializa y devuelve una instancia de servidor gRPC
 func Bootstrap() (ports.Server, error) {
 	config := newConfig(
-		viper.GetString("GRPC_SERVER_HOST"),
+		"", // viper.GetString("GRPC_SERVER_HOST"), // si es necesario
 		viper.GetInt("GRPC_SERVER_PORT"),
 		nil, // Configuración TLS, si es necesario
 	)
