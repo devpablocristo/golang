@@ -8,10 +8,10 @@ BUILD_DIR := ${ROOT_DIR}/bin
 CONFIG_DIR := ${ROOT_DIR}/config
 SCRIPTS_DIR := ${ROOT_DIR}/scripts
 EXAMPLES_DIR := /app/cmd/examples
-DOCKER_COMPOSE := docker compose -f ${CONFIG_DIR}/docker-compose.dev.yml
+DOCKER_COMPOSE_FILE := ${CONFIG_DIR}/docker-compose.dev.yml
 
 # Phony targets
-.PHONY: all build run test docker-up docker-build docker-down clean lint greeter-server-up greeter-server-build greeter-server-down monitoring-up monitoring-build monitoring-down go-micro-up go-micro-build go-micro-down start-and-logs
+.PHONY: all build run test docker-up docker-build docker-down clean lint greeter-server-up greeter-server-build greeter-server-down greeter-client-up greeter-client-build greeter-client-down monitoring-up monitoring-build monitoring-down go-micro-up go-micro-build go-micro-down start-and-logs
 
 # Default target
 all: build run
@@ -36,16 +36,20 @@ test:
 docker-up:
 	@echo "Starting $(PROFILE) API in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go ${DOCKER_COMPOSE} --profile $(PROFILE) up -d && ${DOCKER_COMPOSE} logs -f $(SERVICE_NAME)
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up -d
+	@sleep 5 # Espera unos segundos para asegurarse de que los contenedores se inicien
+	@docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(SERVICE_NAME)
 
 docker-build:
 	@echo "Building $(PROFILE) API in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go ${DOCKER_COMPOSE} --profile $(PROFILE) up --build -d && ${DOCKER_COMPOSE} logs -f $(SERVICE_NAME)
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up --build -d
+	@sleep 5 # Espera unos segundos para asegurarse de que los contenedores se inicien
+	@docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(SERVICE_NAME)
 
 docker-down:
 	@echo "Stopping $(PROFILE) API in dev mode..."
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go ${DOCKER_COMPOSE} --profile $(PROFILE) down --remove-orphans
+	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) down --remove-orphans
 
 # Specific Docker targets using generic commands
 greeter-server-up:

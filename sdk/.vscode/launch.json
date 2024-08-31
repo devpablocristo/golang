@@ -15,16 +15,17 @@
       "request": "attach",
       "mode": "remote",
       "port": 2345,
-      "host": "localhost",
+      "host": "127.0.0.1",
       "substitutePath": [
           {
               "from": "${workspaceFolder}",
               "to": "/app"
           }
       ],
-      "trace": "verbose", 
+      "trace": "log", 
       "logOutput": "debugger",
       "showLog": true,
+      //"postDebugTask": "liveReload"
    }
   ]
 }

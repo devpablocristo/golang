@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -45,8 +44,5 @@ func setupServices() sdkgrpcclientport.Client {
 	if err != nil {
 		log.Fatalf("Failed to initialize gRPC client: %v", err)
 	}
-
-	fmt.Println("asa")
-
 	return c
 }
