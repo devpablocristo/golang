@@ -24,8 +24,7 @@
       ],
       "trace": "verbose", 
       "logOutput": "debugger",
-      "showLog": true
-      // "preLaunchTask": "docker-run" // ejemplo de como lanzar task
-    }
+      "showLog": true,
+   }
   ]
 }

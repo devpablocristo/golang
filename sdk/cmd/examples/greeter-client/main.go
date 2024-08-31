@@ -13,8 +13,8 @@ import (
 )
 
 func init() {
-	if err := sdkviper.LoadConfig("../../../"); err != nil { // en local
-		// if err := sdkviper.LoadConfig(); err != nil { // con docker
+	//if err := sdkviper.LoadConfig("../../../"); err != nil { // en local
+	if err := sdkviper.LoadConfig(); err != nil { // con docker
 
 		log.Fatalf("Viper Service error: %v", err)
 	}
@@ -23,7 +23,7 @@ func init() {
 func main() {
 	gClient := setupServices()
 
-	log.Println("Holassss")
+	log.Println("Holassssxxx")
 
 	greeterGrpcClient := greeter.NewGrpcClient(gClient)
 
