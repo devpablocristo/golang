@@ -265,9 +265,6 @@ func messaging() {
 // 	return nil
 //}
 
-
-
-
 // client grpc calculator
 // func main() {
 

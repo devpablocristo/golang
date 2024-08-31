@@ -159,7 +159,7 @@ services:
     environment:
       # - GRPC_SERVER_HOST=greeter-server # Nombre del servicio del servidor gRPC
       # - GRPC_SERVER_HOST=${GRPC_SERVER_HOST:-localhost} # Usa localhost cuando estás en modo host
-      - GRPC_SERVER_HOST=172.17.0.1
+      # - GRPC_SERVER_HOST=172.17.0.1
       - GRPC_SERVER_PORT=${GRPC_SERVER_PORT:-50051}
       - MAIN_DIR=/app/cmd/examples/greeter-client/main.go
       - APP_NAME=greeter-client-api
