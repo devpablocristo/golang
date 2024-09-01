@@ -25,7 +25,7 @@
       "trace": "log", 
       "logOutput": "debugger",
       "showLog": true,
-      // "postDebugTask": "live reload"
+      //"postDebugTask": "live reload" // FIXME: no funca el script
    }
   ]
 }
