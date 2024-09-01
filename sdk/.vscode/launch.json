@@ -25,7 +25,7 @@
       "trace": "log", 
       "logOutput": "debugger",
       "showLog": true,
-      //"postDebugTask": "liveReload"
+      // "postDebugTask": "live reload"
    }
   ]
 }

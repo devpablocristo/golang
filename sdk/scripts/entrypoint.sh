@@ -3,6 +3,7 @@
 # shellcheck disable=SC2154  # Desactivar aviso de shellcheck para APP_NAME
 # shellcheck source=./config/.env disable=SC1091 # Desactivar aviso de shellcheck de archivo no especificado
 
+
 # Load environment variables from the ./config/.env file in the parent directory
 loadEnv() {
   if [ -f ./config/.env ]; then
@@ -64,28 +65,12 @@ runServer() {
 
   if [ "${DEBUG}" = "true" ]; then
     log "Run in debug mode"
-    # Start the debugger in the background
     dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec "/app/bin/${APP_NAME}" &
-    DEBUG_PID=$!
-    log "Debugger started with PID $DEBUG_PID"
-
-    # Start monitoring the debugger process
-    monitorDebugger $DEBUG_PID
+    liveReloading
   else
     log "Run in production mode"
     "/app/bin/${APP_NAME}"
   fi
-}
-
-# Function to monitor the debugger process and trigger liveReloading when it stops
-monitorDebugger() {
-  DEBUG_PID=$1
-  while kill -0 "$DEBUG_PID" 2> /dev/null; do
-    sleep 1
-  done
-
-  log "Debugger has finished, starting live reload"
-  liveReloading
 }
 
 # Function to rebuild and rerun the server
@@ -98,13 +83,15 @@ rerunServer() {
 # Function to monitor file changes and trigger server restart
 liveReloading() {
   log "Run liveReloading"
-  inotifywait -e modify,delete,move -m -r --format '%w%f' --exclude '.*(\.tmp|\.swp)$' /app | while read -r file; do
-    # Use [ ] instead of [[ ]] for POSIX compatibility
-    if [ "${file##*.}" = "go" ]; then
-      log "File ${file} changed. Reloading..."
-      rerunServer
-    fi
-  done
+  inotifywait -e modify,delete,move -m -r --format '%w%f' --exclude '.*(\.tmp|\.swp)$' /app | (
+    while read -r file; do
+      # Use [ ] instead of [[ ]] for POSIX compatibility
+      if [ "${file##*.}" = "go" ]; then
+        log "File ${file} changed. Reloading..."
+        rerunServer
+      fi
+    done
+  )
 }
 
 # Function to initialize the file change logger
