@@ -11,7 +11,7 @@ EXAMPLES_DIR := /app/cmd/examples
 DOCKER_COMPOSE_FILE := ${CONFIG_DIR}/docker-compose.dev.yml
 
 # Phony targets
-.PHONY: all build run test docker-up docker-build docker-down clean lint greeter-server-up greeter-server-build greeter-server-down greeter-client-up greeter-client-build greeter-client-down monitoring-up monitoring-build monitoring-down go-micro-up go-micro-build go-micro-down start-and-logs
+.PHONY: all build run test docker-up docker-build docker-down docker-logs clean lint greeter-server-up greeter-server-build greeter-server-down greeter-server-logs greeter-client-up greeter-client-build greeter-client-down greeter-client-logs monitoring-up monitoring-build monitoring-down go-micro-up go-micro-build go-micro-down
 
 # Default target
 all: build run
@@ -34,22 +34,24 @@ test:
 
 # Generic Docker commands
 docker-up:
-	@echo "Starting $(PROFILE) API in dev mode..."
+	@echo "Starting $(PROFILE) services in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
 	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up -d
-	@sleep 5 # Espera unos segundos para asegurarse de que los contenedores se inicien
-	@docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(SERVICE_NAME)
+	@$(MAKE) docker-logs PROFILE=$(PROFILE)
 
 docker-build:
-	@echo "Building $(PROFILE) API in dev mode..."
+	@echo "Building $(PROFILE) services in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
 	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up --build -d
-	@sleep 5 # Espera unos segundos para asegurarse de que los contenedores se inicien
-	@docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(SERVICE_NAME)
+	@$(MAKE) docker-logs PROFILE=$(PROFILE)
 
 docker-down:
-	@echo "Stopping $(PROFILE) API in dev mode..."
+	@echo "Stopping $(PROFILE) services in dev mode..."
 	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) down --remove-orphans
+
+docker-logs:
+	@echo "Fetching logs for $(PROFILE) services..."
+	@docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(SERVICE_NAME)
 
 # Specific Docker targets using generic commands
 greeter-server-up:
@@ -61,6 +63,9 @@ greeter-server-build:
 greeter-server-down:
 	@$(MAKE) docker-down PROFILE=greeter-server SERVICE_NAME=greeter-server-api
 
+greeter-server-logs:
+	@$(MAKE) docker-logs PROFILE=greeter-server SERVICE_NAME=greeter-server-api
+
 greeter-client-up:
 	@$(MAKE) docker-up PROFILE=greeter-client SERVICE_NAME=greeter-client-api
 
@@ -69,6 +74,9 @@ greeter-client-build:
 
 greeter-client-down:
 	@$(MAKE) docker-down PROFILE=greeter-client SERVICE_NAME=greeter-client-api
+
+greeter-client-logs:
+	@$(MAKE) docker-logs PROFILE=greeter-client SERVICE_NAME=greeter-client-api
 
 monitoring-up:
 	@$(MAKE) docker-up PROFILE=monitoring SERVICE_NAME=monitoring-api
@@ -87,6 +95,9 @@ go-micro-build:
 
 go-micro-down:
 	@$(MAKE) docker-down PROFILE=go-micro SERVICE_NAME=go-micro-api
+
+go-micro-logs:
+	@$(MAKE) docker-logs PROFILE=go-micro SERVICE_NAME=go-micro-api
 
 # Clean target
 clean:

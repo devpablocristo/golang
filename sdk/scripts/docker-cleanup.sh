@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Solicitar confirmación del usuario
+read -p "Para continuar con la limpieza completa de Docker, escribe 'clean up' y presiona Enter: " confirm
+
+# Verificar la entrada del usuario
+if [ "$confirm" != "clean up" ]; then
+  echo "Acción cancelada. No se realizó ninguna limpieza."
+  exit 0
+fi
+
 # Detener y eliminar todos los contenedores
 if [ "$(docker ps -aq)" ]; then
   docker stop "$(docker ps -aq)"

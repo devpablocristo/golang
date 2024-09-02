@@ -36,7 +36,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error calling Greet method: %v", err)
 	}
-
 	sdklogger.Info(res)
 }
 
