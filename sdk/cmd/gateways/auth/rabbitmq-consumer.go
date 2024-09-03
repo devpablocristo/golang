@@ -6,11 +6,11 @@ import (
 )
 
 type RabbitMq struct {
-	ucs    ports.AuthUseCases
+	ucs    ports.UseCases
 	broker rabbitports.Consumer
 }
 
-func NewRabbitMq(u ports.AuthUseCases, broker rabbitports.Consumer) *RabbitMq {
+func NewRabbitMq(u ports.UseCases, broker rabbitports.Consumer) *RabbitMq {
 	return &RabbitMq{
 		ucs:    u,
 		broker: broker,

@@ -1,6 +1,8 @@
 FROM golang:1.22.3-alpine3.20
 
 # Install git and Go tools (Delve and Air) for debugging and live reloading
+# no se usa ya pero este es el comando apra inotifywatch
+#  apk add --no-cache bash git libc-dev g++ inotify-tools curl && \
 RUN apk update && apk add --no-cache git && \
     go install github.com/go-delve/delve/cmd/dlv@latest && \
     go install github.com/air-verse/air@latest && \
