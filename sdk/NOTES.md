@@ -1,10 +1,33 @@
-comportamiento esperado, cuando haya algun cambio inodewait hace rerunsever
-cuando aprieto ctrl alt f5 rereunserver
+El comportamiento que observas, donde los logs se detienen después de hacer `Ctrl + S` en la terminal, no está relacionado directamente con `Air` o `Delve`, sino más bien con cómo la terminal maneja los comandos de flujo de control.
 
+### Explicación
 
-problema:
-lo q pasa es cuando le doy a "crtl save y estoy en la temrinal, con la sesion funcionando, ahi se traba y no funciona mas, inodewait se vuelve loca.
-solucion actual: crtl c + logs docker (tb funciona con up docker)
+- **`Ctrl + S`** es un atajo de teclado que tradicionalmente se utiliza para **pausar el flujo de salida en una terminal**. Esto es parte de los controles de flujo XON/XOFF, que se remontan a los terminales seriales más antiguos.
+- Cuando presionas `Ctrl + S`, la terminal entra en un estado "pausado" y deja de mostrar la salida. Puedes reanudar la salida presionando **`Ctrl + Q`**, que envía el comando para "continuar".
+
+### Cómo Solucionarlo
+
+1. **No presiones `Ctrl + S` en la terminal**: Evita usar este atajo en la terminal si no es necesario.
+
+2. **Reanudar la salida con `Ctrl + Q`**:
+   - Si accidentalmente presionas `Ctrl + S` y la salida se detiene, simplemente presiona `Ctrl + Q` para reanudar la salida.
+
+3. **Deshabilitar los controles de flujo XON/XOFF en la terminal**:
+   - En algunas terminales, puedes desactivar este comportamiento modificando la configuración. Por ejemplo, si estás utilizando `bash`, puedes agregar lo siguiente a tu archivo `.bashrc` o `.bash_profile` para desactivar el control de flujo:
+
+   ```bash
+   stty -ixon
+   ```
+
+   Después de agregar esto, guarda el archivo y ejecuta `source ~/.bashrc` o `source ~/.bash_profile` para aplicar los cambios.
+
+### Verificación
+
+Después de hacer cualquiera de estos cambios o ajustes, verifica que los logs continúen mostrando la salida esperada incluso después de presionar `Ctrl + S`.
+
+### Conclusión
+
+El problema no está en `Air` o `Delve`, sino en cómo la terminal maneja el control de flujo. Usando los pasos anteriores, puedes evitar o solucionar este comportamiento para que los logs se muestren continuamente sin interrupciones.
 
 ### Resumen Simplificado y Mejorado para Configurar Docker y `xbindkeys`
 

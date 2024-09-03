@@ -89,7 +89,8 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro      
+      - go-micro
+    command: air -c .air.toml
 
   monitoring-api:
     container_name: "monitoring"
@@ -118,7 +119,8 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - monitoring      
+      - monitoring    
+    command: air -c .air.toml  
 
   greeter-server-api:
     container_name: "greeter-server"
@@ -147,6 +149,7 @@ services:
     profiles:
       - greeter-server
       - greeter-service
+    command: air -c .air.toml
 
   greeter-client-api:
     container_name: "greeter-client"
@@ -160,6 +163,7 @@ services:
       # - GRPC_SERVER_HOST=greeter-server # Nombre del servicio del servidor gRPC
       # - GRPC_SERVER_HOST=${GRPC_SERVER_HOST:-localhost} # Usa localhost cuando estás en modo host
       # - GRPC_SERVER_HOST=172.17.0.1
+      - AIR_CONFIG=/app/config/.air.toml  # Archivo de configuración para Air
       - GRPC_SERVER_PORT=${GRPC_SERVER_PORT:-50051}
       - MAIN_DIR=/app/cmd/examples/greeter-client/main.go
       - APP_NAME=greeter-client-api
@@ -176,6 +180,7 @@ services:
     profiles:
       - greeter-client
       - greeter-service
+    command: air -c .air.toml
 
   postgres:
     image: postgres:16.3

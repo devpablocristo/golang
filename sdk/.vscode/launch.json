@@ -14,6 +14,7 @@
       "type": "go",
       "request": "attach",
       "mode": "remote",
+      "remotePath": "/app",  // Ruta en el contenedor
       "port": 2345,
       "host": "127.0.0.1",
       "substitutePath": [
@@ -23,8 +24,7 @@
           }
       ],
       "trace": "log", 
-      "logOutput": "debugger",
-      "showLog": true,
+      "showLog": false,
       //"postDebugTask": "live reload" // FIXME: no funca el script
    }
   ]
