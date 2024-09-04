@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	greeter "github.com/devpablocristo/golang/sdk/internal/core/greeter-client"
+	calculator "github.com/devpablocristo/golang/sdk/internal/core/calculator-client"
 	sdklogger "github.com/devpablocristo/golang/sdk/pkg/configurators/logger"
 	sdkviper "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
 	sdkgrpcclient "github.com/devpablocristo/golang/sdk/pkg/grpc/client"
@@ -23,24 +23,22 @@ func init() {
 func main() {
 	gClient := setupServices()
 
-	log.Println("Holassssxxx")
+	calculatorGrpcClient := calculator.NewGrpcClient(gClient)
 
-	greeterGrpcClient := greeter.NewGrpcClient(gClient)
-
-	greeterUseCases := greeter.NewUseCases(greeterGrpcClient)
+	calculatorUseCases := calculator.NewUseCases(calculatorGrpcClient)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	// example
-	firstName := "Emma"
-	lastName := "Watson"
+	firstNum := int32(23)
+	lastNum := int32(12)
 
-	res, err := greeterUseCases.Greet(ctx, firstName, lastName)
+	res, err := calculatorUseCases.Addition(ctx, firstNum, lastNum)
 	if err != nil {
 		log.Fatalf("Error calling Greet method: %v", err)
 	}
-	sdklogger.Info(res)
+	sdklogger.Info("%d", res)
 }
 
 func setupServices() sdkgrpcclientport.Client {

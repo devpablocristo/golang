@@ -13,8 +13,8 @@ func NewUseCases() ports.UseCases {
 	return &useCases{}
 }
 
-func (c *useCases) SayHello(ctx context.Context) (string, error) {
-	message := "Hi!"
+func (c *useCases) Greet(ctx context.Context, name string) (string, error) {
+	message := "Hi " + name + "!"
 
 	return message, nil
 }

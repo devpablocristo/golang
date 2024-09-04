@@ -18,12 +18,12 @@ func NewGrpcClient(c sdkports.Client) coreports.GrpcClient {
 	}
 }
 
-func (c *grpcClient) Greet(ctx context.Context) (string, error) {
+func (c *grpcClient) Greet(ctx context.Context, fistName, lastName string) (string, error) {
 	// Crear una solicitud de tipo HelloRequest
 	request := &pb.GreetUnaryRequest{
 		Greeting: &pb.Greeting{
-			FirstName: "Emma",
-			LastName:  "Watson",
+			FirstName: fistName,
+			LastName:  lastName,
 		},
 	}
 

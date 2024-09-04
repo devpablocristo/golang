@@ -1,20 +1,12 @@
 syntax = "proto3";
 
 package greeter;
-
 option go_package = "github.com/devpablocristo/golang/sdk/pb;pb";
 
 service Greeter {
-    // Unary RPC
     rpc GreetUnary (GreetUnaryRequest) returns (GreetUnaryResponse);
-    
-    // // Server Streaming RPC
     // rpc GreetServerStreaming (GreetRequest) returns (stream GreetResponse);
-    
-    // // Client Streaming RPC
     // rpc GreetClientStreaming (stream GreetRequest) returns (GreetResponse);
-    
-    // // Bidirectional Streaming RPC
     // rpc GreetBidirectionalStreaming (stream GreetRequest) returns (stream GreetResponse);
 }
 

@@ -29,11 +29,14 @@ func (s *GreeterGrpcServer) Start() error {
 	return nil
 }
 
-// Unary RPC: responde con un mensaje de saludo
 func (s *GreeterGrpcServer) GreetUnary(ctx context.Context, req *pb.GreetUnaryRequest) (*pb.GreetUnaryResponse, error) {
-	firstName := req.GetGreeting().GetFirstName()
-	result := "Hello " + firstName
-	return &pb.GreetUnaryResponse{Result: result}, nil
+	name := req.GetGreeting().GetFirstName() + " " + req.GetGreeting().GetLastName()
+	greeting, err := s.useCases.Greet(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GreetUnaryResponse{Result: greeting}, nil
 }
 
 // Server Streaming RPC: envía varios mensajes de saludo al cliente

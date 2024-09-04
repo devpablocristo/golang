@@ -265,43 +265,6 @@ func messaging() {
 // 	return nil
 //}
 
-// client grpc calculator
-// func main() {
-
-// 	fmt.Println("Calculator Client")
-// 	cc, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
-// 	if err != nil {
-// 		log.Fatalf("could not connect: %v", err)
-// 	}
-// 	defer cc.Close()
-
-// 	c := pb.NewCalculatorServiceClient(cc)
-// 	// fmt.Printf("Created client: %f", c)
-
-// 	// doUnary(c)
-
-// 	// doServerStreaming(c)
-
-// 	// doClientStreaming(c)
-
-// 	// doBiDiStreaming(c)
-
-// 	doErrorUnary(c)
-// }
-
-// func doUnary(c pb.CalculatorServiceClient) {
-// 	fmt.Println("Starting to do a Sum Unary RPC...")
-// 	req := &pb.SumRequest{
-// 		FirstNumber:  5,
-// 		SecondNumber: 40,
-// 	}
-// 	res, err := c.Sum(context.Background(), req)
-// 	if err != nil {
-// 		log.Fatalf("error while calling Sum RPC: %v", err)
-// 	}
-// 	log.Printf("Response from Sum: %v", res.SumResult)
-// }
-
 // func doServerStreaming(c pb.CalculatorServiceClient) {
 // 	fmt.Println("Starting to do a PrimeDecomposition Server Streaming RPC...")
 // 	req := &pb.PrimeNumberDecompositionRequest{
@@ -421,22 +384,6 @@ func messaging() {
 // 	fmt.Printf("Result of square root of %v: %v\n", n, res.GetNumberRoot())
 // }
 
-// server grpc calculator
-
-// type server struct {
-// 	pb.CalculatorServiceServer
-// }
-
-// func (*server) Sum(ctx context.Context, req *pb.SumRequest) (*pb.SumResponse, error) {
-// 	fmt.Printf("Received Sum RPC: %v\n", req)
-// 	firstNumber := req.FirstNumber
-// 	secondNumber := req.SecondNumber
-// 	sum := firstNumber + secondNumber
-// 	res := &pb.SumResponse{
-// 		SumResult: sum,
-// 	}
-// 	return res, nil
-// }
 
 // func (*server) PrimeNumberDecomposition(req *pb.PrimeNumberDecompositionRequest, stream pb.CalculatorService_PrimeNumberDecompositionServer) error {
 // 	fmt.Printf("Received PrimeNumberDecomposition RPC: %v\n", req)
@@ -522,53 +469,9 @@ func messaging() {
 // 	}, nil
 // }
 
-// func main() {
-// 	fmt.Println("Calculator Server")
 
-// 	lis, err := net.Listen("tcp", "0.0.0.0:50051")
-// 	if err != nil {
-// 		log.Fatalf("Failed to listen: %v", err)
-// 	}
 
-// 	s := grpc.NewServer()
-// 	pb.RegisterCalculatorServiceServer(s, &server{})
 
-// 	// Register reflection service on gRPC server.
-// 	reflection.Register(s)
-
-// 	if err := s.Serve(lis); err != nil {
-// 		log.Fatalf("failed to serve: %v", err)
-// 	}
-// }
-
-// arithmetic calc main grpc
-// func main() {
-// 	dbaseDriver := os.Getenv("DB_DRIVER")
-// 	dsourceName := os.Getenv("DS_NAME")
-// 	var err error
-// 	//ports
-// 	var dbaseAdaptor ports.DbPort
-// 	var core ports.ArithmaticPort
-// 	var appAdaptor ports.APIPort
-// 	var gRPCAdaptor ports.GRPCPort
-
-// 	//dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", username, password, host, schema)
-
-// 	dbaseAdaptor, err = db.NewAdaptor(dbaseDriver, dsourceName)
-// 	if err != nil {
-// 		log.Fatal("failed to initiate dbase connection: %v", err)
-// 	}
-// 	defer dbaseAdaptor.CloseDbConnection()
-
-// 	core = arithamtic.NewAdaptor()
-// 	appAdaptor = api.NewApplication(dbaseAdaptor, core)
-// 	gRPCAdaptor = gRPC.NewAdaptor(appAdaptor)
-// 	gRPCAdaptor.Run()
-
-// 	// creation of type adaptor which has access to all methods
-// 	//arithAdaptor := arithmatic.NewAdaptor()
-
-// }
 
 // client gripc bookstore
 // package main
