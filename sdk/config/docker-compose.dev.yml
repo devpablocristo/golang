@@ -6,10 +6,10 @@ services:
     build:
       context: ..
       dockerfile: config/Dockerfile.dev
-    image: "go-micro-api:${APP_VERSION:-1.0}"
+    image: "go-micro-api:${APP_VERSION}"
     ports:
-      - "${ROUTER_PORT:-8080}:${ROUTER_TARGET_PORT:-8080}"
-      - "${DELVE_PORT:-2345}:${DELVE_TARGET_PORT:-2345}"
+      - "${ROUTER_PORT}:${ROUTER_PORT}"
+      - "${DELVE_PORT}:${DELVE_PORT}"
     volumes:
       - type: bind
         source: ..
@@ -19,60 +19,60 @@ services:
         target: /app/migrations
     environment:
       - MAIN_DIR=/app/cmd/examples/go-micro/main.go
-      - APP_NAME=${APP_NAME:-golang-sdk}
-      - APP_VERSION=${APP_VERSION:-1.0}
-      - DEBUG=${DEBUG:-true}
-      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
-      - POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT:-5432}
-      - POSTGRES_DATABASE=${POSTGRES_DATABASE:-dev_events_db}
-      - POSTGRES_USERNAME=${POSTGRES_USERNAME:-postgres}
-      - POSTGRES_USER_PASSWORD=${POSTGRES_USER_PASSWORD:-root}
-      - CONSUL_ADDRESS=${CONSUL_ADDRESS:-consul:8500}
-      - CONSUL_ID=${CONSUL_ID:-ms-1}
-      - CONSUL_NAME=${CONSUL_NAME:-golang-sdk}
-      - CONSUL_SERVICE_NAME=${CONSUL_SERVICE_NAME:-golang-sdk}
-      - CONSUL_HEALTH_CHECK=${CONSUL_HEALTH_CHECK:-http://golang-sdk:8080/health}
-      - CONSUL_CHECK_INTERVAL=${CONSUL_CHECK_INTERVAL:-10s}
-      - CONSUL_CHECK_TIMEOUT=${CONSUL_CHECK_TIMEOUT:-1s}
-      - CONSUL_PORT=${CONSUL_PORT:-8500}
-      - CONSUL_TAGS=${CONSUL_TAGS:-version:v1,env:development,team:backend}
-      - CASSANDRA_HOST=${CASSANDRA_HOST:-cassandra}
-      - CASSANDRA_PORT=${CASSANDRA_PORT:-9042}
-      - CASSANDRA_USERNAME=${CASSANDRA_USERNAME:-cassandra}
-      - CASSANDRA_PASSWORD=${CASSANDRA_PASSWORD:-cassandra}
-      - CASSANDRA_KEYSPACE=${CASSANDRA_KEYSPACE:-dev_keyspace}
-      - CASSANDRA_REPLICATION_FACTOR=${CASSANDRA_REPLICATION_FACTOR:-3}
-      - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME:-CassandraCluster}
-      - CASSANDRA_DC=${CASSANDRA_DC:-datacenter1}
-      - CASSANDRA_RACK=${CASSANDRA_RACK:-rack1}
-      - CASSANDRA_ENDPOINT_SNITCH=${CASSANDRA_ENDPOINT_SNITCH:-GossipingPropertyFileSnitch}
-      - REDIS_ADDRESS=${REDIS_ADDRESS:-redis:6379}
-      - REDIS_PORT=${REDIS_PORT:-6379}
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-defaultpassword}
-      - REDIS_DB=${REDIS_DB:-0}
-      - MYSQL_HOST=${MYSQL_HOST:-mysql}
-      - MYSQL_PORT=${MYSQL_PORT:-3306}
-      - MYSQL_DATABASE=${MYSQL_DATABASE:-dev_events_db}
-      - MYSQL_USER=${MYSQL_USER:-root}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-root}
-      - PYROSCOPE_SERVER_ADDRESS=${PYROSCOPE_SERVER_ADDRESS:-http://pyroscope-server:4040}
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-rootpassword}
-      - MONGO_HOST=${MONGO_HOST:-mongodb}
-      - MONGO_PORT=${MONGO_PORT:-27017}
-      - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}      
-      - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}          
-      - RABBITMQ_MANAGEMENT_PORT=${RABBITMQ_MANAGEMENT_PORT:-15672} 
-      - RABBITMQ_USER=${RABBITMQ_USER:-guest}        
-      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}    
-      - RABBITMQ_VHOST=${RABBITMQ_VHOST:-/} 
-      - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT:-http://dynamodb:8765} 
-      - DYNAMODB_PORT=${DYNAMODB_PORT:-8765}          
-      - DYNAMODB_REGION=${DYNAMODB_REGION:-us-west-2} 
-      - GOMICRO_RPC_SERVICE_NAME=${GOMICRO_RPC_SERVICE_NAME:-golang-sdk-rpc}
-      - GOMICRO_RPC_SERVICE_ADDRESS=${GOMICRO_RPC_SERVICE_ADDRESS:-8082}
-      - GOMICRO_WEB_SERVICE_NAME=${GOMICRO_WEB_SERVICE_NAME:-golang-sdk-web}
-      - GOMICRO_WEB_SERVICE_ADDRESS=${GOMICRO_WEB_SERVICE_ADDRESS:-8080}
+      - APP_NAME=${APP_NAME}
+      - APP_VERSION=${APP_VERSION}
+      - DEBUG=${DEBUG}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
+      - POSTGRES_USER_PASSWORD=${POSTGRES_USER_PASSWORD}
+      - CONSUL_ADDRESS=${CONSUL_ADDRESS}
+      - CONSUL_ID=${CONSUL_ID}
+      - CONSUL_NAME=${CONSUL_NAME}
+      - CONSUL_SERVICE_NAME=${CONSUL_SERVICE_NAME}
+      - CONSUL_HEALTH_CHECK=${CONSUL_HEALTH_CHECK}
+      - CONSUL_CHECK_INTERVAL=${CONSUL_CHECK_INTERVAL}
+      - CONSUL_CHECK_TIMEOUT=${CONSUL_CHECK_TIMEOUT}
+      - CONSUL_PORT=${CONSUL_PORT}
+      - CONSUL_TAGS=${CONSUL_TAGS}
+      - CASSANDRA_HOST=${CASSANDRA_HOST}
+      - CASSANDRA_PORT=${CASSANDRA_PORT}
+      - CASSANDRA_USERNAME=${CASSANDRA_USERNAME}
+      - CASSANDRA_PASSWORD=${CASSANDRA_PASSWORD}
+      - CASSANDRA_KEYSPACE=${CASSANDRA_KEYSPACE}
+      - CASSANDRA_REPLICATION_FACTOR=${CASSANDRA_REPLICATION_FACTOR}
+      - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME}
+      - CASSANDRA_DC=${CASSANDRA_DC}
+      - CASSANDRA_RACK=${CASSANDRA_RACK}
+      - CASSANDRA_ENDPOINT_SNITCH=${CASSANDRA_ENDPOINT_SNITCH}
+      - REDIS_ADDRESS=${REDIS_ADDRESS}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_DB=${REDIS_DB}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - PYROSCOPE_SERVER_ADDRESS=${PYROSCOPE_SERVER_ADDRESS}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}      
+      - RABBITMQ_PORT=${RABBITMQ_PORT}          
+      - RABBITMQ_MANAGEMENT_PORT=${RABBITMQ_MANAGEMENT_PORT} 
+      - RABBITMQ_USER=${RABBITMQ_USER}        
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}    
+      - RABBITMQ_VHOST=${RABBITMQ_VHOST} 
+      - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT} 
+      - DYNAMODB_PORT=${DYNAMODB_PORT}          
+      - DYNAMODB_REGION=${DYNAMODB_REGION} 
+      - GOMICRO_RPC_SERVICE_NAME=${GOMICRO_RPC_SERVICE_NAME}
+      - GOMICRO_RPC_SERVICE_ADDRESS=${GOMICRO_RPC_SERVICE_ADDRESS}
+      - GOMICRO_WEB_SERVICE_NAME=${GOMICRO_WEB_SERVICE_NAME}
+      - GOMICRO_WEB_SERVICE_ADDRESS=${GOMICRO_WEB_SERVICE_ADDRESS}
     depends_on:
       - postgres
       - consul
@@ -97,10 +97,10 @@ services:
     build:
       context: ..
       dockerfile: config/Dockerfile.dev
-    image: "monitoring-api:${APP_VERSION:-1.0}"
+    image: "monitoring-api:${APP_VERSION}"
     ports:
-      - "${ROUTER_PORT:-8080}:${ROUTER_TARGET_PORT:-8080}"
-      - "${DELVE_PORT:-2345}:${DELVE_TARGET_PORT:-2345}"
+      - "${ROUTER_PORT}:${ROUTER_PORT}"
+      - "${DELVE_PORT}:${DELVE_PORT}"
     volumes:
       - type: bind
         source: ..
@@ -108,8 +108,8 @@ services:
     environment:
       - MAIN_DIR=/app/cmd/examples/monitoring/main.go
       - APP_NAME=monitoring-api
-      - APP_VERSION=${APP_VERSION:-1.0}
-      - DEBUG=${DEBUG:-true}
+      - APP_VERSION=${APP_VERSION}
+      - DEBUG=${DEBUG}
       - PROMETHEUS_URL=http://prometheus:9090
     depends_on:
       - mysql
@@ -127,17 +127,17 @@ services:
     build:
       context: ..
       dockerfile: config/Dockerfile.dev # Ruta al Dockerfile del servidor
-    image: "greeter-server:${APP_VERSION:-1.0}"
+    image: "greeter-server:${APP_VERSION}"
     ports:
-      - "${GRPC_SERVER_PORT:-50051}:${GRPC_SERVER_PORT:-50051}" # Exponer el puerto del servidor gRPC
-      - "${DELVE_PORT_SERVER:-2345}:${DELVE_PORT_SERVER:-2345}" # Puerto para debugging con Delve
+      - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}" # Exponer el puerto del servidor gRPC
+      - "${DELVE_PORT_SERVER}:${DELVE_PORT_SERVER}" # Puerto para debugging con Delve
     environment:
       - GRPC_SERVER_HOST=0.0.0.0 # Escuchar en todas las interfaces
-      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT:-50051}
+      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
       - MAIN_DIR=/app/cmd/examples/greeter-server/main.go
       - APP_NAME=greeter-server-api
-      - APP_VERSION=${APP_VERSION:-1.0}
-      - DEBUG=${DEBUG:-true}
+      - APP_VERSION=${APP_VERSION}
+      - DEBUG=${DEBUG}
       - FORCE_COLOR=1  # Añadir aquí
     networks:
       - app-network
@@ -156,19 +156,19 @@ services:
     build:
       context: ..
       dockerfile: config/Dockerfile.dev # Ruta al Dockerfile del cliente
-    image: "greeter-client:${APP_VERSION:-1.0}"
+    image: "greeter-client:${APP_VERSION}"
     ports:
-    - "${DELVE_PORT_SERVER:-2345}:${DELVE_PORT_SERVER:-2345}"
+    - "${DELVE_PORT_SERVER}:${DELVE_PORT_SERVER}"
     environment:
       # - GRPC_SERVER_HOST=greeter-server # Nombre del servicio del servidor gRPC
       # - GRPC_SERVER_HOST=${GRPC_SERVER_HOST:-localhost} # Usa localhost cuando estás en modo host
       # - GRPC_SERVER_HOST=172.17.0.1
       - AIR_CONFIG=/app/config/.air.toml  # Archivo de configuración para Air
-      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT:-50051}
+      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
       - MAIN_DIR=/app/cmd/examples/greeter-client/main.go
       - APP_NAME=greeter-client-api
-      - APP_VERSION=${APP_VERSION:-1.0}
-      - DEBUG=${DEBUG:-true}
+      - APP_VERSION=${APP_VERSION}
+      - DEBUG=${DEBUG}
     # networks:
     #   - app-network
     network_mode: "host"  # Usa la red del host
@@ -186,11 +186,11 @@ services:
     image: postgres:16.3
     container_name: postgres
     ports:
-      - "${POSTGRES_HOST_PORT:-5432}:${POSTGRES_HOST_PORT:-5432}"
+      - "${POSTGRES_HOST_PORT}:${POSTGRES_HOST_PORT}"
     environment:
-      POSTGRES_DB: ${POSTGRES_DATABASE:-dev_events_db}
-      POSTGRES_USER: ${POSTGRES_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_USER_PASSWORD:-root}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_USER_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -202,10 +202,10 @@ services:
     image: dpage/pgadmin4:8.8
     container_name: pgadmin
     ports:
-      - "${PGADMIN_PORT:-8081}:${PGADMIN_PORT:-80}"
+      - "${PGADMIN_PORT}:${PGADMIN_PORT}"
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     logging:
       driver: "none"
     depends_on:
@@ -220,7 +220,7 @@ services:
     image: consul:1.15.4
     container_name: consul
     ports:
-      - "${CONSUL_PORT:-8500}:${CONSUL_TARGET_PORT:-8500}"
+      - "${CONSUL_PORT}:${CONSUL_PORT}"
     networks:
       - app-network
     restart: on-failure
@@ -229,15 +229,15 @@ services:
     image: cassandra:4.1
     container_name: cassandra
     ports:
-      - "${CASSANDRA_PORT:-9042}:${CASSANDRA_PORT:-9042}"
+      - "${CASSANDRA_PORT}:${CASSANDRA_PORT}"
     environment:
-      - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME:-CassandraCluster}
-      - CASSANDRA_DC=${CASSANDRA_DC:-datacenter1}
-      - CASSANDRA_RACK=${CASSANDRA_RACK:-rack1}
-      - CASSANDRA_SEEDS=${CASSANDRA_HOST:-cassandra}
-      - CASSANDRA_ENDPOINT_SNITCH=${CASSANDRA_ENDPOINT_SNITCH:-GossipingPropertyFileSnitch}
-      - CASSANDRA_USERNAME=${CASSANDRA_USERNAME:-cassandra}
-      - CASSANDRA_PASSWORD=${CASSANDRA_PASSWORD:-cassandra}
+      - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME}
+      - CASSANDRA_DC=${CASSANDRA_DC}
+      - CASSANDRA_RACK=${CASSANDRA_RACK}
+      - CASSANDRA_SEEDS=${CASSANDRA_HOST}
+      - CASSANDRA_ENDPOINT_SNITCH=${CASSANDRA_ENDPOINT_SNITCH}
+      - CASSANDRA_USERNAME=${CASSANDRA_USERNAME}
+      - CASSANDRA_PASSWORD=${CASSANDRA_PASSWORD}
     volumes:
       - cassandra_data:/var/lib/cassandra
     networks:
@@ -248,7 +248,7 @@ services:
     image: datastax/dse-studio:6.8.32
     container_name: datastax-studio
     ports:
-      - "${DS_PORT:-9091}:${DS_PORT:-9091}"
+      - "${DS_PORT}:${DS_PORT}"
     depends_on:
       - cassandra
     environment:
@@ -261,7 +261,7 @@ services:
     image: redis:7.0
     container_name: redis
     ports:
-      - "${REDIS_PORT:-6379}:${REDIS_PORT:-6379}"
+      - "${REDIS_PORT}:${REDIS_PORT}"
     networks:
       - app-network
     restart: on-failure
@@ -270,10 +270,10 @@ services:
     image: mysql:8.0
     container_name: mysql
     ports:
-      - "${MYSQL_PORT:-3306}:${MYSQL_PORT:-3306}"
+      - "${MYSQL_PORT}:${MYSQL_PORT}"
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
-      - MYSQL_DATABASE=${MYSQL_DATABASE:-dev_events_db}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -284,11 +284,11 @@ services:
     image: phpmyadmin:5.2.1-apache
     container_name: phpmyadmin
     ports:
-      - "${PHPMYADMIN_PORT:-8082}:${PHPMYADMIN_PORT:-80}"
+      - "${PHPMYADMIN_PORT}:${PHPMYADMIN_PORT}"
     environment:
-      - PMA_HOST=${PMA_HOST:-mysql}
-      - PMA_USER=${MYSQL_USER:-root}
-      - PMA_PASSWORD=${MYSQL_PASSWORD:-root}
+      - PMA_HOST=${PMA_HOST}
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
     depends_on:
       - mysql
     networks:
@@ -301,7 +301,7 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "${PROMETHEUS_PORT:-9090}:${PROMETHEUS_PORT:-9090}"
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
     networks:
       - app-network
     restart: on-failure
@@ -310,7 +310,7 @@ services:
     image: grafana/grafana:10.2.8
     container_name: grafana
     ports:
-      - "${GRAFANA_PORT:-3000}:${GRAFANA_PORT:-3000}"
+      - "${GRAFANA_PORT}:${GRAFANA_PORT}"
     depends_on:
       - prometheus
     networks:
@@ -321,7 +321,7 @@ services:
     image: grafana/pyroscope:weekly-f76-feefa815b
     container_name: pyroscope
     ports:
-      - "${PYROSCOPE_PORT:-4040}:${PYROSCOPE_PORT:-4040}"
+      - "${PYROSCOPE_PORT}:${PYROSCOPE_PORT}"
     volumes:
       - pyroscope_data:/var/lib/pyroscope
     networks:
@@ -332,10 +332,10 @@ services:
     image: mongo:5.0.28
     container_name: mongodb
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-rootpassword}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     ports:
-      - "${MONGO_PORT:-27017}:${MONGO_PORT:-27017}"
+      - "${MONGO_PORT}:${MONGO_PORT}"
     volumes:
       - mongodb_data:/data/db
     networks:
@@ -346,12 +346,12 @@ services:
     image: mongo-express:1.0.2-20-alpine3.19
     container_name: mongo-express
     environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-rootpassword}
-      - ME_CONFIG_MONGODB_SERVER=${MONGO_HOST:-mongodb}
-      - ME_CONFIG_MONGODB_URL=${ME_CONFIG_MONGODB_URL:-mongodb://root:rootpassword@mongodb:27017/}
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - ME_CONFIG_MONGODB_SERVER=${MONGO_HOST}
+      - ME_CONFIG_MONGODB_URL=${ME_CONFIG_MONGODB_URL}
     ports:
-      - "${ME_PORT:-8083}:${ME_PORT:-8081}"
+      - "${ME_PORT}:${ME_PORT}"
     depends_on:
       - mongodb
     networks:
@@ -365,7 +365,7 @@ services:
     volumes:
       - ./ngrok.yml:/etc/ngrok.yml
     ports:
-      - "${NGROK_PORT:-5050}:${NGROK_PORT:-5050}"
+      - "${NGROK_PORT}:${NGROK_PORT}"
     networks:
       - app-network
     restart: on-failure
@@ -374,12 +374,12 @@ services:
     image: kong:2.8.5-alpine
     command: kong migrations bootstrap
     environment:
-      - KONG_DATABASE=${KONG_DATABASE:-postgres}
-      - KONG_PG_HOST=${POSTGRES_HOST:-postgres}
-      - KONG_PG_PORT=${POSTGRES_HOST_PORT:-5432}
-      - KONG_PG_USER=${POSTGRES_USERNAME:-postgres}
-      - KONG_PG_PASSWORD=${POSTGRES_USER_PASSWORD:-root}
-      - KONG_PG_DATABASE=${POSTGRES_DATABASE:-dev_events_db}
+      - KONG_DATABASE=${KONG_DATABASE}
+      - KONG_PG_HOST=${POSTGRES_HOST}
+      - KONG_PG_PORT=${POSTGRES_HOST_PORT}
+      - KONG_PG_USER=${POSTGRES_USERNAME}
+      - KONG_PG_PASSWORD=${POSTGRES_USER_PASSWORD}
+      - KONG_PG_DATABASE=${POSTGRES_DATABASE}
     depends_on:
       - postgres
     networks:
@@ -389,22 +389,22 @@ services:
     image: kong:2.8.5-alpine
     container_name: kong
     environment:
-      - KONG_DATABASE=${KONG_DATABASE:-postgres}
-      - KONG_PG_HOST=${POSTGRES_HOST:-postgres}
-      - KONG_PG_PORT=${POSTGRES_HOST_PORT:-5432}
-      - KONG_PG_USER=${POSTGRES_USERNAME:-postgres}
-      - KONG_PG_PASSWORD=${POSTGRES_USER_PASSWORD:-root}
-      - KONG_PG_DATABASE=${POSTGRES_DATABASE:-dev_events_db}
-      - KONG_PROXY_ACCESS_LOG=${KONG_PROXY_ACCESS_LOG:-/dev/stdout}
-      - KONG_ADMIN_ACCESS_LOG=${KONG_ADMIN_ACCESS_LOG:-/dev/stdout}
-      - KONG_PROXY_ERROR_LOG=${KONG_PROXY_ERROR_LOG:-/dev/stderr}
-      - KONG_ADMIN_ERROR_LOG=${KONG_ADMIN_ERROR_LOG:-/dev/stderr}
-      - KONG_ADMIN_LISTEN=${KONG_ADMIN_LISTEN:-0.0.0.0:8001}
+      - KONG_DATABASE=${KONG_DATABASE}
+      - KONG_PG_HOST=${POSTGRES_HOST}
+      - KONG_PG_PORT=${POSTGRES_HOST_PORT}
+      - KONG_PG_USER=${POSTGRES_USERNAME}
+      - KONG_PG_PASSWORD=${POSTGRES_USER_PASSWORD}
+      - KONG_PG_DATABASE=${POSTGRES_DATABASE}
+      - KONG_PROXY_ACCESS_LOG=${KONG_PROXY_ACCESS_LOG}
+      - KONG_ADMIN_ACCESS_LOG=${KONG_ADMIN_ACCESS_LOG}
+      - KONG_PROXY_ERROR_LOG=${KONG_PROXY_ERROR_LOG}
+      - KONG_ADMIN_ERROR_LOG=${KONG_ADMIN_ERROR_LOG}
+      - KONG_ADMIN_LISTEN=${KONG_ADMIN_LISTEN}
     ports:
-      - "${KONG_PROXY_PORT:-8000}:${KONG_PROXY_PORT:-8000}"
-      - "${KONG_PROXY_SSL_PORT:-8443}:${KONG_PROXY_SSL_PORT:-8443}"
-      - "${KONG_ADMIN_PORT:-8001}:${KONG_ADMIN_PORT:-8001}"
-      - "${KONG_ADMIN_SSL_PORT:-8444}:${KONG_ADMIN_SSL_PORT:-8444}"
+      - "${KONG_PROXY_PORT}:${KONG_PROXY_PORT}"
+      - "${KONG_PROXY_SSL_PORT}:${KONG_PROXY_SSL_PORT}"
+      - "${KONG_ADMIN_PORT}:${KONG_ADMIN_PORT}"
+      - "${KONG_ADMIN_SSL_PORT}:${KONG_ADMIN_SSL_PORT}"
     depends_on:
       - kong-migrations
     networks:
@@ -415,12 +415,12 @@ services:
     image: "rabbitmq:4.0.0-beta.3-management-alpine"
     container_name: rabbitmq
     environment:
-      - RABBITMQ_USER=${RABBITMQ_USER:-guest}
-      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-guest}
-      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_VHOST:-/}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_VHOST}
     ports:
-      - "${RABBITMQ_PORT:-5672}:${RABBITMQ_TARGET_PORT:-5672}"
-      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:${RABBITMQ_TARGET_MANAGEMENT_PORT:-15672}"
+      - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"
+      - "${RABBITMQ_MANAGEMENT_PORT}:${RABBITMQ_MANAGEMENT_PORT}"
     networks:
       - app-network
     restart: on-failure
@@ -428,9 +428,9 @@ services:
   dynamodb:
     image: amazon/dynamodb-local:1.24.0
     container_name: dynamodb
-    command: "-jar DynamoDBLocal.jar -port ${DYNAMODB_PORT:-8765} -sharedDb -dbPath /home/dynamodblocal/data"
+    command: "-jar DynamoDBLocal.jar -port ${DYNAMODB_PORT} -sharedDb -dbPath /home/dynamodblocal/data"
     ports:
-      - "${DYNAMODB_PORT:-8765}:${DYNAMODB_TARGET_PORT:-8765}"
+      - "${DYNAMODB_PORT}:${DYNAMODB_PORT}"
     volumes:
       - dynamodb_data:/home/dynamodblocal/data
     networks:
@@ -441,22 +441,23 @@ services:
     image: vault:1.13.3
     container_name: vault
     ports:
-      - "${VAULT_PORT:-8200}:${VAULT_TARGET_PORT:-8200}"
+      - "${VAULT_PORT}:${VAULT_PORT}"
     environment:
-      VAULT_ADDR: ${VAULT_ADDR}
-      VAULT_API_ADDR: ${VAULT_API_ADDR}
-      VAULT_CLUSTER_ADDR: ${VAULT_CLUSTER_ADDR}
-      VAULT_UI: ${VAULT_UI}
+      VAULT_ADDR: http://localhost:8200
+      VAULT_API_ADDR: http://localhost:8200
+      VAULT_CLUSTER_ADDR: http://vault:8201
+      VAULT_UI: "true"
     volumes:
+      - ./config/vault-config.hcl:/vault/config/vault-config.hcl
       - vault_data:/vault/data
-    command: server -config=/vault/config/vault-config.hcl
+    command: vault server -config=/vault/config/vault-config.hcl
     depends_on:
       - consul
     networks:
       - app-network
     restart: on-failure
     cap_add:
-      - IPC_LOCK      
+      - IPC_LOCK
 
 networks:
   app-network:
