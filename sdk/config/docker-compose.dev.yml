@@ -202,7 +202,7 @@ services:
     image: dpage/pgadmin4:8.8
     container_name: pgadmin
     ports:
-      - "${PGADMIN_PORT}:${PGADMIN_PORT}"
+      - "${PGADMIN_PORT}:${PGADMIN_TARGET_PORT}"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
@@ -274,6 +274,8 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -284,16 +286,16 @@ services:
     image: phpmyadmin:5.2.1-apache
     container_name: phpmyadmin
     ports:
-      - "${PHPMYADMIN_PORT}:${PHPMYADMIN_PORT}"
+      - "${PHPMYADMIN_PORT}:${PHPMYADMIN_TARGET_PORT}"
     environment:
-      - PMA_HOST=${PMA_HOST}
+      - PMA_HOST=${MYSQL_HOST}
       - PMA_USER=${MYSQL_USER}
       - PMA_PASSWORD=${MYSQL_PASSWORD}
     depends_on:
       - mysql
     networks:
       - app-network
-    restart: on-failure 
+    restart: on-failure
 
   prometheus:
     image: prom/prometheus:v2.45.6
