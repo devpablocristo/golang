@@ -5,6 +5,10 @@ import (
 	"github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/nimble"
 	utils2 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/utils"
 )
+type ItemReq struct {
+	ItemID   string `json:"item_id"`
+	Quantity int    `json:"quantity"`
+}
 
 // OrderReq representa la estructura del request para una orden de Nimble
 type OrderReq struct {

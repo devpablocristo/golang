@@ -3,7 +3,7 @@ package calculator
 import (
 	"context"
 
-	coreports "github.com/devpablocristo/golang/sdk/internal/core/calculator-client/ports"
+	ports "github.com/devpablocristo/golang/sdk/internal/core/calculator-client/ports"
 	pb "github.com/devpablocristo/golang/sdk/pb"
 	sdkports "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
 )
@@ -12,7 +12,7 @@ type grpcClient struct {
 	client sdkports.Client
 }
 
-func NewGrpcClient(c sdkports.Client) coreports.GrpcClient {
+func NewGrpcClient(c sdkports.Client) ports.GrpcClient {
 	return &grpcClient{
 		client: c,
 	}

@@ -5,6 +5,10 @@ import (
 	"github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/cin7"
 	utils2 "github.com/devpablocristo/golang/sdk/internal/core/nimble-cin7/utils"
 )
+type ItemReq struct {
+	ItemID   string `json:"item_id"`
+	Quantity int    `json:"quantity"`
+}
 
 type ShipmentReq struct {
 	ShipmentID  string          `json:"shipment_id"`

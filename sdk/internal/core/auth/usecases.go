@@ -2,30 +2,37 @@ package auth
 
 import (
 	"context"
-	"time"
+	"fmt"
 
 	entities "github.com/devpablocristo/golang/sdk/internal/core/auth/entities"
 	ports "github.com/devpablocristo/golang/sdk/internal/core/auth/ports"
 )
 
 type useCases struct {
-	accessControl ports.AccessControl
+	grpcClient ports.GrpcClient
+	jwtService ports.JwtService
 }
 
-func NewUseCases(ac ports.AccessControl) ports.UseCases {
+// NewUseCases crea una nueva instancia de useCases
+func NewUseCases(gc ports.GrpcClient, js ports.JwtService) ports.UseCases {
 	return &useCases{
-		accessControl: ac,
+		grpcClient: gc,
+		jwtService: js,
 	}
 }
 
-func (s *useCases) Login(ctx context.Context, credentials *entities.LoginCredentials) (*entities.Token, error) {
-	// _, err := s.messageBroker.GetUserUUID(ctx, credentials)
-	// if err != nil {
-	// 	return nil, err
-	// }
+// Login maneja la lógica de autenticación de usuario
+func (s *useCases) Login(ctx context.Context, creds *entities.LoginCredentials) (*entities.Token, error) {
+	userUUID, err := s.grpcClient.GetUserUUID(ctx, creds)
+	if err != nil {
+		return nil, fmt.Errorf("error al obtener el UUID del usuario: %w", err)
+	}
 
-	return &entities.Token{
-		AccessToken: "",
-		ExpiresAt:   time.Now().Add(time.Hour * 24),
-	}, nil
+	token, err := s.jwtService.GenerateToken(userUUID)
+	if err != nil {
+		return nil, fmt.Errorf("error generando el token de autenticación: %w", err)
+	}
+
+	// Devuelve el token generado
+	return token, nil
 }
