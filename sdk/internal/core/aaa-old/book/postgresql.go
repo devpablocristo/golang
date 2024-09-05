@@ -4,46 +4,27 @@ import (
 	pqsql "github.com/devpablocristo/golang/sdk/pkg/postgresql/pq"
 )
 
-// Repository represents the repository structure.
-type Repository struct {
+// repository represents the repository structure.
+type repository struct {
 	pgInst pqsql.PostgreSQLClientPort
 }
 
-// NewRepository initializes a new book repository.
-func NewRepository(inst pqsql.PostgreSQLClientPort) RepositoryPort {
-	return &Repository{
+// Newrepository initializes a new book repository.
+func NewRepository(inst pqsql.PostgreSQLClientPort) Repository {
+	return &repository{
 		pgInst: inst,
 	}
 }
 
-// GetBooks retrieves all books from the database.
-func (b *Repository) GetBooks(book Book, books []Book) ([]Book, error) {
-	rows, err := b.pgInst.DB().Query("SELECT * FROM books")
-	if err != nil {
-		return []Book{}, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rows.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
-		if err != nil {
-			return []Book{}, err
-		}
-		books = append(books, book)
-	}
-
-	return books, nil
-}
-
 // GetBook retrieves a single book by its ID.
-func (b *Repository) GetBook(book Book, id int) (Book, error) {
+func (b *repository) GetBook(book Book, id int) (Book, error) {
 	row := b.pgInst.DB().QueryRow("SELECT * FROM books WHERE id=$1", id)
 	err := row.Scan(&book.ID, &book.Title, &book.Author, &book.Year)
 	return book, err
 }
 
 // AddBook inserts a new book into the database.
-func (b *Repository) AddBook(book Book) (int, error) {
+func (b *repository) AddBook(book Book) (int, error) {
 	var id int
 	err := b.pgInst.DB().QueryRow("INSERT INTO books (title, author, year) VALUES($1, $2, $3) RETURNING id;",
 		book.Title, book.Author, book.Year).Scan(&id)
@@ -54,7 +35,7 @@ func (b *Repository) AddBook(book Book) (int, error) {
 }
 
 // UpdateBook updates an existing book in the database.
-func (b *Repository) UpdateBook(book Book) (int64, error) {
+func (b *repository) UpdateBook(book Book) (int64, error) {
 	result, err := b.pgInst.DB().Exec("UPDATE books SET title=$1, author=$2, year=$3 WHERE id=$4",
 		book.Title, book.Author, book.Year, book.ID)
 	if err != nil {
@@ -68,7 +49,7 @@ func (b *Repository) UpdateBook(book Book) (int64, error) {
 }
 
 // RemoveBook deletes a book from the database.
-func (b *Repository) RemoveBook(id int) (int64, error) {
+func (b *repository) RemoveBook(id int) (int64, error) {
 	result, err := b.pgInst.DB().Exec("DELETE FROM books WHERE id=$1", id)
 	if err != nil {
 		return 0, err

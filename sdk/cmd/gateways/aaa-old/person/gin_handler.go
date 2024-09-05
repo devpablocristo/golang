@@ -105,14 +105,3 @@ func (h *GinHandler) CreatePerson(c *gin.Context) {
 
 // 	c.JSON(http.StatusOK, ctypes.NewAPIMessage("Person founded", Person))
 // }
-
-// func (es *GinHandler) GetAllPersons(c *gin.Context) {
-// 	Persons, err := es.PersonUseCasesPort.GetAllPersons(c)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, ctypes.NewAPIError(http.StatusBadRequest, err.Error()))
-// 		return
-// 	}
-
-// 	convPersons := domain.PersonToInterface(Persons)
-// 	c.JSON(http.StatusOK, ctypes.NewAPIMessage("list of all Persons", convPersons))
-// }

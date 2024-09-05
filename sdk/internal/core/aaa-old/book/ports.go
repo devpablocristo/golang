@@ -1,7 +1,6 @@
 package book
 
-type RepositoryPort interface {
-	GetBooks(Book, []Book) ([]Book, error)
+type Repository interface {
 	GetBook(Book, int) (Book, error)
 	AddBook(Book) (int, error)
 	UpdateBook(Book) (int64, error)
