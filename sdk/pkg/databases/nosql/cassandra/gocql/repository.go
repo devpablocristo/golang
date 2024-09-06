@@ -15,16 +15,16 @@ var (
 	initError error
 )
 
-type Repository struct {
+type repository struct {
 	session *gocql.Session
 }
 
 func newRepository(config ports.Config) (ports.Repository, error) {
 	once.Do(func() {
-		client := &Repository{}
-		initError = client.Connect(config)
+		instance := &repository{}
+		initError = instance.Connect(config)
 		if initError == nil {
-			instance = client
+			instance = nil
 		}
 	})
 	return instance, initError
@@ -37,7 +37,7 @@ func GetInstance() (ports.Repository, error) {
 	return instance, nil
 }
 
-func (c *Repository) Connect(config ports.Config) error {
+func (c *repository) Connect(config ports.Config) error {
 	cluster := gocql.NewCluster(config.GetHosts()...)
 	cluster.Keyspace = config.GetKeyspace()
 	cluster.Authenticator = gocql.PasswordAuthenticator{
@@ -52,12 +52,12 @@ func (c *Repository) Connect(config ports.Config) error {
 	return nil
 }
 
-func (c *Repository) Close() {
+func (c *repository) Close() {
 	if c.session != nil {
 		c.session.Close()
 	}
 }
 
-func (c *Repository) GetSession() *gocql.Session {
+func (c *repository) GetSession() *gocql.Session {
 	return c.session
 }

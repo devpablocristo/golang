@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/devpablocristo/golang/sdk/internal/core/monitoring/ports"
-	portsmysql "github.com/devpablocristo/golang/sdk/pkg/databases/mysql/go-sql-driver/ports"
+	portsmysql "github.com/devpablocristo/golang/sdk/pkg/databases/sql/mysql/go-sql-driver/ports"
 )
 
 type mysqlRepository struct {

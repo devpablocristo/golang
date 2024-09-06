@@ -6,8 +6,8 @@ import (
 	gtwmon "github.com/devpablocristo/golang/sdk/cmd/gateways/monitoring"
 	coremon "github.com/devpablocristo/golang/sdk/internal/core/monitoring"
 	sdkviper "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
-	sdkmysql "github.com/devpablocristo/golang/sdk/pkg/databases/mysql/go-sql-driver"
-	portsmysql "github.com/devpablocristo/golang/sdk/pkg/databases/mysql/go-sql-driver/ports"
+	sdkmysql "github.com/devpablocristo/golang/sdk/pkg/databases/sql/mysql/go-sql-driver"
+	sdkmysqlports "github.com/devpablocristo/golang/sdk/pkg/databases/sql/mysql/go-sql-driver/ports"
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
 	portsgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
@@ -33,7 +33,7 @@ func main() {
 
 }
 
-func lauchBootstraps() (portsgin.Server, portsmysql.Repository) {
+func lauchBootstraps() (portsgin.Server, sdkmysqlports.Repository) {
 	mysqlRepository, err := sdkmysql.Bootstrap()
 	if err != nil {
 		log.Fatalf("MySQL Service error: %v", err)

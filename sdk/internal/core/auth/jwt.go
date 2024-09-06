@@ -7,6 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+// TODO: usar jwt del sdk
 // JwtService define la interfaz del servicio JWT
 type JwtService interface {
 	GenerateToken(userUUID string) (*entities.Token, error)
