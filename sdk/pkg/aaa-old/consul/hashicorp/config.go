@@ -1,4 +1,4 @@
-package cslhash
+package sdkconsul
 
 import (
 	"fmt"

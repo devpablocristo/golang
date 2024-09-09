@@ -7,38 +7,60 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/shared"
-	"github.com/devpablocristo/golang/sdk/cmd/gateways/ttools"
-	"github.com/devpablocristo/golang/sdk/internal/core"
+	shared "github.com/devpablocristo/golang/sdk/cmd/gateways/shared"
+	coreeventports "github.com/devpablocristo/golang/sdk/internal/core/event/ports"
+	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
 
 type Handler struct {
-	uc core.EventUseCases
+	useCases  coreeventports.UseCases
+	ginServer sdkgin.Server
 }
 
 // NewHandler crea un nuevo handler para los eventos.
-func NewHandler(uc core.EventUseCases) *Handler {
+func NewHandler(uc coreeventports.UseCases, gs sdkgin.Server) *Handler {
 	return &Handler{
-		uc: uc,
+		useCases:  uc,
+		ginServer: gs,
 	}
+}
+
+func (h *Handler) Start(apiVersion string, secret string) error {
+	h.Routes(apiVersion, secret)
+	return h.ginServer.RunServer()
+}
+
+func (h *Handler) Routes(apiVersion string, secret string) {
+	//r := h.ginServer.GetRouter()
+
+	// r.POST("/events", r.CreateEvent)
+	// r.DELETE("/events/:eventID", r.DeleteEvent)
+	// r.DELETE("/events/hard/:eventID", r.HardDeleteEvent)
+	// r.PATCH("/events/:eventID", r.UpdateEvent)
+	// r.PATCH("/events/revive/:eventID", r.ReviveEvent)
+	// r.GET("/events/:eventID", r.GetEvent)
+	// r.GET("/events", r.GetAllEvents)
 }
 
 // FakeCreateEvent maneja la creación ficticia de un evento para pruebas.
 func (h *Handler) FakeCreateEvent(c *gin.Context) {
-	data, err := ttools.LoadTestData("event.json")
+	dir := "data"
+	filename := "event.json"
+
+	data, err := shared.LoadTestData(dir, filename)
 	if err != nil {
 		shared.WriteErrorResponse(c.Writer, shared.ApiErrors["InternalServer"], c.Request.Method)
 		return
 	}
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(data))
 
-	dto, err := decodeCreateEventRequest(c)
+	req, err := decodeCreateEventRequest(c)
 	if err != nil {
 		shared.WriteErrorResponse(c.Writer, shared.ApiErrors["InvalidJSON"], c.Request.Method)
 		return
 	}
 
-	if err = h.uc.CreateEvent(c.Request.Context(), dto.ToDomain()); err != nil {
+	if err = h.useCases.CreateEvent(c.Request.Context(), req.ToDomain()); err != nil {
 		shared.WriteErrorResponse(c.Writer, shared.ApiErrors["InternalServer"], c.Request.Method)
 		return
 	}

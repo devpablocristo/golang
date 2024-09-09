@@ -4,10 +4,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/devpablocristo/golang/sdk/cmd/gateways/event/dto"
 )
 
-func decodeCreateEventRequest(c *gin.Context) (*EventRequest, error) {
-	var request EventRequest
+func decodeCreateEventRequest(c *gin.Context) (*dto.EventRequest, error) {
+	var request dto.EventRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		return nil, err
 	}

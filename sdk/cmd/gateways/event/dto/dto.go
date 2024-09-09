@@ -1,14 +1,13 @@
-package event
+package dto
 
 import (
 	"time"
 
-	"github.com/devpablocristo/golang/sdk/internal/core/event"
-	"github.com/devpablocristo/golang/sdk/internal/core/location"
+	event "github.com/devpablocristo/golang/sdk/internal/core/event/entities"
+	location "github.com/devpablocristo/golang/sdk/internal/core/location/entities"
 	user "github.com/devpablocristo/golang/sdk/internal/core/user/entities"
 )
 
-// EventRequest representa la solicitud para crear o actualizar un evento
 type EventRequest struct {
 	ID          string            `json:"id"`
 	Title       string            `json:"title"`

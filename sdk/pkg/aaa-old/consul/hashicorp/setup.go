@@ -5,14 +5,14 @@ import (
 
 	"github.com/spf13/viper"
 
-	cslhash "github.com/devpablocristo/golang/sdk/pkg/consul/hashicorp"
+	sdkconsul "github.com/devpablocristo/golang/sdk/pkg/consul/hashicorp"
 )
 
-func NewConsulInstance() (cslhash.ConsulClientPort, error) {
+func NewConsulInstance() (sdkconsul.ConsulClientPort, error) {
 	tagsString := viper.GetString("CONSUL_TAGS")
 	tags := strings.Split(tagsString, ",") // Asume que los tags están separados por comas
 
-	config := cslhash.ConsulConfig{
+	config := sdkconsul.ConsulConfig{
 		ID:            viper.GetString("CONSUL_ID"),
 		Name:          viper.GetString("CONSUL_NAME"),
 		Port:          viper.GetInt("CONSUL_PORT"),
@@ -28,9 +28,9 @@ func NewConsulInstance() (cslhash.ConsulClientPort, error) {
 		return nil, err
 	}
 
-	if err := cslhash.InitializeConsulClient(config); err != nil {
+	if err := sdkconsul.InitializeConsulClient(config); err != nil {
 		return nil, err
 	}
 
-	return cslhash.GetConsulInstance()
+	return sdkconsul.GetConsulInstance()
 }
