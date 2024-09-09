@@ -158,7 +158,7 @@ services:
       dockerfile: config/Dockerfile.dev # Ruta al Dockerfile del cliente
     image: "greeter-client:${APP_VERSION}"
     ports:
-    - "${DELVE_PORT_SERVER}:${DELVE_PORT_SERVER}"
+    - "${DELVE_PORT}:${DELVE_PORT}"
     environment:
       # - GRPC_SERVER_HOST=greeter-server # Nombre del servicio del servidor gRPC
       # - GRPC_SERVER_HOST=${GRPC_SERVER_HOST:-localhost} # Usa localhost cuando estás en modo host
@@ -450,7 +450,7 @@ services:
       VAULT_CLUSTER_ADDR: http://vault:8201
       VAULT_UI: "true"
     volumes:
-      - ./config/vault-config.hcl:/vault/config/vault-config.hcl
+      - ./vault-config.hcl:/vault/config/vault-config.hcl
       - vault_data:/vault/data
     command: vault server -config=/vault/config/vault-config.hcl
     depends_on:
