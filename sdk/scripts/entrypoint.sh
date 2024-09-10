@@ -3,22 +3,6 @@
 # shellcheck disable=SC2154  # Desactivar aviso de shellcheck para APP_NAME
 # shellcheck source=./config/.env disable=SC1091 # Desactivar aviso de shellcheck de archivo no especificado
 
-# Load environment variables from the ./config/.env file in the parent directory
-# loadEnv() {
-#   if [ -f ./config/.env ]; then
-#     log "Loading environment variables from ./config/.env"
-#     # Export all variables from .env file
-#     set -a
-#     # shellcheck source=./config/.env
-#     . ./config/.env
-#     set +a
-#   else
-#     echo "ERROR: ./config/.env file not found in the parent directory. Please create ./config/.env with the necessary environment variables."
-#     exit 1
-#   fi
-# }
-
-
 # Load environment variables from the ./config/.env file without overwriting existing ones
 loadEnv() {
   if [ -f ./config/.env ]; then
