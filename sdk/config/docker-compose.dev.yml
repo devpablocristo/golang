@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   go-micro-api:
-    container_name: "go-micro"
+    container_name: "go-micro-api"
     build:
       context: ..
       dockerfile: config/Dockerfile.dev
@@ -22,7 +22,6 @@ services:
       - APP_NAME=go-micro-api
       - APP_VERSION=${APP_VERSION}
       - DEBUG=${DEBUG}
-      - DELVE_PORT=2345
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT}
       - POSTGRES_DATABASE=${POSTGRES_DATABASE}
@@ -91,10 +90,10 @@ services:
     restart: on-failure
     profiles:
       - go-micro
-    command: air -c .air.toml
+    command: air -c ${AIR_CONFIG}
 
   monitoring-api:
-    container_name: "monitoring"
+    container_name: "monitoring-api"
     build:
       context: ..
       dockerfile: config/Dockerfile.dev
@@ -107,7 +106,6 @@ services:
         source: ..
         target: /app
     environment:
-      - DELVE_PORT=2345
       - MAIN_DIR=/app/cmd/examples/monitoring/main.go
       - APP_NAME=monitoring-api
       - APP_VERSION=${APP_VERSION}
@@ -122,23 +120,22 @@ services:
     restart: on-failure
     profiles:
       - monitoring    
-    command: air -c .air.toml  
+    command: air -c ${AIR_CONFIG}
 
   greeter-server-api:
-    container_name: "greeter-server"
+    container_name: "greeter-server-api"
     build:
       context: ..
-      dockerfile: config/Dockerfile.dev # Ruta al Dockerfile del servidor
-    image: "greeter-server:${APP_VERSION}"
+      dockerfile: config/Dockerfile.dev  # Ruta al Dockerfile del servidor
+    image: "greeter-server-api:${APP_VERSION}"
     ports:
-      - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}" # Exponer el puerto del servidor gRPC
-      - "${DELVE_PORT}:${DELVE_PORT}" # Puerto para debugging con Delve
+      - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}"  # Exponer el puerto del servidor gRPC
+      - "${DELVE_PORT_SERVER}:${DELVE_PORT_SERVER}"  # Puerto para debugging con Delve
     environment:
-      - DELVE_PORT=2346
-      - GRPC_SERVER_HOST=0.0.0.0 # Escuchar en todas las interfaces
+      - DELVE_PORT=${DELVE_PORT_SERVER}  # Sobrescribir el valor de DELVE_PORT para el servidor
+      - GRPC_SERVER_HOST=0.0.0.0  # Escuchar en todas las interfaces
       - MAIN_DIR=/app/cmd/examples/greeter-server/main.go
       - APP_NAME=greeter-server-api
-      - AIR_CONFIG=/app/config/.air.toml  # Archivo de configuración para Air
       - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
       - APP_VERSION=${APP_VERSION}
       - DEBUG=${DEBUG}
@@ -151,23 +148,21 @@ services:
     restart: on-failure
     profiles:
       - greeter-server
-    command: air -c .air.toml
+    command: air -c ${AIR_CONFIG}
 
   greeter-client-api:
-    container_name: "greeter-client"
+    container_name: "greeter-client-api"
     build:
       context: ..
       dockerfile: config/Dockerfile.dev # Ruta al Dockerfile del cliente
-    image: "greeter-client:${APP_VERSION}"
+    image: "greeter-client-api:${APP_VERSION}"
     ports:
     - "${DELVE_PORT}:${DELVE_PORT}"
     environment:
       # - GRPC_SERVER_HOST=greeter-server # Nombre del servicio del servidor gRPC
       # - GRPC_SERVER_HOST=${GRPC_SERVER_HOST:-localhost} # Usa localhost cuando estás en modo host
       # - GRPC_SERVER_HOST=172.17.0.1
-      - DELVE_PORT=2345
-      - AIR_CONFIG=/app/config/.air.toml  # Archivo de configuración para Air
-      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
+      # - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
       - MAIN_DIR=/app/cmd/examples/greeter-client/main.go
       - APP_NAME=greeter-client-api
       - APP_VERSION=${APP_VERSION}
@@ -182,7 +177,7 @@ services:
     restart: on-failure
     profiles:
       - greeter-client
-    command: air -c .air.toml
+    command: air -c ${AIR_CONFIG}
 
   postgres:
     image: postgres:16.3

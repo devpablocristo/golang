@@ -36,68 +36,68 @@ test:
 docker-up:
 	@echo "Starting $(PROFILE) services in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up -d
+	MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up -d
 	@$(MAKE) docker-logs PROFILE=$(PROFILE)
 
 docker-build:
 	@echo "Building $(PROFILE) services in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up --build -d
+	MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up --build -d
 	@$(MAKE) docker-logs PROFILE=$(PROFILE)
 
 docker-down:
 	@echo "Stopping $(PROFILE) services in dev mode..."
-	APP_NAME=${APP_NAME} MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) down --remove-orphans
+	MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) down --remove-orphans
 
 docker-logs:
 	@echo "Fetching logs for $(PROFILE) services..."
-	@docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(SERVICE_NAME)
+	@docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(APP_NAME)
 
 # Specific Docker targets using generic commands
 greeter-server-up:
-	@$(MAKE) docker-up PROFILE=greeter-server SERVICE_NAME=greeter-server-api
+	@$(MAKE) docker-up PROFILE=greeter-server APP_NAME=greeter-server-api
 
 greeter-server-build:
-	@$(MAKE) docker-build PROFILE=greeter-server SERVICE_NAME=greeter-server-api
+	@$(MAKE) docker-build PROFILE=greeter-server APP_NAME=greeter-server-api
 
 greeter-server-down:
-	@$(MAKE) docker-down PROFILE=greeter-server SERVICE_NAME=greeter-server-api
+	@$(MAKE) docker-down PROFILE=greeter-server APP_NAME=greeter-server-api
 
 greeter-server-logs:
-	@$(MAKE) docker-logs PROFILE=greeter-server SERVICE_NAME=greeter-server-api
+	@$(MAKE) docker-logs PROFILE=greeter-server APP_NAME=greeter-server-api
 
 greeter-client-up:
-	@$(MAKE) docker-up PROFILE=greeter-client SERVICE_NAME=greeter-client-api
+	@$(MAKE) docker-up PROFILE=greeter-client APP_NAME=greeter-client-api
 
 greeter-client-build:
-	@$(MAKE) docker-build PROFILE=greeter-client SERVICE_NAME=greeter-client-api
+	@$(MAKE) docker-build PROFILE=greeter-client APP_NAME=greeter-client-api
 
 greeter-client-down:
-	@$(MAKE) docker-down PROFILE=greeter-client SERVICE_NAME=greeter-client-api
+	@$(MAKE) docker-down PROFILE=greeter-client APP_NAME=greeter-client-api
 
 greeter-client-logs:
-	@$(MAKE) docker-logs PROFILE=greeter-client SERVICE_NAME=greeter-client-api
+	@$(MAKE) docker-logs PROFILE=greeter-client APP_NAME=greeter-client-api
 
 monitoring-up:
-	@$(MAKE) docker-up PROFILE=monitoring SERVICE_NAME=monitoring-api
+	@$(MAKE) docker-up PROFILE=monitoring APP_NAME=monitoring-api
 
 monitoring-build:
-	@$(MAKE) docker-build PROFILE=monitoring SERVICE_NAME=monitoring-api
+	@$(MAKE) docker-build PROFILE=monitoring APP_NAME=monitoring-api
 
 monitoring-down:
-	@$(MAKE) docker-down PROFILE=monitoring SERVICE_NAME=monitoring-api
+	@$(MAKE) docker-down PROFILE=monitoring APP_NAME=monitoring-api
 
 go-micro-up:
-	@$(MAKE) docker-up PROFILE=go-micro SERVICE_NAME=go-micro-api
+	@$(MAKE) docker-up PROFILE=go-micro APP_NAME=go-micro-api
 
 go-micro-build:
-	@$(MAKE) docker-build PROFILE=go-micro SERVICE_NAME=go-micro-api
+	@$(MAKE) docker-build PROFILE=go-micro APP_NAME=go-micro-api
 
 go-micro-down:
-	@$(MAKE) docker-down PROFILE=go-micro SERVICE_NAME=go-micro-api
+	@$(MAKE) docker-down PROFILE=go-micro APP_NAME=go-micro-api
 
 go-micro-logs:
-	@$(MAKE) docker-logs PROFILE=go-micro SERVICE_NAME=go-micro-api
+	@$(MAKE) docker-logs PROFILE=go-micro APP_NAME=go-micro-api
 
 # Clean target
 clean:

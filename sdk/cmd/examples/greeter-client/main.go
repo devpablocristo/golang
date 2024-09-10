@@ -33,8 +33,8 @@ func main() {
 	defer cancel()
 
 	// example
-	firstName := "Emma"
-	lastName := "Watson"
+	firstName := "Flibis2"
+	lastName := "Bufé"
 
 	res, err := greeterUseCases.Greet(ctx, firstName, lastName)
 	if err != nil {

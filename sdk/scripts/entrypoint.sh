@@ -4,19 +4,45 @@
 # shellcheck source=./config/.env disable=SC1091 # Desactivar aviso de shellcheck de archivo no especificado
 
 # Load environment variables from the ./config/.env file in the parent directory
+# loadEnv() {
+#   if [ -f ./config/.env ]; then
+#     log "Loading environment variables from ./config/.env"
+#     # Export all variables from .env file
+#     set -a
+#     # shellcheck source=./config/.env
+#     . ./config/.env
+#     set +a
+#   else
+#     echo "ERROR: ./config/.env file not found in the parent directory. Please create ./config/.env with the necessary environment variables."
+#     exit 1
+#   fi
+# }
+
+
+# Load environment variables from the ./config/.env file without overwriting existing ones
 loadEnv() {
   if [ -f ./config/.env ]; then
     log "Loading environment variables from ./config/.env"
-    # Export all variables from .env file
-    set -a
-    # shellcheck source=./config/.env
-    . ./config/.env
-    set +a
+    # Read each line in .env file
+    while IFS= read -r line || [ -n "$line" ]; do
+      # Ignore empty lines and comments
+      if [ -n "$line" ] && [ "${line#\#}" = "$line" ]; then
+        VAR_NAME=$(echo "$line" | cut -d '=' -f1)
+        VAR_VALUE=$(echo "$line" | cut -d '=' -f2-)
+        # Check if variable is already set
+        if [ -z "$(printenv "$VAR_NAME")" ]; then
+          export "$VAR_NAME=$VAR_VALUE"
+        else
+          log "Variable $VAR_NAME is already set to $(printenv "$VAR_NAME"), not overwriting."
+        fi
+      fi
+    done < ./config/.env
   else
     echo "ERROR: ./config/.env file not found in the parent directory. Please create ./config/.env with the necessary environment variables."
     exit 1
   fi
 }
+
 
 # Function to log messages
 log() {
