@@ -10,7 +10,7 @@ tmp_dir = "./tmp"
   bin = "./tmp/${APP_NAME}"
 
   # Comando completo para ejecutar el binario utilizando Delve
-  full_bin = "dlv exec --accept-multiclient --headless --listen :2345 --api-version 2 ./tmp/${APP_NAME}"
+  full_bin = "dlv exec --accept-multiclient --headless --listen :${DELVE_PORT} --api-version 2 ./tmp/${APP_NAME}"
 
   # Otros ajustes de compilación y monitoreo
   delay = 1000

@@ -19,9 +19,10 @@ services:
         target: /app/migrations
     environment:
       - MAIN_DIR=/app/cmd/examples/go-micro/main.go
-      - APP_NAME=${APP_NAME}
+      - APP_NAME=go-micro-api
       - APP_VERSION=${APP_VERSION}
       - DEBUG=${DEBUG}
+      - DELVE_PORT=2345
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT}
       - POSTGRES_DATABASE=${POSTGRES_DATABASE}
@@ -106,6 +107,7 @@ services:
         source: ..
         target: /app
     environment:
+      - DELVE_PORT=2345
       - MAIN_DIR=/app/cmd/examples/monitoring/main.go
       - APP_NAME=monitoring-api
       - APP_VERSION=${APP_VERSION}
@@ -130,15 +132,16 @@ services:
     image: "greeter-server:${APP_VERSION}"
     ports:
       - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}" # Exponer el puerto del servidor gRPC
-      - "${DELVE_PORT_SERVER}:${DELVE_PORT_SERVER}" # Puerto para debugging con Delve
+      - "${DELVE_PORT}:${DELVE_PORT}" # Puerto para debugging con Delve
     environment:
+      - DELVE_PORT=2346
       - GRPC_SERVER_HOST=0.0.0.0 # Escuchar en todas las interfaces
-      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
       - MAIN_DIR=/app/cmd/examples/greeter-server/main.go
       - APP_NAME=greeter-server-api
+      - AIR_CONFIG=/app/config/.air.toml  # Archivo de configuración para Air
+      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
       - APP_VERSION=${APP_VERSION}
       - DEBUG=${DEBUG}
-      - FORCE_COLOR=1  # Añadir aquí
     networks:
       - app-network
     volumes:
@@ -148,7 +151,6 @@ services:
     restart: on-failure
     profiles:
       - greeter-server
-      - greeter-service
     command: air -c .air.toml
 
   greeter-client-api:
@@ -163,6 +165,7 @@ services:
       # - GRPC_SERVER_HOST=greeter-server # Nombre del servicio del servidor gRPC
       # - GRPC_SERVER_HOST=${GRPC_SERVER_HOST:-localhost} # Usa localhost cuando estás en modo host
       # - GRPC_SERVER_HOST=172.17.0.1
+      - DELVE_PORT=2345
       - AIR_CONFIG=/app/config/.air.toml  # Archivo de configuración para Air
       - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
       - MAIN_DIR=/app/cmd/examples/greeter-client/main.go
@@ -179,7 +182,6 @@ services:
     restart: on-failure
     profiles:
       - greeter-client
-      - greeter-service
     command: air -c .air.toml
 
   postgres:
@@ -197,6 +199,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   pgadmin:
     image: dpage/pgadmin4:8.8
@@ -215,6 +219,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   consul:
     image: consul:1.15.4
@@ -224,6 +230,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   cassandra:
     image: cassandra:4.1
@@ -243,6 +251,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   datastax-studio:
     image: datastax/dse-studio:6.8.32
@@ -256,6 +266,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   redis:
     image: redis:7.0
@@ -265,6 +277,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   mysql:
     image: mysql:8.0
@@ -281,6 +295,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   phpmyadmin:
     image: phpmyadmin:5.2.1-apache
@@ -296,6 +312,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   prometheus:
     image: prom/prometheus:v2.45.6
@@ -307,6 +325,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   grafana:
     image: grafana/grafana:10.2.8
@@ -318,6 +338,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   pyroscope:
     image: grafana/pyroscope:weekly-f76-feefa815b
@@ -329,6 +351,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   mongodb:
     image: mongo:5.0.28
@@ -343,6 +367,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   mongo-express:
     image: mongo-express:1.0.2-20-alpine3.19
@@ -359,6 +385,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   ngrok:
     image: ngrok/ngrok:3.13.0-alpine-91be825
@@ -371,6 +399,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   kong-migrations:
     image: kong:2.8.5-alpine
@@ -386,6 +416,8 @@ services:
       - postgres
     networks:
       - app-network
+    profiles:
+      - go-micro
 
   kong:
     image: kong:2.8.5-alpine
@@ -412,6 +444,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   rabbitmq:
     image: "rabbitmq:4.0.0-beta.3-management-alpine"
@@ -426,6 +460,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   dynamodb:
     image: amazon/dynamodb-local:1.24.0
@@ -438,6 +474,8 @@ services:
     networks:
       - app-network
     restart: on-failure
+    profiles:
+      - go-micro
 
   vault:
     image: vault:1.13.3
@@ -460,6 +498,8 @@ services:
     restart: on-failure
     cap_add:
       - IPC_LOCK
+    profiles:
+      - go-micro
 
 networks:
   app-network:

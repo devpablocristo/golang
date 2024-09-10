@@ -5,9 +5,9 @@ option go_package = "github.com/devpablocristo/golang/sdk/pb;pb";
 
 service Greeter {
     rpc GreetUnary (GreetUnaryRequest) returns (GreetUnaryResponse);
-    // rpc GreetServerStreaming (GreetRequest) returns (stream GreetResponse);
-    // rpc GreetClientStreaming (stream GreetRequest) returns (GreetResponse);
-    // rpc GreetBidirectionalStreaming (stream GreetRequest) returns (stream GreetResponse);
+    rpc GreetServerStreaming (GreetServerRequest) returns (stream GreetServerResponse);
+    // rpc GreetClientStreaming (stream GreetClientRequest) returns (GreetClientResponse);
+    // rpc GreetBidiStreaming (stream GreetBidiRequest) returns (stream GreetBidiResponse);
 }
 
 message Greeting {
@@ -23,12 +23,13 @@ message GreetUnaryResponse {
     string result = 1;
 }
 
-// message NamesList {
-//     repeated string names = 1;
-// }
+message GreetServerRequest {
+    Greeting greeting = 1;
+}
 
-// message MessagesList {
-//     repeated string messages = 1;
-// }
+message GreetServerResponse {
+    string result = 1;
+}
+
 
 //  protoc --go_out=../pb --go-grpc_out=../pb --go_opt=module=github.com/devpablocristo/golang/sdk/pb --go-grpc_opt=module=github.com/devpablocristo/golang/sdk/pb greet.proto

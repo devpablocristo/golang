@@ -2,6 +2,8 @@ package greeter
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	ports "github.com/devpablocristo/golang/sdk/internal/core/greeter-server/ports"
 	pb "github.com/devpablocristo/golang/sdk/pb"
@@ -39,17 +41,16 @@ func (s *GreeterGrpcServer) GreetUnary(ctx context.Context, req *pb.GreetUnaryRe
 	return &pb.GreetUnaryResponse{Result: greeting}, nil
 }
 
-// Server Streaming RPC: envía varios mensajes de saludo al cliente
-// func (s *GreeterGrpcServer) GreetServerStreaming(req *pb.GreetRequest, stream pb.Greeter_GreetServerStreamingServer) error {
-// 	for i := 0; i < 5; i++ {
-// 		message := fmt.Sprintf("Hello, %s! Count: %d", req.Name, i)
-// 		if err := stream.Send(&pb.GreetResponse{Message: message}); err != nil {
-// 			return err
-// 		}
-// 		time.Sleep(1 * time.Second) // Simulación de una operación larga
-// 	}
-// 	return nil
-// }
+func (s *GreeterGrpcServer) GreetServerStreaming(req *pb.GreetServerRequest, stream pb.Greeter_GreetServerStreamingServer) error {
+	for i := 0; i < 5; i++ {
+		message := fmt.Sprintf("Hello, %s %s! Count: %d", req.Greeting.FirstName, req.Greeting.LastName, i)
+		if err := stream.Send(&pb.GreetServerResponse{Result: message}); err != nil {
+			return err
+		}
+		time.Sleep(1 * time.Second)
+	}
+	return nil
+}
 
 // // Client Streaming RPC: recibe múltiples solicitudes de saludo y responde con un solo mensaje
 // func (s *GreeterGrpcServer) GreetClientStreaming(stream pb.Greeter_GreetClientStreamingServer) error {
