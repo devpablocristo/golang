@@ -3,15 +3,8 @@ testdata_dir = "testdata"
 tmp_dir = "./tmp"
 
 [build]
-  # Comando para compilar el binario con las opciones adecuadas
-  cmd = "go build -gcflags='all=-N -l' -o ./tmp/${APP_NAME} ${MAIN_DIR}"  # Usa variables de entorno para el directorio principal y nombre de la aplicación
-  
-  # Especifica el binario generado
+  cmd = "dlv exec --accept-multiclient --headless --listen :${DELVE_PORT} --api-version 2 ./tmp/${APP_NAME}"
   bin = "./tmp/${APP_NAME}"
-
-  # Comando completo para ejecutar el binario utilizando Delve
-  full_bin = "dlv exec --accept-multiclient --headless --listen :${DELVE_PORT} --api-version 2 ./tmp/${APP_NAME}"
-
   # Otros ajustes de compilación y monitoreo
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]

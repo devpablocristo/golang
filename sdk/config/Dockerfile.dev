@@ -1,33 +1,38 @@
 FROM golang:1.22.3-alpine3.20
 
-# Install git and Go tools (Delve and Air) for debugging and live reloading
-# no se usa ya pero este es el comando apra inotifywatch
-#  apk add --no-cache bash git libc-dev g++ inotify-tools curl && \
-RUN apk update && apk add --no-cache git && \
+# Instalar git, Go tools (Delve y Air), y tzdata para configurar la zona horaria
+RUN apk update && apk add --no-cache git tzdata && \
     go install github.com/go-delve/delve/cmd/dlv@latest && \
     go install github.com/air-verse/air@latest && \
     rm -rf /var/cache/apk/*
 
-# Add Go bin directory to PATH (ensures Air is in the PATH)
+# Configurar la zona horaria a Buenos Aires, Argentina
+ENV TZ=America/Argentina/Buenos_Aires
+
+# Crear un enlace simbólico a la zona horaria correcta
+RUN cp /usr/share/zoneinfo/America/Argentina/Buenos_Aires /etc/localtime && \
+    echo "America/Argentina/Buenos_Aires" > /etc/timezone
+
+# Agregar el directorio bin de Go al PATH
 ENV PATH="/root/go/bin:${PATH}"
 
-# Set the working directory inside the container
+# Establecer el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copy the rest of the project files to the container
+# Copiar los archivos del proyecto al contenedor
 COPY . .
 
-# Ensure the entrypoint script is executable
+# Asegurarse de que el script de entrypoint sea ejecutable
 RUN chmod +x /app/scripts/entrypoint.sh
 
-# Install Go dependencies
+# Instalar dependencias de Go
 RUN go mod download && go mod verify
 
-# Create the bin directory if it doesn't exist
+# Crear el directorio tmp si no existe
 RUN mkdir -p /app/tmp
 
-# Expose the necessary ports
+# Exponer los puertos necesarios
 EXPOSE 8080 2345
 
-# Define the entrypoint script for the container
+# Definir el script de entrypoint para el contenedor
 ENTRYPOINT ["/app/scripts/entrypoint.sh"]
