@@ -20,59 +20,6 @@ services:
     environment:
       - MAIN_DIR=/app/cmd/examples/go-micro/main.go
       - APP_NAME=go-micro-api
-      - APP_VERSION=${APP_VERSION}
-      - DEBUG=${DEBUG}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_HOST_PORT=${POSTGRES_HOST_PORT}
-      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
-      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
-      - POSTGRES_USER_PASSWORD=${POSTGRES_USER_PASSWORD}
-      - CONSUL_ADDRESS=${CONSUL_ADDRESS}
-      - CONSUL_ID=${CONSUL_ID}
-      - CONSUL_NAME=${CONSUL_NAME}
-      - CONSUL_SERVICE_NAME=${CONSUL_SERVICE_NAME}
-      - CONSUL_HEALTH_CHECK=${CONSUL_HEALTH_CHECK}
-      - CONSUL_CHECK_INTERVAL=${CONSUL_CHECK_INTERVAL}
-      - CONSUL_CHECK_TIMEOUT=${CONSUL_CHECK_TIMEOUT}
-      - CONSUL_PORT=${CONSUL_PORT}
-      - CONSUL_TAGS=${CONSUL_TAGS}
-      - CASSANDRA_HOST=${CASSANDRA_HOST}
-      - CASSANDRA_PORT=${CASSANDRA_PORT}
-      - CASSANDRA_USERNAME=${CASSANDRA_USERNAME}
-      - CASSANDRA_PASSWORD=${CASSANDRA_PASSWORD}
-      - CASSANDRA_KEYSPACE=${CASSANDRA_KEYSPACE}
-      - CASSANDRA_REPLICATION_FACTOR=${CASSANDRA_REPLICATION_FACTOR}
-      - CASSANDRA_CLUSTER_NAME=${CASSANDRA_CLUSTER_NAME}
-      - CASSANDRA_DC=${CASSANDRA_DC}
-      - CASSANDRA_RACK=${CASSANDRA_RACK}
-      - CASSANDRA_ENDPOINT_SNITCH=${CASSANDRA_ENDPOINT_SNITCH}
-      - REDIS_ADDRESS=${REDIS_ADDRESS}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - REDIS_DB=${REDIS_DB}
-      - MYSQL_HOST=${MYSQL_HOST}
-      - MYSQL_PORT=${MYSQL_PORT}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - PYROSCOPE_SERVER_ADDRESS=${PYROSCOPE_SERVER_ADDRESS}
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-      - MONGO_HOST=${MONGO_HOST}
-      - MONGO_PORT=${MONGO_PORT}
-      - RABBITMQ_HOST=${RABBITMQ_HOST}      
-      - RABBITMQ_PORT=${RABBITMQ_PORT}          
-      - RABBITMQ_MANAGEMENT_PORT=${RABBITMQ_MANAGEMENT_PORT} 
-      - RABBITMQ_USER=${RABBITMQ_USER}        
-      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}    
-      - RABBITMQ_VHOST=${RABBITMQ_VHOST} 
-      - DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT} 
-      - DYNAMODB_PORT=${DYNAMODB_PORT}          
-      - DYNAMODB_REGION=${DYNAMODB_REGION} 
-      - GOMICRO_RPC_SERVICE_NAME=${GOMICRO_RPC_SERVICE_NAME}
-      - GOMICRO_RPC_SERVICE_ADDRESS=${GOMICRO_RPC_SERVICE_ADDRESS}
-      - GOMICRO_WEB_SERVICE_NAME=${GOMICRO_WEB_SERVICE_NAME}
-      - GOMICRO_WEB_SERVICE_ADDRESS=${GOMICRO_WEB_SERVICE_ADDRESS}
     depends_on:
       - postgres
       - consul
@@ -108,8 +55,6 @@ services:
     environment:
       - MAIN_DIR=/app/cmd/examples/monitoring/main.go
       - APP_NAME=monitoring-api
-      - APP_VERSION=${APP_VERSION}
-      - DEBUG=${DEBUG}
       - PROMETHEUS_URL=http://prometheus:9090
     depends_on:
       - mysql
@@ -136,9 +81,7 @@ services:
       - GRPC_SERVER_HOST=0.0.0.0  # Escuchar en todas las interfaces
       - MAIN_DIR=/app/cmd/examples/greeter-server/main.go
       - APP_NAME=greeter-server-api
-      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
-      - APP_VERSION=${APP_VERSION}
-      - DEBUG=${DEBUG}
+      - APP_ROLE=server
     networks:
       - app-network
     volumes:
@@ -159,16 +102,9 @@ services:
     ports:
     - "${DELVE_PORT}:${DELVE_PORT}"
     environment:
-      # - GRPC_SERVER_HOST=greeter-server # Nombre del servicio del servidor gRPC
-      # - GRPC_SERVER_HOST=${GRPC_SERVER_HOST:-localhost} # Usa localhost cuando estás en modo host
-      # - GRPC_SERVER_HOST=172.17.0.1
-      # - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
       - MAIN_DIR=/app/cmd/examples/greeter-client/main.go
       - APP_NAME=greeter-client-api
-      - APP_VERSION=${APP_VERSION}
-      - DEBUG=${DEBUG}
-    # networks:
-    #   - app-network
+      - APP_ROLE=client
     network_mode: "host"  # Usa la red del host
     volumes:
       - type: bind

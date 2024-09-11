@@ -56,25 +56,33 @@ initializeFileChangeLogger() {
   tail -f /tmp/filechanges.log &
 }
 
-
-# Function to run the server with Air and Delve for debugging
 runServer() {
-  log "Run server"
+  log "Running service"
 
   # Kill any existing server processes
-  log "Killing old server processes"
+  log "Killing old processes"
   pkill -f dlv || true
   pkill -f "/app/tmp/${APP_NAME}" || true
 
   if [ "${DEBUG}" = "true" ]; then
-    log "Run in debug mode with Air and Delve"
-
-    # Start Air with the provided configuration for live reloading
-    air -c "$AIR_CONFIG"
-  else
-    log "Run in production mode with Air"
+    log "Running in debug mode with Air and Delve"
     
-    # Start Air normally for live reloading in production mode
+    # Log APP_ROLE to verify correct loading
+    log "App Role is set to: ${APP_ROLE}"
+
+    # Check if the role is client or server
+    if [ "$APP_ROLE" = "client" ]; then
+      log "Starting client"
+      air -c "$AIR_CONFIG"
+    elif [ "$APP_ROLE" = "server" ]; then
+      log "Starting server"
+      air -c "$AIR_CONFIG"
+    else
+      log "ERROR: APP_ROLE is not set correctly. Must be 'client' or 'server'."
+      exit 1
+    fi
+  else
+    log "Running in production mode with Air"
     air -c "$AIR_CONFIG"
   fi
 }
