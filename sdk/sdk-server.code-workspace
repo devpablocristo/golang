@@ -116,7 +116,7 @@
     "launch": {
         "configurations": [
             {
-                "name": "Docker Client",
+                "name": "Docker Server",
                 "type": "go",
                 "request": "attach",
                 "mode": "remote",

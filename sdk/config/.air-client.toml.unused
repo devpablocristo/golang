@@ -8,7 +8,7 @@ tmp_dir = "./tmp/client"
 
 [build]
 # Comando para compilar el binario del cliente
-cmd = "go build -gcflags='all=-N -l' -o ./tmp/client/greeter-client /app/cmd/examples/greeter-client/main.go"
+cmd = "go build -gcflags='all=-N -l' -o ./tmp/client/greeter-client /app/examples/greeter-client/main.go"
 
 # Binario del cliente
 bin = "./tmp/client/greeter-client"

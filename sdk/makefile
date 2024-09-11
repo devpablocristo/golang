@@ -2,12 +2,11 @@ SHELL := /bin/bash
 
 # Variables
 ROOT_DIR := $(shell pwd)
-APP_NAME := golang-sdk
 VERSION := 1.0
 BUILD_DIR := ${ROOT_DIR}/bin
 CONFIG_DIR := ${ROOT_DIR}/config
 SCRIPTS_DIR := ${ROOT_DIR}/scripts
-EXAMPLES_DIR := /app/cmd/examples
+EXAMPLES_DIR := ${ROOT_DIR}/examples
 DOCKER_COMPOSE_FILE := ${CONFIG_DIR}/docker-compose.dev.yml
 
 # Phony targets
@@ -20,7 +19,8 @@ all: build run
 build:
 	@echo "Building the project..."
 	@mkdir -p ${BUILD_DIR}
-	go build -gcflags "all=-N -l" -o ${BUILD_DIR}/${APP_NAME} -ldflags "-X main.Version=${VERSION}" ${ROOT_DIR}/cmd
+	# El APP_NAME debe definirse explícitamente
+	APP_NAME=main go build -gcflags "all=-N -l" -o ${BUILD_DIR}/${APP_NAME} -ldflags "-X main.Version=${VERSION}" ${ROOT_DIR}/cmd/main.go
 
 # Run target
 run:
@@ -36,47 +36,47 @@ test:
 docker-up:
 	@echo "Starting $(PROFILE) services in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up -d
+	APP_NAME=$(APP_NAME) docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up -d
 	@$(MAKE) docker-logs PROFILE=$(PROFILE)
 
 docker-build:
 	@echo "Building $(PROFILE) services in dev mode..."
 	@chmod +x ${SCRIPTS_DIR}/entrypoint.sh
-	MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up --build -d
+	APP_NAME=$(APP_NAME) docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) up --build -d
 	@$(MAKE) docker-logs PROFILE=$(PROFILE)
 
 docker-down:
 	@echo "Stopping $(PROFILE) services in dev mode..."
-	MAIN_DIR=${EXAMPLES_DIR}/$(PROFILE)/main.go docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) down --remove-orphans
+	APP_NAME=$(APP_NAME) docker compose -f ${DOCKER_COMPOSE_FILE} --profile $(PROFILE) down --remove-orphans
 
 docker-logs:
 	@echo "Fetching logs for $(PROFILE) services..."
-	@docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(APP_NAME)
+	APP_NAME=$(APP_NAME) docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(APP_NAME)
 
 # Specific Docker targets using generic commands
 greeter-server-up:
-	@$(MAKE) docker-up PROFILE=greeter-server APP_NAME=greeter-server-api
+	@$(MAKE) docker-up PROFILE=greeter-server APP_NAME=greeter-server
 
 greeter-server-build:
-	@$(MAKE) docker-build PROFILE=greeter-server APP_NAME=greeter-server-api
+	@$(MAKE) docker-build PROFILE=greeter-server APP_NAME=greeter-server
 
 greeter-server-down:
-	@$(MAKE) docker-down PROFILE=greeter-server APP_NAME=greeter-server-api
+	@$(MAKE) docker-down PROFILE=greeter-server APP_NAME=greeter-server
 
 greeter-server-logs:
-	@$(MAKE) docker-logs PROFILE=greeter-server APP_NAME=greeter-server-api
+	@$(MAKE) docker-logs PROFILE=greeter-server APP_NAME=greeter-server
 
 greeter-client-up:
-	@$(MAKE) docker-up PROFILE=greeter-client APP_NAME=greeter-client-api
+	@$(MAKE) docker-up PROFILE=greeter-client APP_NAME=greeter-client
 
 greeter-client-build:
-	@$(MAKE) docker-build PROFILE=greeter-client APP_NAME=greeter-client-api
+	@$(MAKE) docker-build PROFILE=greeter-client APP_NAME=greeter-client
 
 greeter-client-down:
-	@$(MAKE) docker-down PROFILE=greeter-client APP_NAME=greeter-client-api
+	@$(MAKE) docker-down PROFILE=greeter-client APP_NAME=greeter-client
 
 greeter-client-logs:
-	@$(MAKE) docker-logs PROFILE=greeter-client APP_NAME=greeter-client-api
+	@$(MAKE) docker-logs PROFILE=greeter-client APP_NAME=greeter-client
 
 monitoring-up:
 	@$(MAKE) docker-up PROFILE=monitoring APP_NAME=monitoring-api

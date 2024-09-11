@@ -94,7 +94,7 @@
 
 #### 1. DTOs de Request y Response (Capa de Presentación)
 
-**cmd/devapi/dtos/user_request_dto.go**
+**devapi/dtos/user_request_dto.go**
 ```go
 package dtos
 
@@ -105,7 +105,7 @@ type UserRequestDTO struct {
 }
 ```
 
-**cmd/devapi/dtos/user_response_dto.go**
+**devapi/dtos/user_response_dto.go**
 ```go
 package dtos
 
@@ -118,7 +118,7 @@ type UserResponseDTO struct {
 
 #### 2. DTOs de Service-to-Service (Capa de Aplicación)
 
-**cmd/devapi/dtos/user_auth_service_dto.go**
+**devapi/dtos/user_auth_service_dto.go**
 ```go
 package dtos
 
@@ -132,7 +132,7 @@ type AuthServiceResponseDTO struct {
 }
 ```
 
-**cmd/devapi/dtos/user_notification_service_dto.go**
+**devapi/dtos/user_notification_service_dto.go**
 ```go
 package dtos
 
@@ -148,7 +148,7 @@ type NotificationServiceResponseDTO struct {
 
 #### 3. DTOs de Mensajería (Capa de Aplicación o Presentación)
 
-**cmd/devapi/dtos/user_messaging_dto.go**
+**devapi/dtos/user_messaging_dto.go**
 ```go
 package dtos
 
@@ -161,7 +161,7 @@ type UserCreatedEventDTO struct {
 
 #### 4. DTOs de Validación
 
-**cmd/devapi/dtos/user_validation_dto.go**
+**devapi/dtos/user_validation_dto.go**
 ```go
 package dtos
 
@@ -174,7 +174,7 @@ type UserValidationDTO struct {
 
 #### 5. DTOs de Transformación
 
-**cmd/devapi/dtos/user_transformation_dto.go**
+**devapi/dtos/user_transformation_dto.go**
 ```go
 package dtos
 
@@ -187,7 +187,7 @@ type UserTransformationDTO struct {
 
 #### 6. DTOs de Consultas
 
-**cmd/devapi/dtos/user_query_dto.go**
+**devapi/dtos/user_query_dto.go**
 ```go
 package dtos
 
@@ -199,7 +199,7 @@ type UserQueryDTO struct {
 
 #### 7. DTOs de Autenticación y Autorización
 
-**cmd/devapi/dtos/login_request_dto.go**
+**devapi/dtos/login_request_dto.go**
 ```go
 package dtos
 

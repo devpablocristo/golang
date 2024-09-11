@@ -1,10 +1,12 @@
 FROM golang:1.23
 
 # Instalar git, Go tools (Delve y Air), y tzdata para configurar la zona horaria
-RUN apt-get update && apt-get install -y git tzdata && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git tzdata && \
+    rm -rf /var/lib/apt/lists/* && \
     go install github.com/go-delve/delve/cmd/dlv@latest && \
-    go install github.com/air-verse/air@latest && \
-    rm -rf /var/lib/apt/lists/*
+    go install github.com/air-verse/air@latest
+
 
 # Configurar la zona horaria a Buenos Aires, Argentina
 ENV TZ=America/Argentina/Buenos_Aires

@@ -175,7 +175,7 @@ import (
 
     "github.com/gin-gonic/gin"
 
-    "api/cmd/rest/handlers"
+    "api/rest/handlers"
     "api/internal/core"
     "api/internal/core/item"
     "api/internal/bootstrap/mysql"

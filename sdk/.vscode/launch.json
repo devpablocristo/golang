@@ -6,12 +6,12 @@
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceRoot}/cmd/examples/greeter-client/main.go",
+        "program": "${workspaceRoot}/examples/greeter-client/main.go",
         "envFile": "${workspaceRoot}/config/.env"
         //"postDebugTask": "live reload" // FIXME: no funca el script
     },
     {
-      "name": "Docker Server",
+      "name": "Docker",
       "type": "go",
       "request": "attach",
       "mode": "remote",

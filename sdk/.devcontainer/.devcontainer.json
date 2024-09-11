@@ -2,7 +2,7 @@
     // NOTE: no enteindo para que se usa
     "name": "Go Dev Container",
     "dockerComposeFile": "docker-compose.yml",
-    "service": "greeter-client-api",  // O el nombre del servicio que estás desarrollando
+    "service": "greeter-client",  // O el nombre del servicio que estás desarrollando
     "workspaceFolder": "/app",
     "settings": {
       "go.useLanguageServer": true

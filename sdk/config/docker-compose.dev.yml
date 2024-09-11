@@ -18,7 +18,7 @@ services:
         source: ../migrations
         target: /app/migrations
     environment:
-      - MAIN_DIR=/app/cmd/examples/go-micro/main.go
+      - MAIN_DIR=/app/examples/go-micro/main.go
       - APP_NAME=go-micro-api
     depends_on:
       - postgres
@@ -53,7 +53,7 @@ services:
         source: ..
         target: /app
     environment:
-      - MAIN_DIR=/app/cmd/examples/monitoring/main.go
+      - MAIN_DIR=/app/examples/monitoring/main.go
       - APP_NAME=monitoring-api
       - PROMETHEUS_URL=http://prometheus:9090
     depends_on:
@@ -67,26 +67,26 @@ services:
       - monitoring    
     command: air -c ${AIR_CONFIG}
 
-  greeter-server-api:
-    container_name: "greeter-server-api"
+  greeter-server:
+    container_name: "greeter-server"
     build:
       context: ..
       dockerfile: config/Dockerfile.dev  # Ruta al Dockerfile del servidor
-    image: "greeter-server-api:${APP_VERSION}"
+    image: "greeter-server:${APP_VERSION}"
     ports:
       - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}"  # Exponer el puerto del servidor gRPC
       - "${DELVE_PORT_SERVER}:${DELVE_PORT_SERVER}"  # Puerto para debugging con Delve
     environment:
       - DELVE_PORT=${DELVE_PORT_SERVER}  # Sobrescribir el valor de DELVE_PORT para el servidor
       - GRPC_SERVER_HOST=0.0.0.0  # Escuchar en todas las interfaces
-      - MAIN_DIR=/app/cmd/examples/greeter-server/main.go
-      - APP_NAME=greeter-server-api
+      - MAIN_DIR=/app/examples/greeter-server/cmd/main.go
+      - APP_NAME=greeter-server
       - APP_ROLE=server
     networks:
       - app-network
     volumes:
       - type: bind
-        source: ./server
+        source: ..
         target: /app
     restart: on-failure
     profiles:
@@ -94,22 +94,22 @@ services:
     command: air -c ${AIR_CONFIG}  
     # command: air -c ${AIR_CONFIG_SERVER}
 
-  greeter-client-api:
-    container_name: "greeteclientr-client-api"
+  greeter-client:
+    container_name: "greeter-client"
     build:
       context: ..
       dockerfile: config/Dockerfile.dev # Ruta al Dockerfile del cliente
-    image: "greeter-client-api:${APP_VERSION}"
+    image: "greeter-client:${APP_VERSION}"
     ports:
     - "${DELVE_PORT}:${DELVE_PORT}"
     environment:
-      - MAIN_DIR=/app/cmd/examples/greeter-client/main.go
-      - APP_NAME=greeter-client-api
+      - MAIN_DIR=/app/examples/greeter-client/cmd/main.go
+      - APP_NAME=greeter-client
       - APP_ROLE=client
     network_mode: "host"  # Usa la red del host
     volumes:
       - type: bind
-        source: ./client
+        source: ..
         target: /app
     restart: on-failure
     profiles:
