@@ -4,7 +4,10 @@ import (
 	"log"
 
 	gtwuser "github.com/devpablocristo/golang/sdk/examples/user/gateways/user"
-	coreuser "github.com/devpablocristo/golang/sdk/internal/core/user"
+
+	// FIXME: Usar gRPC, no se puede importar desde internal
+	coreuser "github.com/devpablocristo/golang/sdk/examples/user/internal/user" 
+
 	sdkviper "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
 	sdkmapdb "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb"
 	portsmdb "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb/ports"

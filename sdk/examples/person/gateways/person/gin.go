@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/devpablocristo/golang/sdk/examples/person/gateways/person/dto"
+	"github.com/devpablocristo/golang/sdk/examples/person/internal/person/ports"
 	"github.com/devpablocristo/golang/sdk/examples/shared"
-	"github.com/devpablocristo/golang/sdk/internal/core/person/ports"
 )
 
 type GinHandler struct {
