@@ -6,9 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/devpablocristo/golang/sdk/gateways/analytics/dto"
-	"github.com/devpablocristo/golang/sdk/gateways/shared"
-	"github.com/devpablocristo/golang/sdk/internal/core/analytics/ports"
+	"github.com/devpablocristo/golang/sdk/examples/analytics/gateways/analytics/dto"
+	"github.com/devpablocristo/golang/sdk/examples/shared"
+	"github.com/devpablocristo/golang/sdk/examples/analytics/internal/core/analytics/ports"
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
 
