@@ -7,17 +7,16 @@ import (
 
 	"github.com/google/uuid"
 
-	entities "github.com/devpablocristo/golang/sdk/examples/user/internal/user/entities"
-	ports "github.com/devpablocristo/golang/sdk/examples/user/internal/user/ports"
-	sdkmapdbports "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb/ports"
+	entities "github.com/devpablocristo/golang/sdk/examples/users-api/internal/user/entities"
+	ports "github.com/devpablocristo/golang/sdk/examples/users-api/internal/user/ports"
+	sdkports "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb/ports"
 )
 
-
 type mapDbRepository struct {
-	service sdkmapdbports.Repository
+	service sdkports.Repository
 }
 
-func NewMapDbRepository(s sdkmapdbports.Repository) ports.Repository {
+func NewMapDbRepository(s sdkports.Repository) ports.Repository {
 	return &mapDbRepository{
 		service: s,
 	}

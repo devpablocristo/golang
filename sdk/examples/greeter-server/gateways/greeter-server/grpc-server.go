@@ -7,16 +7,16 @@ import (
 
 	ports "github.com/devpablocristo/golang/sdk/examples/greeter-server/internal/core/greeter-server/ports"
 	pb "github.com/devpablocristo/golang/sdk/pb"
-	sdkgrpcserverport "github.com/devpablocristo/golang/sdk/pkg/grpc/server/ports"
+	sdkports "github.com/devpablocristo/golang/sdk/pkg/grpc/server/ports"
 )
 
 type GreeterGrpcServer struct {
 	pb.UnimplementedGreeterServer // NOTE: que es esto?
 	useCases                      ports.UseCases
-	grpcServer                    sdkgrpcserverport.Server
+	grpcServer                    sdkports.Server
 }
 
-func NewGrpcServer(ucs ports.UseCases, gsv sdkgrpcserverport.Server) *GreeterGrpcServer {
+func NewGrpcServer(ucs ports.UseCases, gsv sdkports.Server) *GreeterGrpcServer {
 	return &GreeterGrpcServer{
 		useCases:   ucs,
 		grpcServer: gsv,

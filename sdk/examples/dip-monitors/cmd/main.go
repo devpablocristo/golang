@@ -14,17 +14,26 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
+// Definición de la estructura Metric
 type Metric struct {
-	MetricID  string     `json:"metric_id"`
-	GitAuthor string     `json:"git_author"`
-	Score     string     `json:"score"`
-	Evidence  []Evidence `json:"evidence"`
+	MetricID  string     `json:"metric_id"`  // Identificador de la métrica
+	GitAuthor string     `json:"git_author"` // Autor del commit
+	Score     int        `json:"score"`      // Puntaje de cumplimiento
+	Evidence  []Evidence `json:"evidence"`   // Evidencias recolectadas
 }
 
+// Definición de la estructura Evidence
 type Evidence struct {
-	CommitID string `json:"commit_id"`
-	File     string `json:"file"`
-	Line     int    `json:"line"`
+	CommitID string `json:"commit_id"` // ID del commit asociado
+	File     string `json:"file"`      // Archivo donde se encuentra la evidencia
+	Line     int    `json:"line"`      // Línea del archivo donde está la violación o evidencia
+}
+
+// Definimos una variable global de tipo Metric con un puntaje inicial
+var globalMetric = Metric{
+	MetricID: "dependency_inversion",
+	Score:    3, // Puntaje inicial
+	Evidence: []Evidence{},
 }
 
 var baseDir string
@@ -67,7 +76,9 @@ func main() {
 	var files []string
 	if len(filesToAnalyze) == 0 {
 		err = tree.Files().ForEach(func(f *object.File) error {
-			files = append(files, f.Name)
+			if filepath.Ext(f.Name) == ".go" {
+				files = append(files, f.Name)
+			}
 			return nil
 		})
 		if err != nil {
@@ -75,7 +86,11 @@ func main() {
 			os.Exit(1)
 		}
 	} else {
-		files = filesToAnalyze
+		for _, file := range filesToAnalyze {
+			if filepath.Ext(file) == ".go" {
+				files = append(files, file)
+			}
+		}
 	}
 
 	if len(files) == 0 {
@@ -115,10 +130,8 @@ func analyzeCode(repo *git.Repository, tree *object.Tree, filesToAnalyze []strin
 }
 
 func analyzeDependencyInversion(repo *git.Repository, tree *object.Tree, filesToAnalyze []string) (Metric, error) {
-	metric := Metric{
-		MetricID: "dependency_inversion",
-		Score:    "3",
-	}
+	// Aquí usamos la métrica global
+	metric := globalMetric
 
 	interfaces := make(map[string]bool)
 	concreteDeps := false
@@ -138,28 +151,33 @@ func analyzeDependencyInversion(repo *git.Repository, tree *object.Tree, filesTo
 		ast.Inspect(node, func(n ast.Node) bool {
 			switch x := n.(type) {
 			case *ast.TypeSpec:
+				// Revisamos si hay interfaces definidas
 				if _, ok := x.Type.(*ast.InterfaceType); ok {
 					interfaces[x.Name.Name] = true
 				}
 			case *ast.CallExpr:
-				if ident, ok := x.Fun.(*ast.Ident); ok && interfaces[ident.Name] == false {
-					concreteDeps = true
-					metric.Evidence = append(metric.Evidence, Evidence{
-						File: filePath,
-						Line: fset.Position(x.Pos()).Line,
-					})
+				// Verificamos si se llama a una función que NO es una interfaz
+				if ident, ok := x.Fun.(*ast.Ident); ok {
+					if !interfaces[ident.Name] {
+						concreteDeps = true // Se detecta una dependencia concreta
+						metric.Evidence = append(metric.Evidence, Evidence{
+							File: filePath,
+							Line: fset.Position(x.Pos()).Line,
+						})
+					}
 				}
 			}
 			return true
 		})
 	}
 
+	// Ajustamos el puntaje dependiendo de las condiciones
 	if len(interfaces) == 0 && concreteDeps {
-		metric.Score = "1"
+		metric.Score = 1 // No hay interfaces y se encontraron dependencias concretas (Violación completa de DIP)
 	} else if len(interfaces) > 0 && concreteDeps {
-		metric.Score = "2"
+		metric.Score = 2 // Hay interfaces, pero también hay dependencias concretas (Violación parcial de DIP)
 	} else {
-		metric.Score = "3"
+		metric.Score = 3 // Todo está bien, no hay dependencias concretas
 	}
 
 	return metric, nil

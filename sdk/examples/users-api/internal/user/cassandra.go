@@ -6,18 +6,18 @@ import (
 
 	"github.com/gocql/gocql"
 
-	entities "github.com/devpablocristo/golang/sdk/examples/user/internal/user/entities"
-	ports "github.com/devpablocristo/golang/sdk/examples/user/internal/user/ports"
-	sdkcassandraports "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/cassandra/gocql/ports"
+	entities "github.com/devpablocristo/golang/sdk/examples/users-api/internal/user/entities"
+	ports "github.com/devpablocristo/golang/sdk/examples/users-api/internal/user/ports"
+	sdkports "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/cassandra/gocql/ports"
 )
 
 type cassandraRepository struct {
-	service sdkcassandraports.Repository
+	service sdkports.Repository
 }
 
-func NewCassandraRepository(inst sdkcassandraports.Repository) ports.Repository {
+func NewCassandraRepository(r sdkports.Repository) ports.Repository {
 	return &cassandraRepository{
-		service: inst,
+		service: r,
 	}
 }
 

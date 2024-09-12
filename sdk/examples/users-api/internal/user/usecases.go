@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	entities "github.com/devpablocristo/golang/sdk/examples/user/internal/user/entities"
-	ports "github.com/devpablocristo/golang/sdk/examples/user/internal/user/ports"
+	entities "github.com/devpablocristo/golang/sdk/examples/users-api/internal/user/entities"
+	ports "github.com/devpablocristo/golang/sdk/examples/users-api/internal/user/ports"
 )
 
 type useCases struct {

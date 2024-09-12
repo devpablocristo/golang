@@ -5,14 +5,14 @@ import (
 
 	entities "github.com/devpablocristo/golang/sdk/examples/bookstore/internal/book/entities"
 	ports "github.com/devpablocristo/golang/sdk/examples/bookstore/internal/book/ports"
-	sdkpgports "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pq/ports"
+	sdkports "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pq/ports"
 )
 
 type repository struct {
-	pgInst sdkpgports.Repository
+	pgInst sdkports.Repository
 }
 
-func NewRepository(inst sdkpgports.Repository) ports.Repository {
+func NewRepository(inst sdkports.Repository) ports.Repository {
 	return &repository{
 		pgInst: inst,
 	}

@@ -9,15 +9,15 @@ import (
 	"github.com/devpablocristo/golang/sdk/examples/analytics/gateways/analytics/dto"
 	"github.com/devpablocristo/golang/sdk/examples/analytics/internal/analytics/ports"
 	"github.com/devpablocristo/golang/sdk/examples/shared"
-	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
+	sdkports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
 
 type Handler struct {
 	ucs       ports.UseCases
-	ginServer sdkgin.Server
+	ginServer sdkports.Server
 }
 
-func NewRestHandler(ucs ports.UseCases, gsr sdkgin.Server) *Handler {
+func NewRestHandler(ucs ports.UseCases, gsr sdkports.Server) *Handler {
 	return &Handler{
 		ucs:       ucs,
 		ginServer: gsr,

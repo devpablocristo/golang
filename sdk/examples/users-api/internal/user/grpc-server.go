@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	ports "github.com/devpablocristo/golang/sdk/examples/user/internal/user/ports"
+	ports "github.com/devpablocristo/golang/sdk/examples/users-api/internal/user/ports"
 	pb "github.com/devpablocristo/golang/sdk/pb"
 )
 

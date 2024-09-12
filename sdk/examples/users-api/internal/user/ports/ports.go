@@ -3,7 +3,7 @@ package coreuserports
 import (
 	"context"
 
-	entities "github.com/devpablocristo/golang/sdk/examples/user/internal/user/entities"
+	entities "github.com/devpablocristo/golang/sdk/examples/users-api/internal/user/entities"
 	pb "github.com/devpablocristo/golang/sdk/pb"
 )
 
