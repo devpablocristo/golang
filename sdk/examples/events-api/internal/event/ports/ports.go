@@ -3,7 +3,7 @@ package event
 import (
 	"context"
 
-	entities "github.com/devpablocristo/golang/sdk/examples/event/internal/event/entities"
+	entities "github.com/devpablocristo/golang/sdk/examples/events-api/internal/event/entities"
 )
 
 type UseCases interface {

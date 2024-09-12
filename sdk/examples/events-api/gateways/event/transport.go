@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/devpablocristo/golang/sdk/examples/event/gateways/event/dto"
+	"github.com/devpablocristo/golang/sdk/examples/events-api/gateways/event/dto"
 )
 
 func decodeCreateEventRequest(c *gin.Context) (*dto.EventRequest, error) {

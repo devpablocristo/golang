@@ -10,7 +10,7 @@ import (
 	"github.com/devpablocristo/golang/sdk/gateways/monitoring"
 	"github.com/devpablocristo/golang/sdk/gateways/user"
 	"github.com/devpablocristo/golang/sdk/internal/bootstrap/cassandra"
-	user2 "github.com/devpablocristo/golang/sdk/internal/core/user"
+	user2 "github.com/devpablocristo/golang/sdk/internal/user"
 )
 
 // Injectors from wire.go:

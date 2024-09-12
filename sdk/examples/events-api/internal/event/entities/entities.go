@@ -3,8 +3,9 @@ package event
 import (
 	"time"
 
-	location "github.com/devpablocristo/golang/sdk/internal/core/location/entities"
-	user "github.com/devpablocristo/golang/sdk/internal/core/user/entities"
+	// FIXME: de nuevo internal, pasar a gRPC
+	location "github.com/devpablocristo/golang/sdk/examples/locations-api/internal/location/entities"
+	user "github.com/devpablocristo/golang/sdk/examples/user/internal/user/entities"
 )
 
 type EventStatus string

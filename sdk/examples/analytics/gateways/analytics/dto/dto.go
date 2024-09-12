@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/devpablocristo/golang/sdk/examples/analytics/internal/core/analytics/entities"
+	"github.com/devpablocristo/golang/sdk/examples/analytics/internal/analytics/entities"
 )
 
 type EventMetrics struct {

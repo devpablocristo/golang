@@ -7,18 +7,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	coreeventports "github.com/devpablocristo/golang/sdk/examples/event/internal/event/ports"
+	eventports "github.com/devpablocristo/golang/sdk/examples/events-api/internal/event/ports"
 	shared "github.com/devpablocristo/golang/sdk/examples/shared"
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
 
 type Handler struct {
-	useCases  coreeventports.UseCases
+	useCases  eventports.UseCases
 	ginServer sdkgin.Server
 }
 
 // NewHandler crea un nuevo handler para los eventos.
-func NewHandler(uc coreeventports.UseCases, gs sdkgin.Server) *Handler {
+func NewHandler(uc eventports.UseCases, gs sdkgin.Server) *Handler {
 	return &Handler{
 		useCases:  uc,
 		ginServer: gs,

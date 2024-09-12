@@ -12,11 +12,11 @@ package shared
 
 // 	authgin "github.com/devpablocristo/golang/sdk/gateways/auth"
 
-// 	authucs "github.com/devpablocristo/golang/sdk/internal/core/auth"
+// 	authucs "github.com/devpablocristo/golang/sdk/internal/auth"
 // 	// casssetup "github.com/devpablocristo/golang/sdk/internal/bootstrap/cassandra"
 // 	// mongin "github.com/devpablocristo/golang/sdk/gateways/monitoring"
 // 	// usergin "github.com/devpablocristo/golang/sdk/gateways/user"
-// 	// userhucs "github.com/devpablocristo/golang/sdk/internal/core/user"
+// 	// userhucs "github.com/devpablocristo/golang/sdk/internal/user"
 // )
 
 // func InitializeUserHandler() (*userhandler.GinHandler, error) {

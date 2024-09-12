@@ -3,8 +3,8 @@ package event
 import (
 	"context"
 
-	entities "github.com/devpablocristo/golang/sdk/examples/event/internal/event/entities"
-	ports "github.com/devpablocristo/golang/sdk/examples/event/internal/event/ports"
+	entities "github.com/devpablocristo/golang/sdk/examples/events-api/internal/event/entities"
+	ports "github.com/devpablocristo/golang/sdk/examples/events-api/internal/event/ports"
 )
 
 type mongoEventDAO struct {

@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	greeter "github.com/devpablocristo/golang/sdk/examples/greeter-client/internal/core/greeter-client"
+	greeter "github.com/devpablocristo/golang/sdk/examples/greeter-client/internal/greeter-client"
 	sdklogger "github.com/devpablocristo/golang/sdk/pkg/configurators/logger"
 	sdkviper "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
 	sdkgrpcclient "github.com/devpablocristo/golang/sdk/pkg/grpc/client"

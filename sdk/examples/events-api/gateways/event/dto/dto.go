@@ -3,9 +3,9 @@ package dto
 import (
 	"time"
 
-	event "github.com/devpablocristo/golang/sdk/examples/event/internal/event/entities"
-	location "github.com/devpablocristo/golang/sdk/internal/core/location/entities"
-	user "github.com/devpablocristo/golang/sdk/internal/core/user/entities"
+	event "github.com/devpablocristo/golang/sdk/examples/events-api/internal/event/entities"
+	location "github.com/devpablocristo/golang/sdk/examples/locations-api/internal/location/entities"
+	user "github.com/devpablocristo/golang/sdk/examples/users-api/internal/user/entities"
 )
 
 type EventRequest struct {
