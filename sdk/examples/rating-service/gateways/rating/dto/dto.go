@@ -1,7 +1,7 @@
 package rating
 
 import (
-	"github.com/devpablocristo/golang/sdk/examples/rating/internal/rating/entities"
+	"github.com/devpablocristo/golang/sdk/examples/rating-service/internal/rating/entities"
 )
 
 type RatingDTO struct {

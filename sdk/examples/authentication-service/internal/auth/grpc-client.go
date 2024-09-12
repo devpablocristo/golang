@@ -3,8 +3,8 @@ package auth
 import (
 	"context"
 
-	entities "github.com/devpablocristo/golang/sdk/examples/auth/internal/auth/entities"
-	ports "github.com/devpablocristo/golang/sdk/examples/auth/internal/auth/ports"
+	entities "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/entities"
+	ports "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/ports"
 	pb "github.com/devpablocristo/golang/sdk/pb"
 	sdkports "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
 )

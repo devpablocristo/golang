@@ -2,12 +2,31 @@
   "version": "0.2.0",
   "configurations": [
     {
-        "name": "Local",
+        "name": "Go App",
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceRoot}/examples/greeter-client/main.go",
+        "program": "${workspaceRoot}/examples/xxx/cmd/main.go",
         "envFile": "${workspaceRoot}/config/.env"
+    },
+    {
+      "name": "DIP Monitor",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceRoot}/examples/indi-dip-monitors/cmd/main.go",  // Ruta al archivo que quieres ejecutar
+      "envFile": "${workspaceRoot}/config/.env",
+      "args": [
+          "/home/pablo/Downloads/hex_dip_projects/bueno",
+          "/home/pablo/Downloads/hex_dip_projects/bueno/internal/core/domain",
+          "/home/pablo/Downloads/hex_dip_projects/bueno/internal/core/services",        
+          "/home/pablo/Downloads/hex_dip_projects/bueno/internal/adapters"          
+      ],
+      "env": {},
+      "buildFlags": "",
+      "cwd": "${workspaceFolder}",  // Directorio de trabajo
+      "stopOnEntry": false,
+      "internalConsoleOptions": "openOnSessionStart"
     },
     {
       "name": "Docker A",

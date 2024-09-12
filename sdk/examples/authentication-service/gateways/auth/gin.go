@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	dto "github.com/devpablocristo/golang/sdk/examples/auth/gateways/auth/dto"
-	ports "github.com/devpablocristo/golang/sdk/examples/auth/internal/auth/ports"
+	dto "github.com/devpablocristo/golang/sdk/examples/authentication-service/gateways/auth/dto"
+	ports "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/ports"
 	mware "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )

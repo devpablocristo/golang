@@ -3,7 +3,7 @@ package ports
 import (
 	"context"
 
-	entities "github.com/devpablocristo/golang/sdk/examples/auth/internal/auth/entities"
+	entities "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/entities"
 )
 
 // UseCases define las operaciones de casos de uso para autenticación

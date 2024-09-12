@@ -5,7 +5,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	entities "github.com/devpablocristo/golang/sdk/examples/auth/internal/auth/entities"
+	entities "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/entities"
 )
 
 // TODO: usar jwt del sdk

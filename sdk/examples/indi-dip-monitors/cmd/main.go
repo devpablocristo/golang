@@ -1,3 +1,7 @@
+// NOTE:crear un archivito de configuración en cada repo? un json o yaml, que tenga esos paths, y que el código lea ese archivo (ya lo va a tener en el path que se le pasa)
+
+
+
 package main
 
 import (
@@ -39,13 +43,16 @@ var globalMetric = Metric{
 var baseDir string
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: go run main.go <repo_path> [file1] [file2] ...")
+	if len(os.Args) < 5 {
+		fmt.Println("Usage: go run main.go <repo_path> <domain_dir> <application_dir> <infra_dir> [file1] [file2] ...")
 		return
 	}
 
 	repoPath := os.Args[1]
-	filesToAnalyze := os.Args[2:]
+	domainDir := os.Args[2]
+	applicationDir := os.Args[3]
+	infraDir := os.Args[4]
+	filesToAnalyze := os.Args[5:]
 
 	repo, err := git.PlainOpen(repoPath)
 	if err != nil {
@@ -98,7 +105,7 @@ func main() {
 		return
 	}
 
-	metrics := analyzeCode(repo, tree, files)
+	metrics := analyzeCode(repo, tree, files, domainDir, applicationDir, infraDir)
 
 	jsonOutput, err := json.MarshalIndent(metrics, "", "  ")
 	if err != nil {
@@ -109,7 +116,7 @@ func main() {
 	fmt.Println(string(jsonOutput))
 }
 
-func analyzeCode(repo *git.Repository, tree *object.Tree, filesToAnalyze []string) []Metric {
+func analyzeCode(repo *git.Repository, tree *object.Tree, filesToAnalyze []string, domainDir, applicationDir, infraDir string) []Metric {
 	var metrics []Metric
 
 	author, err := getFileAuthor(repo, filesToAnalyze[0])
@@ -118,7 +125,7 @@ func analyzeCode(repo *git.Repository, tree *object.Tree, filesToAnalyze []strin
 		os.Exit(1)
 	}
 
-	dipMetric, err := analyzeDependencyInversion(repo, tree, filesToAnalyze)
+	dipMetric, err := analyzeDependencyInversion(repo, tree, filesToAnalyze, domainDir, applicationDir, infraDir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -129,7 +136,7 @@ func analyzeCode(repo *git.Repository, tree *object.Tree, filesToAnalyze []strin
 	return metrics
 }
 
-func analyzeDependencyInversion(repo *git.Repository, tree *object.Tree, filesToAnalyze []string) (Metric, error) {
+func analyzeDependencyInversion(repo *git.Repository, tree *object.Tree, filesToAnalyze []string, domainDir, applicationDir, infraDir string) (Metric, error) {
 	// Aquí usamos la métrica global
 	metric := globalMetric
 
@@ -137,6 +144,9 @@ func analyzeDependencyInversion(repo *git.Repository, tree *object.Tree, filesTo
 	concreteDeps := false
 
 	for _, filePath := range filesToAnalyze {
+		// Categorizar el archivo
+		layer := categorizeFile(filePath, domainDir, applicationDir, infraDir)
+
 		content, err := os.ReadFile(filepath.Join(baseDir, filePath))
 		if err != nil {
 			return metric, fmt.Errorf("error reading file: %v", err)
@@ -151,12 +161,10 @@ func analyzeDependencyInversion(repo *git.Repository, tree *object.Tree, filesTo
 		ast.Inspect(node, func(n ast.Node) bool {
 			switch x := n.(type) {
 			case *ast.TypeSpec:
-				// Revisamos si hay interfaces definidas
 				if _, ok := x.Type.(*ast.InterfaceType); ok {
 					interfaces[x.Name.Name] = true
 				}
 			case *ast.CallExpr:
-				// Verificamos si se llama a una función que NO es una interfaz
 				if ident, ok := x.Fun.(*ast.Ident); ok {
 					if !interfaces[ident.Name] {
 						concreteDeps = true // Se detecta una dependencia concreta
@@ -164,6 +172,15 @@ func analyzeDependencyInversion(repo *git.Repository, tree *object.Tree, filesTo
 							File: filePath,
 							Line: fset.Position(x.Pos()).Line,
 						})
+
+						// Aplicar reglas según la capa
+						if layer == "domain" {
+							metric.Score = 1 // Violación grave en el dominio
+						} else if layer == "application" {
+							metric.Score = 2 // Violación moderada en la aplicación
+						} else if layer == "infrastructure" {
+							metric.Score = 3 // No es violación aquí
+						}
 					}
 				}
 			}
@@ -171,7 +188,6 @@ func analyzeDependencyInversion(repo *git.Repository, tree *object.Tree, filesTo
 		})
 	}
 
-	// Ajustamos el puntaje dependiendo de las condiciones
 	if len(interfaces) == 0 && concreteDeps {
 		metric.Score = 1 // No hay interfaces y se encontraron dependencias concretas (Violación completa de DIP)
 	} else if len(interfaces) > 0 && concreteDeps {
@@ -195,4 +211,15 @@ func getFileAuthor(repo *git.Repository, file string) (string, error) {
 	}
 
 	return fmt.Sprintf("%s <%s>", commit.Author.Name, commit.Author.Email), nil
+}
+
+func categorizeFile(filePath string, domainDir, applicationDir, infraDir string) string {
+	if filepath.HasPrefix(filePath, domainDir) {
+		return "domain"
+	} else if filepath.HasPrefix(filePath, applicationDir) {
+		return "application"
+	} else if filepath.HasPrefix(filePath, infraDir) {
+		return "infrastructure"
+	}
+	return "unknown"
 }

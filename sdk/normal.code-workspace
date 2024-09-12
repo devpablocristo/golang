@@ -1,7 +1,6 @@
 {
     "folders": [
         {
-            "name": "sdk",
             "path": "."
         }
     ],
@@ -45,7 +44,6 @@
             "staticcheck": true
         },
         "makefile.configureOnOpen": true,
-        "security.workspace.trust.untrustedFiles": "open",
         "tabnine.experimentalAutoImports": true,
         "terminal.integrated.fontFamily": "monospace",
         "terminal.integrated.cursorStyle": "block",
