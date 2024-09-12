@@ -1,7 +1,7 @@
 {
     "folders": [
         {
-            "path": "../sdk-server"
+            "path": "../sdk-helper"
         }
     ],
     "settings": {
@@ -16,7 +16,7 @@
         "terminal.integrated.scrollback": 10000,
         "workbench.startupEditor": "none",
         "workbench.iconTheme": "vscode-icons",
-        "workbench.colorTheme": "paddy-zenith-upright",
+        "workbench.colorTheme": "Red",
         "workbench.colorCustomizations": {
             "statusBar.debuggingBackground": "#ff7b00",
             "statusBar.debuggingForeground": "#000000"

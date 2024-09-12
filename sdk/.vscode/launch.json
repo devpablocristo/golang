@@ -8,10 +8,9 @@
         "mode": "auto",
         "program": "${workspaceRoot}/examples/greeter-client/main.go",
         "envFile": "${workspaceRoot}/config/.env"
-        //"postDebugTask": "live reload" // FIXME: no funca el script
     },
     {
-      "name": "Docker Client",
+      "name": "Docker A",
       "type": "go",
       "request": "attach",
       "mode": "remote",
@@ -26,14 +25,49 @@
       ],
       "trace": "log", 
       "showLog": false
+      //"postDebugTask": "live reload" // FIXME: no funca el script
     },
     {
-      "name": "Docker Server",
+      "name": "Docker B",
       "type": "go",
       "request": "attach",
       "mode": "remote",
       "remotePath": "/app",  
       "port": 2346,
+      "host": "127.0.0.1",
+      "substitutePath": [
+          {
+              "from": "${workspaceFolder}",
+              "to": "/app"
+          }
+      ],
+      "trace": "log", 
+      "showLog": false
+    },
+    {
+      "name": "Docker C",
+      "type": "go",
+      "request": "attach",
+      "mode": "remote",
+      "remotePath": "/app",  
+      "port": 2347,
+      "host": "127.0.0.1",
+      "substitutePath": [
+          {
+              "from": "${workspaceFolder}",
+              "to": "/app"
+          }
+      ],
+      "trace": "log", 
+      "showLog": false
+    },
+    {
+      "name": "Docker D",
+      "type": "go",
+      "request": "attach",
+      "mode": "remote",
+      "remotePath": "/app",  
+      "port": 2348,
       "host": "127.0.0.1",
       "substitutePath": [
           {
