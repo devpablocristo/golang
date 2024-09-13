@@ -1,225 +1,233 @@
-// NOTE:crear un archivito de configuración en cada repo? un json o yaml, que tenga esos paths, y que el código lea ese archivo (ya lo va a tener en el path que se le pasa)
-
-
-
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
+	"gopkg.in/yaml.v2"
 )
 
-// Definición de la estructura Metric
-type Metric struct {
-	MetricID  string     `json:"metric_id"`  // Identificador de la métrica
-	GitAuthor string     `json:"git_author"` // Autor del commit
-	Score     int        `json:"score"`      // Puntaje de cumplimiento
-	Evidence  []Evidence `json:"evidence"`   // Evidencias recolectadas
+// Definición de la estructura del archivo monitor.yml
+type LayerConfig struct {
+	Layers struct {
+		Domain         string `yaml:"domain"`
+		Application    string `yaml:"application"`
+		Infrastructure string `yaml:"infrastructure"`
+	} `yaml:"layers"`
 }
 
-// Definición de la estructura Evidence
-type Evidence struct {
-	CommitID string `json:"commit_id"` // ID del commit asociado
-	File     string `json:"file"`      // Archivo donde se encuentra la evidencia
-	Line     int    `json:"line"`      // Línea del archivo donde está la violación o evidencia
+// Estructura para almacenar información de los paquetes importados y su capa
+type fileImports struct {
+	name  string
+	path  string
+	layer string
 }
 
-// Definimos una variable global de tipo Metric con un puntaje inicial
-var globalMetric = Metric{
-	MetricID: "dependency_inversion",
-	Score:    3, // Puntaje inicial
-	Evidence: []Evidence{},
-}
+var packagesInfo []fileImports
+var dependencyViolations []string
 
-var baseDir string
-
+// Función principal
 func main() {
-	if len(os.Args) < 5 {
-		fmt.Println("Usage: go run main.go <repo_path> <domain_dir> <application_dir> <infra_dir> [file1] [file2] ...")
+	if len(os.Args) != 2 {
+		fmt.Println("Usage: go run main.go <repo_path>")
 		return
 	}
 
 	repoPath := os.Args[1]
-	domainDir := os.Args[2]
-	applicationDir := os.Args[3]
-	infraDir := os.Args[4]
-	filesToAnalyze := os.Args[5:]
 
-	repo, err := git.PlainOpen(repoPath)
+	// Cargar el archivo monitor.yml para las capas
+	layerConfig, err := loadLayerConfig(filepath.Join(repoPath, "monitor.yml"))
 	if err != nil {
-		fmt.Printf("Error opening repository: %v\n", err)
+		fmt.Printf("Error loading layer configuration: %v\n", err)
 		return
 	}
 
-	head, err := repo.Head()
-	if err != nil {
-		fmt.Printf("Error getting HEAD: %v\n", err)
-		return
-	}
-
-	commit, err := repo.CommitObject(head.Hash())
-	if err != nil {
-		fmt.Printf("Error getting commit: %v\n", err)
-		return
-	}
-
-	tree, err := commit.Tree()
-	if err != nil {
-		fmt.Printf("Error getting tree: %v\n", err)
-		return
-	}
-
-	baseDir = repoPath
-
-	var files []string
-	if len(filesToAnalyze) == 0 {
-		err = tree.Files().ForEach(func(f *object.File) error {
-			if filepath.Ext(f.Name) == ".go" {
-				files = append(files, f.Name)
-			}
-			return nil
-		})
+	// Recorrer todos los archivos y clasificarlos
+	err = filepath.Walk(repoPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			fmt.Printf("Error iterating files: %v\n", err)
-			os.Exit(1)
+			return err
 		}
-	} else {
-		for _, file := range filesToAnalyze {
-			if filepath.Ext(file) == ".go" {
-				files = append(files, file)
+		if !info.IsDir() && filepath.Ext(path) == ".go" {
+			classifyFile(path, layerConfig, repoPath)
+		}
+		return nil
+	})
+
+	if err != nil {
+		fmt.Printf("Error walking the path %v: %v\n", repoPath, err)
+		return
+	}
+
+	// Realizar el análisis de la inversión de dependencias
+	analyzeDependencyInversion(packagesInfo, layerConfig)
+
+	// Mostrar las violaciones encontradas
+	printViolations()
+}
+
+// Cargar el archivo monitor.yml
+func loadLayerConfig(path string) (LayerConfig, error) {
+	var config LayerConfig
+
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return config, err
+	}
+
+	err = yaml.Unmarshal(content, &config)
+	if err != nil {
+		return config, err
+	}
+
+	return config, nil
+}
+
+func classifyFile(filePath string, config LayerConfig, repoPath string) {
+	absFilePath, _ := filepath.Abs(filePath)
+
+	// Convertimos las rutas relativas de las capas a rutas absolutas
+	domainPath, _ := filepath.Abs(filepath.Join(repoPath, config.Layers.Domain))
+	applicationPath, _ := filepath.Abs(filepath.Join(repoPath, config.Layers.Application))
+	infrastructurePath, _ := filepath.Abs(filepath.Join(repoPath, config.Layers.Infrastructure))
+
+	// Clasificamos el archivo según la capa a la que pertenezca
+	switch {
+	case isSubPath(domainPath, absFilePath):
+		pkgName, _ := getPackageName(filePath)
+		addFileImport(pkgName, absFilePath, "domain")
+	case isSubPath(applicationPath, absFilePath):
+		pkgName, _ := getPackageName(filePath)
+		addFileImport(pkgName, absFilePath, "application")
+	case isSubPath(infrastructurePath, absFilePath):
+		pkgName, _ := getPackageName(filePath)
+		addFileImport(pkgName, absFilePath, "infrastructure")
+	default:
+		fmt.Printf("File: %s does not belong to any known layer\n", filePath)
+	}
+}
+
+func isSubPath(basePath, targetPath string) bool {
+	relPath, err := filepath.Rel(basePath, targetPath)
+	if err != nil {
+		return false
+	}
+	return !strings.HasPrefix(relPath, "..")
+}
+
+func getPackageName(filePath string) (string, error) {
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, filePath, nil, parser.PackageClauseOnly)
+	if err != nil {
+		return "", fmt.Errorf("error parsing file: %v", err)
+	}
+	if node.Name != nil {
+		return node.Name.Name, nil
+	}
+	return "", fmt.Errorf("package name not found")
+}
+
+func addFileImport(name, path, layer string) {
+	newImport := fileImports{
+		name:  name,
+		path:  path,
+		layer: layer,
+	}
+	packagesInfo = append(packagesInfo, newImport)
+}
+
+// Función para analizar la inversión de dependencias
+func analyzeDependencyInversion(packages []fileImports, config LayerConfig) {
+	for _, file := range packages {
+		imports, err := getFileImports(file.path)
+		if err != nil {
+			fmt.Printf("Error getting imports for file %s: %v\n", file.path, err)
+			continue
+		}
+
+		for _, imp := range imports {
+			validateImport(file, imp, config)
+		}
+	}
+}
+
+// Función para validar cada importación según las reglas de inversión de dependencias
+func validateImport(file fileImports, importPath string, config LayerConfig) {
+	switch file.layer {
+	case "domain":
+		// Los archivos del dominio solo pueden importar de la librería estándar o de la capa de dominio
+		if !isStdLib(importPath) && !strings.Contains(importPath, config.Layers.Domain) {
+			dependencyViolations = append(dependencyViolations, fmt.Sprintf("Violation in %s: imports %s which is not allowed in domain layer", file.path, importPath))
+		}
+	case "application":
+		// Los archivos de la aplicación pueden importar de la librería estándar, dominio o aplicación
+		if !isStdLib(importPath) && !strings.Contains(importPath, config.Layers.Domain) && !strings.Contains(importPath, config.Layers.Application) {
+			// Si importa de infraestructura, debe ser una interfaz
+			if strings.Contains(importPath, config.Layers.Infrastructure) && !isInterfaceUsed(file.path, importPath) {
+				dependencyViolations = append(dependencyViolations, fmt.Sprintf("Violation in %s: imports %s from infrastructure without using an interface", file.path, importPath))
 			}
 		}
 	}
-
-	if len(files) == 0 {
-		fmt.Println("No files to analyze.")
-		return
-	}
-
-	metrics := analyzeCode(repo, tree, files, domainDir, applicationDir, infraDir)
-
-	jsonOutput, err := json.MarshalIndent(metrics, "", "  ")
-	if err != nil {
-		fmt.Printf("Error marshaling JSON: %v\n", err)
-		return
-	}
-
-	fmt.Println(string(jsonOutput))
 }
 
-func analyzeCode(repo *git.Repository, tree *object.Tree, filesToAnalyze []string, domainDir, applicationDir, infraDir string) []Metric {
-	var metrics []Metric
-
-	author, err := getFileAuthor(repo, filesToAnalyze[0])
-	if err != nil {
-		fmt.Printf("Error getting file author: %v\n", err)
-		os.Exit(1)
-	}
-
-	dipMetric, err := analyzeDependencyInversion(repo, tree, filesToAnalyze, domainDir, applicationDir, infraDir)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	dipMetric.GitAuthor = author
-	metrics = append(metrics, dipMetric)
-
-	return metrics
+// Función para determinar si un paquete es de la librería estándar
+func isStdLib(importPath string) bool {
+	return !strings.Contains(importPath, ".")
 }
 
-func analyzeDependencyInversion(repo *git.Repository, tree *object.Tree, filesToAnalyze []string, domainDir, applicationDir, infraDir string) (Metric, error) {
-	// Aquí usamos la métrica global
-	metric := globalMetric
+// Función para obtener las importaciones de un archivo
+func getFileImports(filePath string) ([]string, error) {
+	var imports []string
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, filePath, nil, parser.ImportsOnly)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing file: %v", err)
+	}
+
+	for _, imp := range node.Imports {
+		imports = append(imports, strings.Trim(imp.Path.Value, "\""))
+	}
+
+	return imports, nil
+}
+
+// Función para determinar si una interfaz se está usando
+func isInterfaceUsed(filePath, importPath string) bool {
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, filePath, nil, parser.AllErrors)
+	if err != nil {
+		fmt.Printf("Error parsing file: %v\n", err)
+		return false
+	}
 
 	interfaces := make(map[string]bool)
-	concreteDeps := false
-
-	for _, filePath := range filesToAnalyze {
-		// Categorizar el archivo
-		layer := categorizeFile(filePath, domainDir, applicationDir, infraDir)
-
-		content, err := os.ReadFile(filepath.Join(baseDir, filePath))
-		if err != nil {
-			return metric, fmt.Errorf("error reading file: %v", err)
-		}
-
-		fset := token.NewFileSet()
-		node, err := parser.ParseFile(fset, filePath, content, parser.AllErrors)
-		if err != nil {
-			return metric, fmt.Errorf("error parsing file: %v", err)
-		}
-
-		ast.Inspect(node, func(n ast.Node) bool {
-			switch x := n.(type) {
-			case *ast.TypeSpec:
-				if _, ok := x.Type.(*ast.InterfaceType); ok {
-					interfaces[x.Name.Name] = true
-				}
-			case *ast.CallExpr:
-				if ident, ok := x.Fun.(*ast.Ident); ok {
-					if !interfaces[ident.Name] {
-						concreteDeps = true // Se detecta una dependencia concreta
-						metric.Evidence = append(metric.Evidence, Evidence{
-							File: filePath,
-							Line: fset.Position(x.Pos()).Line,
-						})
-
-						// Aplicar reglas según la capa
-						if layer == "domain" {
-							metric.Score = 1 // Violación grave en el dominio
-						} else if layer == "application" {
-							metric.Score = 2 // Violación moderada en la aplicación
-						} else if layer == "infrastructure" {
-							metric.Score = 3 // No es violación aquí
-						}
-					}
-				}
+	ast.Inspect(node, func(n ast.Node) bool {
+		switch x := n.(type) {
+		case *ast.TypeSpec:
+			if _, ok := x.Type.(*ast.InterfaceType); ok {
+				interfaces[x.Name.Name] = true
 			}
-			return true
-		})
-	}
+		}
+		return true
+	})
 
-	if len(interfaces) == 0 && concreteDeps {
-		metric.Score = 1 // No hay interfaces y se encontraron dependencias concretas (Violación completa de DIP)
-	} else if len(interfaces) > 0 && concreteDeps {
-		metric.Score = 2 // Hay interfaces, pero también hay dependencias concretas (Violación parcial de DIP)
+	return len(interfaces) > 0
+}
+
+// Función para imprimir las violaciones de dependencia encontradas
+func printViolations() {
+	if len(dependencyViolations) == 0 {
+		fmt.Println("No dependency violations found.")
 	} else {
-		metric.Score = 3 // Todo está bien, no hay dependencias concretas
+		fmt.Println("Dependency violations found:")
+		for _, violation := range dependencyViolations {
+			fmt.Println(violation)
+		}
 	}
-
-	return metric, nil
 }
 
-func getFileAuthor(repo *git.Repository, file string) (string, error) {
-	commits, err := repo.Log(&git.LogOptions{FileName: &file})
-	if err != nil {
-		return "", err
-	}
-
-	commit, err := commits.Next()
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%s <%s>", commit.Author.Name, commit.Author.Email), nil
-}
-
-func categorizeFile(filePath string, domainDir, applicationDir, infraDir string) string {
-	if filepath.HasPrefix(filePath, domainDir) {
-		return "domain"
-	} else if filepath.HasPrefix(filePath, applicationDir) {
-		return "application"
-	} else if filepath.HasPrefix(filePath, infraDir) {
-		return "infrastructure"
-	}
-	return "unknown"
-}
+// FIXME: si hay violacion de depenencias en regular y dice que no esta mierda del orto

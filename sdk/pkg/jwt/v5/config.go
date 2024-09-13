@@ -1,9 +1,9 @@
-package jwtpkg
+package sdkjwt
 
 import (
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/jwt/v5/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/jwt/v5/ports"
 )
 
 type jwtConfig struct {

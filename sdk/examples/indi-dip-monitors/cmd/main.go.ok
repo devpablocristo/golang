@@ -1,0 +1,157 @@
+package main
+
+import (
+	"fmt"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"gopkg.in/yaml.v2"
+)
+
+// Definición de la estructura del archivo monitor.yml
+type LayerConfig struct {
+	Layers struct {
+		Domain         string `yaml:"domain"`
+		Application    string `yaml:"application"`
+		Infrastructure string `yaml:"infrastructure"`
+	} `yaml:"layers"`
+}
+
+// Función principal
+func main() {
+	if len(os.Args) != 2 {
+		fmt.Println("Usage: go run main.go <repo_path>")
+		return
+	}
+
+	repoPath := os.Args[1]
+
+	// Cargar el archivo monitor.yml para las capas
+	layerConfig, err := loadLayerConfig(filepath.Join(repoPath, "monitor.yml"))
+	if err != nil {
+		fmt.Printf("Error loading layer configuration: %v\n", err)
+		return
+	}
+
+	// Recorrer todos los archivos y clasificarlos
+	err = filepath.Walk(repoPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && filepath.Ext(path) == ".go" {
+			classifyFile(path, layerConfig, repoPath)
+		}
+		return nil
+	})
+
+	if err != nil {
+		fmt.Printf("Error walking the path %v: %v\n", repoPath, err)
+		return
+	}
+
+	printPackagesList(packagesInfo)
+
+}
+
+// Cargar el archivo monitor.yml
+func loadLayerConfig(path string) (LayerConfig, error) {
+	var config LayerConfig
+
+	content, err := os.ReadFile(path) // Usamos os.ReadFile en lugar de ioutil
+	if err != nil {
+		return config, err
+	}
+
+	err = yaml.Unmarshal(content, &config)
+	if err != nil {
+		return config, err
+	}
+
+	return config, nil
+}
+
+type fileImports struct {
+	name  string
+	path  string
+	layer string
+}
+
+var packagesInfo []fileImports
+
+func classifyFile(filePath string, config LayerConfig, repoPath string) {
+	absFilePath, _ := filepath.Abs(filePath)
+
+	// Convertimos las rutas relativas de las capas a rutas absolutas
+	domainPath, _ := filepath.Abs(filepath.Join(repoPath, config.Layers.Domain))
+	applicationPath, _ := filepath.Abs(filepath.Join(repoPath, config.Layers.Application))
+	infrastructurePath, _ := filepath.Abs(filepath.Join(repoPath, config.Layers.Infrastructure))
+
+	// Clasificamos el archivo según la capa a la que pertenezca
+	switch {
+	case isSubPath(domainPath, absFilePath):
+		//fmt.Printf("File: %s is in Domain Layer\n", filePath)
+		pkgName, _ := getPackageName(filePath)
+		addFileImport(pkgName, absFilePath, "domain")
+	case isSubPath(applicationPath, absFilePath):
+		//fmt.Printf("File: %s is in Application Layer\n", filePath)
+		pkgName, _ := getPackageName(filePath)
+		addFileImport(pkgName, absFilePath, "application")
+	case isSubPath(infrastructurePath, absFilePath):
+		//fmt.Printf("File: %s is in Infrastructure Layer\n", filePath)
+		pkgName, _ := getPackageName(filePath)
+		addFileImport(pkgName, absFilePath, "infrastructure")
+	default:
+		fmt.Printf("File: %s does not belong to any known layer\n", filePath)
+	}
+
+}
+
+func isSubPath(basePath, targetPath string) bool {
+	relPath, err := filepath.Rel(basePath, targetPath)
+	if err != nil {
+		return false
+	}
+
+	// Si la ruta relativa no comienza con "..", entonces targetPath está dentro de basePath
+	return !strings.HasPrefix(relPath, "..")
+}
+
+func getPackageName(filePath string) (string, error) {
+	// Crea un nuevo conjunto de archivos
+	fset := token.NewFileSet()
+
+	// Analiza el archivo Go para obtener el AST (árbol de sintaxis abstracta)
+	node, err := parser.ParseFile(fset, filePath, nil, parser.PackageClauseOnly)
+	if err != nil {
+		return "", fmt.Errorf("error parsing file: %v", err)
+	}
+
+	// Devuelve el nombre del paquete
+	if node.Name != nil {
+		return node.Name.Name, nil
+	}
+
+	return "", fmt.Errorf("package name not found")
+}
+
+func addFileImport(name, path, layer string) {
+	// Crear una nueva instancia de 'fileImports'
+	newImport := fileImports{
+		name:  name,
+		path:  path,
+		layer: layer,
+	}
+
+	// Añadir la nueva instancia al slice 'packagesInfo'
+	packagesInfo = append(packagesInfo, newImport)
+}
+
+func printPackagesList(packagesInfo []fileImports) {
+	fmt.Println("Paquetes encontrados:")
+	for _, imp := range packagesInfo {
+		fmt.Printf("Nombre: %s, Path: %s, Capa: %s\n", imp.name, imp.path, imp.layer)
+	}
+}

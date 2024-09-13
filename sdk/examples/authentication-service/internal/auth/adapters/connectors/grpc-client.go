@@ -1,11 +1,13 @@
-package auth
+package authconn
 
 import (
 	"context"
+	"log"
 
-	entities "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/entities"
-	ports "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/ports"
+	entities "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/core/entities"
+	ports "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/core/ports"
 	pb "github.com/devpablocristo/golang/sdk/pb"
+	sdk "github.com/devpablocristo/golang/sdk/pkg/grpc/client"
 	sdkports "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
 )
 
@@ -14,7 +16,12 @@ type grpcClient struct {
 }
 
 // NewGrpcClient crea un nuevo cliente gRPC para interactuar con el servicio de usuarios
-func NewGrpcClient(c sdkports.Client) ports.GrpcClient {
+func NewGrpcClient() ports.GrpcClient {
+	c, err := sdk.Bootstrap()
+	if err != nil {
+		log.Fatalf("Failed to initialize gRPC client: %v", err)
+	}
+
 	return &grpcClient{
 		client: c,
 	}

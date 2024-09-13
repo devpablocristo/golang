@@ -1,4 +1,4 @@
-package jwtpkg
+package sdkjwt
 
 import (
 	"fmt"
@@ -6,12 +6,12 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/jwt/v5/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/jwt/v5/ports"
 )
 
 var (
-	jwtInstance ports.JwtClient
-	jwtOnce     sync.Once
+	instance ports.JwtService
+	once     sync.Once
 	initError   error
 )
 
@@ -20,26 +20,26 @@ type jwtService struct {
 }
 
 // newJWTService inicializa el servicio JWT con una clave secreta
-func newJWTService(secretKey string) (ports.JwtClient, error) {
-	jwtOnce.Do(func() {
+func newJWTService(secretKey string) (ports.JwtService, error) {
+	once.Do(func() {
 		if secretKey == "" {
 			initError = fmt.Errorf("secret key cannot be empty")
 			return
 		}
 
-		jwtInstance = &jwtService{
+		instance = &jwtService{
 			secretKey: secretKey,
 		}
 	})
-	return jwtInstance, initError
+	return instance, initError
 }
 
-// GetJWTInstance devuelve la instancia del cliente JWT
-func GetJWTInstance() (ports.JwtClient, error) {
-	if jwtInstance == nil {
+// Getinstance devuelve la instancia del cliente JWT
+func Getinstance() (ports.JwtService, error) {
+	if instance == nil {
 		return nil, fmt.Errorf("JWT service is not initialized")
 	}
-	return jwtInstance, nil
+	return instance, nil
 }
 
 // GenerateToken genera un token JWT con las reclamaciones proporcionadas

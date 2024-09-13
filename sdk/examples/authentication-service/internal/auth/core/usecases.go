@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	entities "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/entities"
-	ports "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/ports"
+	entities "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/core/entities"
+	ports "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/core/ports"
 )
 
 type useCases struct {

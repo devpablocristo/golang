@@ -1,15 +1,15 @@
-package jwtpkg
+package sdkjwt
 
 import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/jwt/v5/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/jwt/v5/ports"
 )
 
 // Bootstrap inicializa el servicio JWT usando una clave secreta generada
-func Bootstrap() (ports.JwtClient, error) {
+func Bootstrap() (ports.JwtService, error) {
 	secretKey, err := generateSecretKey(32)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate secret key: %v", err)

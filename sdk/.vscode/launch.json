@@ -15,13 +15,11 @@
       "request": "launch",
       "mode": "auto",
       "program": "${workspaceRoot}/examples/indi-dip-monitors/cmd/main.go",  // Ruta al archivo que quieres ejecutar
-      "envFile": "${workspaceRoot}/config/.env",
       "args": [
-          "/home/pablo/Downloads/hex_dip_projects/bueno",
-          "/home/pablo/Downloads/hex_dip_projects/bueno/internal/core/domain",
-          "/home/pablo/Downloads/hex_dip_projects/bueno/internal/core/services",        
-          "/home/pablo/Downloads/hex_dip_projects/bueno/internal/adapters"          
-      ],
+          //"/home/pablo/Projects/Pablo/github.com/devpablocristo/meli/monitor-projects/bueno"
+          "/home/pablo/Projects/Pablo/github.com/devpablocristo/meli/monitor-projects/regular"
+          //"/home/pablo/Projects/Pablo/github.com/devpablocristo/meli/monitor-projects/malo"
+        ],
       "env": {},
       "buildFlags": "",
       "cwd": "${workspaceFolder}",  // Directorio de trabajo

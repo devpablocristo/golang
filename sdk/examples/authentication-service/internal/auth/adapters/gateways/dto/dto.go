@@ -1,7 +1,7 @@
 package dto
 
 import (
-	entities "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/entities"
+	entities "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/core/entities"
 	mware "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 )
 

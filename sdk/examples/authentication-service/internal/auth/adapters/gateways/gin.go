@@ -1,24 +1,31 @@
-package auth
+package authgtw
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	dto "github.com/devpablocristo/golang/sdk/examples/authentication-service/gateways/auth/dto"
-	ports "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/ports"
+	dto "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/adapters/gateways/dto"
+	ports "github.com/devpablocristo/golang/sdk/examples/authentication-service/internal/auth/core/ports"
 	mware "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
-	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
+	sdk "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
+	sdkports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
 
 type GinHandler struct {
 	ucs        ports.UseCases
-	ginServer  sdkgin.Server
+	ginServer  sdkports.Server
 	apiVersion string
 	secret     string
 }
 
-func NewGinHandler(u ports.UseCases, ginServer sdkgin.Server, apiVersion string, secret string) *GinHandler {
+func NewGinHandler(u ports.UseCases, ginServer sdkports.Server, apiVersion string, secret string) *GinHandler {
+	ginServer, err := sdk.Bootstrap()
+	if err != nil {
+		log.Fatalf("Gin Service error: %v", err)
+	}
+
 	return &GinHandler{
 		ucs:        u,
 		ginServer:  ginServer,
