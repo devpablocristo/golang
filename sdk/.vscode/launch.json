@@ -6,7 +6,7 @@
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceRoot}/examples/xxx/cmd/main.go",
+        "program": "${workspaceRoot}/examples/indi-grpc-server/cmd/main.go",
         "envFile": "${workspaceRoot}/config/.env"
     },
     {

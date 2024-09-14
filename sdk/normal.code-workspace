@@ -16,8 +16,14 @@
         "terminal.integrated.scrollback": 10000,
         "workbench.startupEditor": "none",
         "workbench.iconTheme": "vscode-icons",
-        "workbench.colorTheme": "Default Dark Modern",
+        "workbench.colorTheme": "Peacock Contrast (rainglow)",
         "workbench.colorCustomizations": {
+            "statusBar.background": "#00b7ff",    // Color de fondo de la barra inferior
+            "statusBarItem.hoverBackground": "#333333",  // Color al pasar el ratón sobre elementos en la barra
+            "statusBarItem.prominentBackground": "#FF5733",  // Color del texto cuando esté conectado remotamente
+            "statusBarItem.remoteForeground": "#FFFF00",     // Color específico del texto "Open a Remote Window"
+            "statusBarItem.remoteBackground": "#003e49",      // Color de fondo del botón "Open a Remote Window"
+            "statusBar.foreground": "#000000",
             "statusBar.debuggingBackground": "#ff7b00",
             "statusBar.debuggingForeground": "#000000"
         },
