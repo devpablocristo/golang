@@ -8,7 +8,7 @@ tmp_dir = "./tmp/server"
 
 [build]
 # Comando para compilar el binario del server
-cmd = "go build -gcflags='all=-N -l' -o ./tmp/server/greeter-server /app/examples/greeter-server/main.go"
+cmd = "go build -gcflags='all=-N -l' -o ./tmp/server/greeter-server /app/services/greeter-server/main.go"
 
 # Binario del server
 bin = "./tmp/server/greeter-server"

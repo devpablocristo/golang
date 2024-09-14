@@ -6,7 +6,7 @@
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceRoot}/examples/indi-grpc-server/cmd/main.go",
+        "program": "${workspaceRoot}/services/indi-grpc-server/cmd/main.go",
         "envFile": "${workspaceRoot}/config/.env"
     },
     {
@@ -14,7 +14,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceRoot}/examples/indi-dip-monitors/cmd/main.go",  // Ruta al archivo que quieres ejecutar
+      "program": "${workspaceRoot}/services/indi-dip-monitors/cmd/main.go",  // Ruta al archivo que quieres ejecutar
       "args": [
           //"/home/pablo/Projects/Pablo/github.com/devpablocristo/meli/monitor-projects/bueno"
           "/home/pablo/Projects/Pablo/github.com/devpablocristo/meli/monitor-projects/regular"
