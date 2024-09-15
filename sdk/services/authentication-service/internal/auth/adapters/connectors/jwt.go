@@ -1,6 +1,7 @@
 package authconn
 
 import (
+	"log"
 	"time"
 
 	sdk "github.com/devpablocristo/golang/sdk/pkg/jwt/v5"
@@ -15,19 +16,19 @@ type JwtService interface {
 
 // jwtService es la estructura que implementa la interfaz JwtService
 type jwtService struct {
-	JwtService sdkports.JwtService // Usa el cliente JWT del SDK
+	JwtService sdkports.Service // Usa el cliente JWT del SDK
 }
 
 // NewJwtService crea una nueva instancia de jwtService usando el cliente JWT del SDK
-func NewJwtService() (JwtService, error) {
-	JwtService, err := sdk.Bootstrap() // Inicializa el cliente JWT desde el SDK
+func NewJwtService() JwtService {
+	js, err := sdk.Bootstrap() // Inicializa el cliente JWT desde el SDK
 	if err != nil {
-		return nil, err
+		log.Fatalf("JWT Service error: %v", err)
 	}
 
 	return &jwtService{
-		JwtService: JwtService,
-	}, nil
+		JwtService: js,
+	}
 }
 
 // GenerateToken genera un JWT para un usuario dado su UUID

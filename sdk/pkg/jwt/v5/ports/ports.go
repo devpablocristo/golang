@@ -2,12 +2,12 @@ package ports
 
 import "github.com/golang-jwt/jwt/v5"
 
-type JwtService interface {
+type Service interface {
 	GenerateToken(claims jwt.MapClaims) (string, error)
 	ValidateToken(token string) (*jwt.Token, error)
 }
 
-type JwtConfig interface {
+type Config interface {
 	GetSecretKey() string
 	Validate() error
 }

@@ -6,25 +6,25 @@ import (
 	"github.com/devpablocristo/golang/sdk/pkg/jwt/v5/ports"
 )
 
-type jwtConfig struct {
+type config struct {
 	secretKey string
 }
 
-func newJWTConfig(secretKey string) (ports.JwtConfig, error) {
+func newConfig(secretKey string) (ports.Config, error) {
 	if secretKey == "" {
 		return nil, fmt.Errorf("secret key cannot be empty")
 	}
-	return &jwtConfig{
+	return &config{
 		secretKey: secretKey,
 	}, nil
 }
 
-func (config *jwtConfig) GetSecretKey() string {
-	return config.secretKey
+func (c *config) GetSecretKey() string {
+	return c.secretKey
 }
 
-func (config *jwtConfig) Validate() error {
-	if config.secretKey == "" {
+func (c *config) Validate() error {
+	if c.secretKey == "" {
 		return fmt.Errorf("JWT secret key is not configured")
 	}
 	return nil

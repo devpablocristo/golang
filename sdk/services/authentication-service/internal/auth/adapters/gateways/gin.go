@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 
 	mware "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 	sdk "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
@@ -20,7 +21,7 @@ type GinHandler struct {
 	secret     string
 }
 
-func NewGinHandler(u ports.UseCases, ginServer sdkports.Server, apiVersion string, secret string) *GinHandler {
+func NewGinHandler(u ports.UseCases) *GinHandler {
 	ginServer, err := sdk.Bootstrap()
 	if err != nil {
 		log.Fatalf("Gin Service error: %v", err)
@@ -29,8 +30,8 @@ func NewGinHandler(u ports.UseCases, ginServer sdkports.Server, apiVersion strin
 	return &GinHandler{
 		ucs:        u,
 		ginServer:  ginServer,
-		apiVersion: apiVersion,
-		secret:     secret,
+		apiVersion: viper.GetString("API_VERSION"),
+		secret:     viper.GetString("JWT_SECRET_KEY"),
 	}
 }
 
@@ -38,6 +39,10 @@ func (h *GinHandler) Start() error {
 	h.routes()
 
 	return h.ginServer.RunServer()
+}
+
+func (h *GinHandler) GetRouter() *gin.Engine {
+	return h.ginServer.GetRouter()
 }
 
 func (h *GinHandler) routes() {

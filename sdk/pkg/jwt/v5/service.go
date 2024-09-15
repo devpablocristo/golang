@@ -10,24 +10,24 @@ import (
 )
 
 var (
-	instance ports.JwtService
-	once     sync.Once
-	initError   error
+	instance  ports.Service
+	once      sync.Once
+	initError error
 )
 
-type jwtService struct {
+type Service struct {
 	secretKey string
 }
 
-// newJWTService inicializa el servicio JWT con una clave secreta
-func newJWTService(secretKey string) (ports.JwtService, error) {
+// newService inicializa el servicio JWT con una clave secreta
+func newService(secretKey string) (ports.Service, error) {
 	once.Do(func() {
 		if secretKey == "" {
 			initError = fmt.Errorf("secret key cannot be empty")
 			return
 		}
 
-		instance = &jwtService{
+		instance = &Service{
 			secretKey: secretKey,
 		}
 	})
@@ -35,7 +35,7 @@ func newJWTService(secretKey string) (ports.JwtService, error) {
 }
 
 // Getinstance devuelve la instancia del cliente JWT
-func Getinstance() (ports.JwtService, error) {
+func Getinstance() (ports.Service, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("JWT service is not initialized")
 	}
@@ -43,7 +43,7 @@ func Getinstance() (ports.JwtService, error) {
 }
 
 // GenerateToken genera un token JWT con las reclamaciones proporcionadas
-func (j *jwtService) GenerateToken(claims jwt.MapClaims) (string, error) {
+func (j *Service) GenerateToken(claims jwt.MapClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(j.secretKey))
 	if err != nil {
@@ -53,7 +53,7 @@ func (j *jwtService) GenerateToken(claims jwt.MapClaims) (string, error) {
 }
 
 // ValidateToken valida un token JWT proporcionado
-func (j *jwtService) ValidateToken(token string) (*jwt.Token, error) {
+func (j *Service) ValidateToken(token string) (*jwt.Token, error) {
 	return jwt.Parse(token, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
