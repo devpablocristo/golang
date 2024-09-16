@@ -168,4 +168,171 @@ func (s *useUserCases) SaveUser(user *domain.User) error {
 
 		return true
 	})
+
+	// Función para verificar si un tipo es una interfaz
+	isInterface := func(expr ast.Expr) bool {
+		switch expr := expr.(type) {
+		case *ast.InterfaceType:
+			// Es una interfaz
+			return true
+		case *ast.Ident:
+			// El identificador puede referirse a una interfaz, pero no lo sabemos a simple vista
+			return false
+		case *ast.StarExpr:
+			// Si es un puntero, verificamos si el tipo subyacente es una interfaz
+			return isInterface(expr.X)
+		case *ast.SelectorExpr:
+			// Si es un tipo calificado por un paquete, no podemos saber si es interfaz aquí
+			return false
+		default:
+			return false
+		}
+	}
+
+	// Recorrer el AST para funciones y variables
+	ast.Inspect(file, func(n ast.Node) bool {
+		// Verificar si el nodo es una declaración de función
+		if funcDecl, ok := n.(*ast.FuncDecl); ok {
+			fmt.Printf("Función encontrada: %s\n", funcDecl.Name.Name)
+
+			// Obtener los parámetros de la función
+			if funcDecl.Type.Params != nil {
+				for _, param := range funcDecl.Type.Params.List {
+					// Obtener los nombres de los parámetros (pueden ser múltiples)
+					for _, name := range param.Names {
+						fmt.Printf("  Parámetro: %s, Tipo: ", name.Name)
+
+						// Comprobar el tipo de parámetro (ast.Expr)
+						switch expr := param.Type.(type) {
+						case *ast.Ident:
+							fmt.Printf("%s", expr.Name)
+						case *ast.SelectorExpr:
+							if pkgIdent, ok := expr.X.(*ast.Ident); ok {
+								fmt.Printf("%s.%s", pkgIdent.Name, expr.Sel.Name)
+							}
+						case *ast.StarExpr:
+							if selector, ok := expr.X.(*ast.SelectorExpr); ok {
+								if pkgIdent, ok := selector.X.(*ast.Ident); ok {
+									fmt.Printf("*%s.%s", pkgIdent.Name, selector.Sel.Name)
+								}
+							}
+						default:
+							fmt.Printf("tipo desconocido")
+						}
+
+						// Comprobar si es una interfaz
+						if isInterface(param.Type) {
+							fmt.Println(" (interfaz)")
+						} else {
+							fmt.Println(" (no interfaz)")
+						}
+					}
+				}
+			}
+
+			// Recorrer las declaraciones de variables dentro del cuerpo de la función
+			ast.Inspect(funcDecl.Body, func(n ast.Node) bool {
+				if decl, ok := n.(*ast.DeclStmt); ok {
+					if genDecl, ok := decl.Decl.(*ast.GenDecl); ok && genDecl.Tok == token.VAR {
+						for _, spec := range genDecl.Specs {
+							if valueSpec, ok := spec.(*ast.ValueSpec); ok {
+								for _, name := range valueSpec.Names {
+									fmt.Printf("  Variable local encontrada: %s, Tipo: ", name.Name)
+
+									switch expr := valueSpec.Type.(type) {
+									case *ast.Ident:
+										fmt.Printf("%s", expr.Name)
+									case *ast.SelectorExpr:
+										if pkgIdent, ok := expr.X.(*ast.Ident); ok {
+											fmt.Printf("%s.%s", pkgIdent.Name, expr.Sel.Name)
+										}
+									default:
+										fmt.Printf("tipo desconocido")
+									}
+
+									// Comprobar si es una interfaz
+									if isInterface(valueSpec.Type) {
+										fmt.Println(" (interfaz)")
+									} else {
+										fmt.Println(" (no interfaz)")
+									}
+								}
+							}
+						}
+					}
+				}
+				if assign, ok := n.(*ast.AssignStmt); ok {
+					for i, lh := range assign.Lhs {
+						if ident, ok := lh.(*ast.Ident); ok {
+							if i < len(assign.Rhs) {
+								switch rhs := assign.Rhs[i].(type) {
+								case *ast.Ident:
+									fmt.Printf("  Variable asignada: %s, Tipo: %s", ident.Name, rhs.Name)
+								case *ast.SelectorExpr:
+									if pkgIdent, ok := rhs.X.(*ast.Ident); ok {
+										fmt.Printf("  Variable asignada: %s, Tipo: %s.%s", ident.Name, pkgIdent.Name, rhs.Sel.Name)
+									}
+								default:
+									fmt.Printf("  Variable asignada: %s, Tipo: tipo desconocido", ident.Name)
+								}
+
+								// Comprobar si es una interfaz
+								if isInterface(assign.Rhs[i]) {
+									fmt.Println(" (interfaz)")
+								} else {
+									fmt.Println(" (no interfaz)")
+								}
+							}
+						}
+					}
+				}
+				return true
+			})
+		}
+
+		// Verificar si el nodo es una declaración general (como variables globales)
+		if genDecl, ok := n.(*ast.GenDecl); ok && genDecl.Tok == token.VAR {
+			for _, spec := range genDecl.Specs {
+				if valueSpec, ok := spec.(*ast.ValueSpec); ok {
+					for _, name := range valueSpec.Names {
+						fmt.Printf("Variable global encontrada: %s, Tipo: ", name.Name)
+
+						switch expr := valueSpec.Type.(type) {
+						case *ast.Ident:
+							fmt.Printf("%s", expr.Name)
+						case *ast.SelectorExpr:
+							if pkgIdent, ok := expr.X.(*ast.Ident); ok {
+								fmt.Printf("%s.%s", pkgIdent.Name, expr.Sel.Name)
+							}
+						default:
+							fmt.Printf("tipo desconocido o no especificado")
+						}
+
+						// Comprobar si es una interfaz
+						if isInterface(valueSpec.Type) {
+							fmt.Println(" (interfaz)")
+						} else {
+							fmt.Println(" (no interfaz)")
+						}
+					}
+				}
+			}
+		}
+
+		return true
+	})
+}
+
+func isInterface(typeExpr ast.Expr) bool {
+	// Comprobar si el tipo es una interfaz
+	switch expr := typeExpr.(type) {
+	case *ast.InterfaceType:
+		// Es una interfaz
+		return true
+	case *ast.StarExpr:
+		// Si es un puntero, verificamos si el tipo subyacente es una interfaz
+		return isInterface(expr.X)
+	default:
+		return false
+	}
 }

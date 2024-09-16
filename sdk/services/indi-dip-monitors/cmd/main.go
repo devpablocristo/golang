@@ -241,7 +241,6 @@ func readGoFileLineByLine(filePath string) error {
 func listStructFields(filePath string) error {
 	// Crear el conjunto de archivos para el parser
 
-	
 	fset := token.NewFileSet()
 
 	// Parsear el archivo
