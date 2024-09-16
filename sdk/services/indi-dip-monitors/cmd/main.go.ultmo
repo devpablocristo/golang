@@ -1,0 +1,282 @@
+package main
+
+import (
+	"fmt"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"gopkg.in/yaml.v2"
+)
+
+// Definición de la estructura del archivo monitor.yml
+type LayerConfig struct {
+	Layers struct {
+		Domain         string `yaml:"domain"`
+		Application    string `yaml:"application"`
+		Infrastructure string `yaml:"infrastructure"`
+	} `yaml:"layers"`
+}
+
+// Estructura para almacenar información de los paquetes importados y su capa
+type fileImports struct {
+	name  string
+	path  string
+	layer string
+}
+
+var packagesInfo []fileImports
+var dependencyViolations []string
+
+// Función principal
+func main() {
+	if len(os.Args) != 2 {
+		fmt.Println("Usage: go run main.go <repo_path>")
+		return
+	}
+
+	repoPath := os.Args[1]
+
+	// Cargar el archivo monitor.yml para las capas
+	layerConfig, err := loadLayerConfig(filepath.Join(repoPath, "monitor.yml"))
+	if err != nil {
+		fmt.Printf("Error loading layer configuration: %v\n", err)
+		return
+	}
+
+	// Recorrer todos los archivos y clasificarlos
+	err = filepath.Walk(repoPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && filepath.Ext(path) == ".go" {
+			classifyFile(path, layerConfig, repoPath)
+		}
+		return nil
+	})
+
+	if err != nil {
+		fmt.Printf("Error walking the path %v: %v\n", repoPath, err)
+		return
+	}
+
+	// Realizar el análisis de la inversión de dependencias
+	analyzeDependencyInversion(layerConfig)
+
+	// Mostrar las violaciones encontradas
+	printViolations()
+}
+
+// Cargar el archivo monitor.yml
+func loadLayerConfig(path string) (LayerConfig, error) {
+	var config LayerConfig
+
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return config, err
+	}
+
+	err = yaml.Unmarshal(content, &config)
+	if err != nil {
+		return config, err
+	}
+
+	return config, nil
+}
+
+func classifyFile(filePath string, config LayerConfig, repoPath string) {
+	absFilePath, _ := filepath.Abs(filePath)
+
+	// Convertimos las rutas relativas de las capas a rutas absolutas
+	domainPath, _ := filepath.Abs(filepath.Join(repoPath, config.Layers.Domain))
+	applicationPath, _ := filepath.Abs(filepath.Join(repoPath, config.Layers.Application))
+	infrastructurePath, _ := filepath.Abs(filepath.Join(repoPath, config.Layers.Infrastructure))
+
+	// Clasificamos el archivo según la capa a la que pertenezca
+	switch {
+	case isSubPath(domainPath, absFilePath):
+		pkgName, _ := getPackageName(filePath)
+		addFileImport(pkgName, absFilePath, "domain")
+	case isSubPath(applicationPath, absFilePath):
+		pkgName, _ := getPackageName(filePath)
+		addFileImport(pkgName, absFilePath, "application")
+	case isSubPath(infrastructurePath, absFilePath):
+		pkgName, _ := getPackageName(filePath)
+		addFileImport(pkgName, absFilePath, "infrastructure")
+	default:
+		fmt.Printf("File: %s does not belong to any known layer\n", filePath)
+	}
+}
+
+func isSubPath(basePath, targetPath string) bool {
+	relPath, err := filepath.Rel(basePath, targetPath)
+	if err != nil {
+		return false
+	}
+	return !strings.HasPrefix(relPath, "..")
+}
+
+func getPackageName(filePath string) (string, error) {
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, filePath, nil, parser.PackageClauseOnly)
+	if err != nil {
+		return "", fmt.Errorf("error parsing file: %v", err)
+	}
+	if node.Name != nil {
+		return node.Name.Name, nil
+	}
+	return "", fmt.Errorf("package name not found")
+}
+
+func addFileImport(name, path, layer string) {
+	newImport := fileImports{
+		name:  name,
+		path:  path,
+		layer: layer,
+	}
+	packagesInfo = append(packagesInfo, newImport)
+}
+
+// Función para analizar la inversión de dependencias
+func analyzeDependencyInversion(config LayerConfig) {
+	filteredPackages := filterPackagesByLayer(packagesInfo, []string{"domain", "application"})
+
+	for _, file := range filteredPackages {
+		// Analizar las importaciones
+		imports, err := getFileImports(file.path)
+		if err != nil {
+			fmt.Printf("Error getting imports for file %s: %v\n", file.path, err)
+			continue
+		}
+
+		// Validar las importaciones
+		for _, imp := range imports {
+			validateImport(file, imp, config)
+		}
+
+		// Analizar los structs para verificar si están usando interfaces o structs concretos
+		analyzeStructs(file.path, config)
+	}
+}
+
+// Función que filtra los archivos según las capas dadas
+func filterPackagesByLayer(packages []fileImports, allowedLayers []string) []fileImports {
+	var filtered []fileImports
+	for _, pkg := range packages {
+		for _, layer := range allowedLayers {
+			if pkg.layer == layer {
+				filtered = append(filtered, pkg)
+				break // No es necesario continuar, ya que ya encontramos una coincidencia
+			}
+		}
+	}
+	return filtered
+}
+
+// Función para validar cada importación según las reglas de inversión de dependencias
+func validateImport(file fileImports, importPath string, config LayerConfig) {
+	switch file.layer {
+	case "domain":
+		// Los archivos del dominio solo pueden importar de la librería estándar o de la capa de dominio
+		if !isStdLib(importPath) && !strings.Contains(importPath, config.Layers.Domain) {
+			dependencyViolations = append(dependencyViolations, fmt.Sprintf("Violation in %s: imports %s which is not allowed in domain layer", file.path, importPath))
+		}
+	case "application":
+		// Los archivos de la aplicación pueden importar de la librería estándar, dominio o aplicación
+		if !isStdLib(importPath) && !strings.Contains(importPath, config.Layers.Domain) && !strings.Contains(importPath, config.Layers.Application) {
+			// Si importa de infraestructura, debe ser una interfaz
+			if strings.Contains(importPath, config.Layers.Infrastructure) && !isInterface(importPath) {
+				dependencyViolations = append(dependencyViolations, fmt.Sprintf("Violation in %s: imports %s from infrastructure without using an interface", file.path, importPath))
+			}
+		}
+	}
+}
+
+// Función para analizar los structs en el archivo
+func analyzeStructs(filePath string, config LayerConfig) {
+
+	fmt.Println(filePath)
+	fmt.Println(config)
+
+	fset := token.NewFileSet()                                           // Inicializamos un conjunto de archivos
+	node, err := parser.ParseFile(fset, filePath, nil, parser.AllErrors) // Parseamos el archivo Go
+	if err != nil {
+		fmt.Printf("Error parsing file: %v\n", err)
+		return
+	}
+
+	_ = node
+
+	// // Recorrer el AST (Abstract Syntax Tree) del archivo Go
+	// ast.Inspect(node, func(n ast.Node) bool {
+	// 	switch x := n.(type) {
+	// 	case *ast.TypeSpec: // Verificamos si el nodo es una definición de tipo (struct, interface, etc.)
+	// 		// Si el nodo es un struct
+	// 		if structType, ok := x.Type.(*ast.StructType); ok {
+	// 			for _, field := range structType.Fields.List { // Recorremos los campos del struct
+	// 				for _, fieldName := range field.Names { // Recorremos los nombres de las variables
+	// 					// Imprimir el nombre de la variable que se está analizando
+	// 					fmt.Printf("Analizando variable: %s en struct %s\n", fieldName.Name, x.Name.Name)
+
+	// 					if ident, ok := field.Type.(*ast.Ident); ok { // Verificamos el tipo del campo
+	// 						// Si el tipo del campo no es una interfaz y es de una capa no permitida
+	// 						fmt.Printf("%s", ident.Name)
+	// 						if !isInterface(ident.Name) && isConcreteTypeNotAllowed(ident.Name, config) {
+	// 							dependencyViolations = append(dependencyViolations, fmt.Sprintf("Violation in %s: struct %s uses concrete type %s, which is not allowed", filePath, x.Name.Name, ident.Name))
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	return true
+	// })
+}
+
+// Función para determinar si un tipo es una interfaz
+func isInterface(typeName string) bool {
+	// Aquí puedes mejorar esta lógica para verificar si el tipo es una interfaz
+	return strings.HasPrefix(typeName, "I") // Convención simple, puede mejorarse.
+}
+
+// Función para verificar si un tipo concreto no está permitido
+func isConcreteTypeNotAllowed(typeName string, config LayerConfig) bool {
+	// Si el tipo pertenece a "domain" o "application", está permitido
+	// Si es de "infrastructure" y no es interfaz, no está permitido
+	return strings.Contains(typeName, config.Layers.Infrastructure)
+}
+
+// Función para determinar si un paquete es de la librería estándar
+func isStdLib(importPath string) bool {
+	return !strings.Contains(importPath, ".")
+}
+
+// Función para obtener las importaciones de un archivo
+func getFileImports(filePath string) ([]string, error) {
+	var imports []string
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, filePath, nil, parser.ImportsOnly)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing file: %v", err)
+	}
+
+	for _, imp := range node.Imports {
+		imports = append(imports, strings.Trim(imp.Path.Value, "\""))
+	}
+
+	return imports, nil
+}
+
+// Función para imprimir las violaciones de dependencia encontradas
+func printViolations() {
+	if len(dependencyViolations) == 0 {
+		fmt.Println("No dependency violations found.")
+	} else {
+		fmt.Println("Dependency violations found:")
+		for _, violation := range dependencyViolations {
+			fmt.Println(violation)
+		}
+	}
+}

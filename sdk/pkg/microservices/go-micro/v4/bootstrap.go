@@ -6,6 +6,8 @@ import (
 	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
 )
 
+// rest (gin, std, chi), rpc(grpc, thrift), messaging(rabbitmq, kafka), websocket, graph ql
+// primera version: gin, grpc, rabbitmq, websocket
 func Bootstrap(ginClient ginport.Server, grpcClient grpcclient.Client, grpcServer grpcserver.Server) (ports.Service, error) {
 
 	
