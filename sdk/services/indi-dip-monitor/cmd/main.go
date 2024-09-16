@@ -6,10 +6,12 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"go/types"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"golang.org/x/tools/go/packages"
 	"gopkg.in/yaml.v2"
 )
 
@@ -197,7 +199,8 @@ func analyzeDependencyInversion(analyzer *DependencyAnalyzer, config LayerConfig
 			// Listar variables declaradas en el archivo
 			//readGoFileLineByLine(file.Path)
 			//getVariablesAndTypes(file.Path)
-			listStructFields(file.Path)
+			//listStructFields(file.Path)
+			interfaceChecker(file.Path)
 		}
 
 		// // Validar las importaciones
@@ -209,6 +212,74 @@ func analyzeDependencyInversion(analyzer *DependencyAnalyzer, config LayerConfig
 		// analyzeStructs(file.Path, config, analyzer)
 	} //listar variables declaradas en el archivo
 
+}
+
+func interfaceChecker(filePath string) error {
+	fset := token.NewFileSet()
+
+	// Parsear el archivo
+	node, err := parser.ParseFile(fset, filePath, nil, parser.AllErrors)
+	if err != nil {
+		return fmt.Errorf("error parsing file: %w", err)
+	}
+
+	// Cargar el paquete de información de tipos
+	cfg := &packages.Config{
+		Mode:  packages.NeedTypes | packages.NeedTypesInfo,
+		Tests: false,
+	}
+
+	pkgs, err := packages.Load(cfg, filePath)
+	if err != nil {
+		return fmt.Errorf("error loading package: %w", err)
+	}
+
+	if len(pkgs) == 0 {
+		return fmt.Errorf("no se encontraron paquetes")
+	}
+
+	pkg := pkgs[0]
+
+	// Función para verificar si un tipo es una interfaz
+	isInterface := func(expr ast.Expr) bool {
+		tv := pkg.TypesInfo.Types[expr]
+		if tv.Type == nil {
+			return false
+		}
+		_, ok := tv.Type.Underlying().(*types.Interface)
+		return ok
+	}
+
+	// Recorrer el AST y analizar las variables
+	ast.Inspect(node, func(n ast.Node) bool {
+		switch x := n.(type) {
+		case *ast.ValueSpec:
+			// Para declaraciones de variables globales y locales
+			for _, name := range x.Names {
+				fmt.Printf("Variable: %s, Tipo: ", name.Name)
+				if isInterface(x.Type) {
+					fmt.Println("es una interfaz")
+				} else {
+					fmt.Println("no es una interfaz")
+				}
+			}
+		case *ast.AssignStmt:
+			// Para asignaciones (variables locales)
+			for _, lhs := range x.Lhs {
+				if ident, ok := lhs.(*ast.Ident); ok {
+					fmt.Printf("Variable: %s, Tipo: ", ident.Name)
+					if isInterface(lhs) {
+						fmt.Println("es una interfaz")
+					} else {
+						fmt.Println("no es una interfaz")
+					}
+				}
+			}
+		}
+		return true
+	})
+
+	return nil
 }
 
 func readGoFileLineByLine(filePath string) error {
@@ -239,8 +310,6 @@ func readGoFileLineByLine(filePath string) error {
 }
 
 func listStructFields(filePath string) error {
-	// Crear el conjunto de archivos para el parser
-
 	fset := token.NewFileSet()
 
 	// Parsear el archivo
@@ -357,7 +426,6 @@ func listStructFields(filePath string) error {
 }
 
 // Función para extraer las variables y sus tipos de un archivo Go
-
 func getVariablesAndTypes(filePath string) error {
 	// Crear el conjunto de archivos para el parser
 	fset := token.NewFileSet()
