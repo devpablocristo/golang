@@ -14,7 +14,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceRoot}/services/indi-dip-monitors/cmd/main.go",  // Ruta al archivo que quieres ejecutar
+      "program": "${workspaceRoot}/services/indi-dip-monitor/cmd/main.go",  // Ruta al archivo que quieres ejecutar
       "args": [
           //"/home/pablo/Projects/Pablo/github.com/devpablocristo/meli/monitor-projects/bueno"
           "/home/pablo/Projects/Pablo/github.com/devpablocristo/meli/monitor-projects/regular"

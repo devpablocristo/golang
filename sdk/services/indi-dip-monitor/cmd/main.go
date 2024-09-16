@@ -249,7 +249,6 @@ func listStructFields(filePath string) error {
 		return fmt.Errorf("error parsing file: %w", err)
 	}
 
-	// Recorrer el AST e imprimir las funciones con sus argumentos
 	ast.Inspect(node, func(n ast.Node) bool {
 		// Verificar si el nodo es una declaración de función
 		if funcDecl, ok := n.(*ast.FuncDecl); ok {
@@ -264,13 +263,13 @@ func listStructFields(filePath string) error {
 
 						// Comprobar el tipo de parámetro (ast.Expr)
 						switch expr := param.Type.(type) {
-						case *ast.Ident: // Tipos simples como "string", "int", etc.
+						case *ast.Ident:
 							fmt.Printf("%s\n", expr.Name)
-						case *ast.SelectorExpr: // Tipos calificados con un paquete, como "db.Repository"
+						case *ast.SelectorExpr:
 							if pkgIdent, ok := expr.X.(*ast.Ident); ok {
 								fmt.Printf("%s.%s\n", pkgIdent.Name, expr.Sel.Name)
 							}
-						case *ast.StarExpr: // Tipos con puntero, como "*apiclt.ApiClient"
+						case *ast.StarExpr:
 							if selector, ok := expr.X.(*ast.SelectorExpr); ok {
 								if pkgIdent, ok := selector.X.(*ast.Ident); ok {
 									fmt.Printf("*%s.%s\n", pkgIdent.Name, selector.Sel.Name)
@@ -282,7 +281,75 @@ func listStructFields(filePath string) error {
 					}
 				}
 			}
+
+			// Recorrer las declaraciones de variables dentro del cuerpo de la función
+			ast.Inspect(funcDecl.Body, func(n ast.Node) bool {
+				if decl, ok := n.(*ast.DeclStmt); ok {
+					if genDecl, ok := decl.Decl.(*ast.GenDecl); ok && genDecl.Tok == token.VAR {
+						for _, spec := range genDecl.Specs {
+							if valueSpec, ok := spec.(*ast.ValueSpec); ok {
+								for _, name := range valueSpec.Names {
+									fmt.Printf("  Variable local encontrada: %s, Tipo: ", name.Name)
+
+									switch expr := valueSpec.Type.(type) {
+									case *ast.Ident:
+										fmt.Printf("%s\n", expr.Name)
+									case *ast.SelectorExpr:
+										if pkgIdent, ok := expr.X.(*ast.Ident); ok {
+											fmt.Printf("%s.%s\n", pkgIdent.Name, expr.Sel.Name)
+										}
+									default:
+										fmt.Printf("tipo desconocido\n")
+									}
+								}
+							}
+						}
+					}
+				}
+				if assign, ok := n.(*ast.AssignStmt); ok {
+					for i, lh := range assign.Lhs {
+						if ident, ok := lh.(*ast.Ident); ok {
+							if i < len(assign.Rhs) {
+								switch rhs := assign.Rhs[i].(type) {
+								case *ast.Ident:
+									fmt.Printf("  Variable asignada: %s, Tipo: %s\n", ident.Name, rhs.Name)
+								case *ast.SelectorExpr:
+									if pkgIdent, ok := rhs.X.(*ast.Ident); ok {
+										fmt.Printf("  Variable asignada: %s, Tipo: %s.%s\n", ident.Name, pkgIdent.Name, rhs.Sel.Name)
+									}
+								default:
+									fmt.Printf("  Variable asignada: %s, Tipo: tipo desconocido\n", ident.Name)
+								}
+							}
+						}
+					}
+				}
+				return true
+			})
 		}
+
+		// Verificar si el nodo es una declaración general (como variables globales)
+		if genDecl, ok := n.(*ast.GenDecl); ok && genDecl.Tok == token.VAR {
+			for _, spec := range genDecl.Specs {
+				if valueSpec, ok := spec.(*ast.ValueSpec); ok {
+					for _, name := range valueSpec.Names {
+						fmt.Printf("Variable global encontrada: %s, Tipo: ", name.Name)
+
+						switch expr := valueSpec.Type.(type) {
+						case *ast.Ident:
+							fmt.Printf("%s\n", expr.Name)
+						case *ast.SelectorExpr:
+							if pkgIdent, ok := expr.X.(*ast.Ident); ok {
+								fmt.Printf("%s.%s\n", pkgIdent.Name, expr.Sel.Name)
+							}
+						default:
+							fmt.Printf("tipo desconocido o no especificado\n")
+						}
+					}
+				}
+			}
+		}
+
 		return true
 	})
 
