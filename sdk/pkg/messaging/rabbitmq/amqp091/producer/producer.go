@@ -71,14 +71,6 @@ func newProducer(config ports.Config) (ports.Producer, error) {
 	return producerInstance, producerInitError
 }
 
-// GetInstance returns the singleton instance of the RabbitMQ producer
-func GetInstance() (ports.Producer, error) {
-	if producerInstance == nil {
-		return nil, fmt.Errorf("rabbitmq producer is not initialized")
-	}
-	return producerInstance, nil
-}
-
 // Produce sends a message to the specified queue with optional reply-to and correlation ID
 func (p *rabbitMqProducer) Produce(ctx context.Context, queueName, replyTo, corrID string, message any) (string, error) {
 	body, err := json.Marshal(message)

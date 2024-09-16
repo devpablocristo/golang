@@ -8,6 +8,7 @@ import (
 
 type Server interface {
 	RunServer() error
+	GetApiVersion() string
 	GetRouter() *gin.Engine
 	WrapH(h http.Handler) gin.HandlerFunc
 }
@@ -15,5 +16,7 @@ type Server interface {
 type Config interface {
 	GetRouterPort() string
 	SetRouterPort(string)
+	GetApiVersion() string
+	SetApiVersion(string)
 	Validate() error
 }

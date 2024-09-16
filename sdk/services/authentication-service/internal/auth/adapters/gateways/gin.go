@@ -30,7 +30,7 @@ func NewGinHandler(u ports.UseCases) *GinHandler {
 	return &GinHandler{
 		ucs:        u,
 		ginServer:  ginServer,
-		apiVersion: viper.GetString("API_VERSION"),
+		apiVersion: ginServer.GetApiVersion(),
 		secret:     viper.GetString("JWT_SECRET_KEY"),
 	}
 }
@@ -79,7 +79,6 @@ func (h *GinHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.LoginResponse{Token: token.AccessToken})
 }
 
-// ProtectedHandler maneja el acceso a rutas protegidas.
 func (h *GinHandler) ProtectedHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "ok from protected"})
 }

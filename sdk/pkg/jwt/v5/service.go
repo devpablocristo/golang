@@ -15,7 +15,7 @@ var (
 	initError error
 )
 
-type Service struct {
+type service struct {
 	secretKey string
 }
 
@@ -27,23 +27,19 @@ func newService(secretKey string) (ports.Service, error) {
 			return
 		}
 
-		instance = &Service{
+		instance = &service{
 			secretKey: secretKey,
 		}
 	})
-	return instance, initError
-}
-
-// Getinstance devuelve la instancia del cliente JWT
-func Getinstance() (ports.Service, error) {
-	if instance == nil {
-		return nil, fmt.Errorf("JWT service is not initialized")
+	if initError != nil {
+		return nil, initError
 	}
+
 	return instance, nil
 }
 
 // GenerateToken genera un token JWT con las reclamaciones proporcionadas
-func (j *Service) GenerateToken(claims jwt.MapClaims) (string, error) {
+func (j *service) GenerateToken(claims jwt.MapClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(j.secretKey))
 	if err != nil {
@@ -53,7 +49,7 @@ func (j *Service) GenerateToken(claims jwt.MapClaims) (string, error) {
 }
 
 // ValidateToken valida un token JWT proporcionado
-func (j *Service) ValidateToken(token string) (*jwt.Token, error) {
+func (j *service) ValidateToken(token string) (*jwt.Token, error) {
 	return jwt.Parse(token, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

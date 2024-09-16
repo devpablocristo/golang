@@ -34,14 +34,6 @@ func newCache(c ports.Config) (ports.Cache, error) {
 	return instance, initError
 }
 
-// GetInstance devuelve la instancia de Redis, si está inicializada
-func GetInstance() (ports.Cache, error) {
-	if instance == nil {
-		return nil, fmt.Errorf("redis is not initialized")
-	}
-	return instance, nil
-}
-
 // connect conecta al servidor Redis utilizando los getters de la configuración
 func (ch *Cache) connect(c ports.Config) error {
 	rdb := redis.NewClient(&redis.Options{

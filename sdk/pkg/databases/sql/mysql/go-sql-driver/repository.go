@@ -34,14 +34,6 @@ func newRepository(c config) (ports.Repository, error) {
 	return instance, initError
 }
 
-// GetInstance devuelve la instancia única de Repository.
-func GetInstance() (ports.Repository, error) {
-	if instance == nil {
-		return nil, fmt.Errorf("MySQL client is not initialized")
-	}
-	return instance, nil
-}
-
 // connect establece la conexión a la base de datos MySQL.
 func (r *Repository) connect(c config) error {
 	dsn := c.dsn()

@@ -7,37 +7,37 @@ import (
 )
 
 type config struct {
-	rpcServiceName    string
-	rpcServiceAddress string
-	webServiceName    string
-	webServiceAddress string
-	consulAddress     string
+	grpcServiceName    string
+	grpcServiceAddress string
+	ginServerName      string
+	ginServerAddress   string
+	consulAddress      string
 }
 
-func newConfig(rpcSN, rpcSA, webSN, webSA, cA string) ports.Config {
+func newConfig(grpcN, grpcA, ginN, ginA, cA string) ports.Config {
 	return &config{
-		rpcServiceName:    rpcSN,
-		rpcServiceAddress: rpcSA,
-		webServiceName:    webSN,
-		webServiceAddress: webSA,
-		consulAddress:     cA,
+		grpcServiceName:    grpcN,
+		grpcServiceAddress: grpcA,
+		ginServerName:      ginN,
+		ginServerAddress:   ginA,
+		consulAddress:      cA,
 	}
 }
 
-func (config *config) GetRcpServiceName() string {
-	return config.rpcServiceName
+func (config *config) GetGrpcServiceName() string {
+	return config.grpcServiceName
 }
 
-func (config *config) GetWebServiceName() string {
-	return config.webServiceName
+func (config *config) GetGinServerName() string {
+	return config.ginServerName
 }
 
-func (config *config) GetRcpServiceAddress() string {
-	return config.rpcServiceAddress
+func (config *config) GetGrpcServiceAddress() string {
+	return config.grpcServiceAddress
 }
 
-func (config *config) GetWebServiceAddress() string {
-	return config.webServiceAddress
+func (config *config) GetGinServerAddress() string {
+	return config.ginServerAddress
 }
 
 func (config *config) GetConsulAddress() string {
@@ -45,7 +45,7 @@ func (config *config) GetConsulAddress() string {
 }
 
 func (config *config) Validate() error {
-	if config.rpcServiceName == "" && config.webServiceName == "" {
+	if config.grpcServiceName == "" && config.ginServerName == "" {
 		return fmt.Errorf("missing service name: web or/and rpc")
 	}
 	return nil

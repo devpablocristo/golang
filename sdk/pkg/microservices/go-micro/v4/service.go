@@ -31,20 +31,20 @@ var (
 )
 
 type service struct {
-	rpcService micro.Service
-	webService web.Service
-	client     client.Client
-	server     server.Server
-	auth       auth.Auth
-	broker     broker.Broker
-	config     configx.Config
-	logger     logger.Logger
-	registry   registry.Registry
-	store      store.Store
-	transport  transport.Transport
-	sync       syncx.Sync
-	events     events.Stream
-	selector   selector.Selector
+	grpcService micro.Service
+	ginServer   web.Service
+	client      client.Client
+	server      server.Server
+	auth        auth.Auth
+	broker      broker.Broker
+	config      configx.Config
+	logger      logger.Logger
+	registry    registry.Registry
+	store       store.Store
+	transport   transport.Transport
+	sync        syncx.Sync
+	events      events.Stream
+	selector    selector.Selector
 }
 
 func newService(config ports.Config) (ports.Service, error) {
@@ -54,40 +54,42 @@ func newService(config ports.Config) (ports.Service, error) {
 			return
 		}
 		setupLogger()
+
 		instance = &service{
-			rpcService: setupRcpService(config),
-			webService: setupWebService(config),
+			grpcService: setupRcpService(config),
+			ginServer:   setupGinServer(config),
 		}
 	})
+
 	if initError != nil {
 		return nil, initError
 	}
+
 	return instance, nil
 }
 
-func GetInstance() (ports.Service, error) {
-	if instance == nil {
-		return nil, fmt.Errorf("go micro service is not initialized")
-	}
-	return instance, nil
-}
-
-func setupRcpService(config ports.Config) micro.Service {
-	rcpService := micro.NewService(
-		micro.Name(config.GetRcpServiceName()),
-		micro.Address(config.GetRcpServiceAddress()),
+func setupGrpcService(config ports.Config) micro.Service {
+	// Configuración del servidor gRPC
+	grpcService := micro.NewService(
+		micro.Name(config.GetGrpcServiceName()),
+		micro.Address(config.GetGrpcServiceAddress()),
+		micro.Server(grpcserver.NewServer()),
+		micro.Client(grpcclient.NewClient()),
 		micro.Registry(setupRegistry(config)),
 	)
-	return rcpService
+
+	grpcService.Init()
+
+	return grpcService
 }
 
-func setupWebService(config ports.Config) web.Service {
-	webService := web.NewService(
-		web.Name(config.GetWebServiceName()),
-		web.Address(config.GetWebServiceAddress()),
+func setupginServer(config ports.Config) web.Service {
+	ginServer := web.NewService(
+		web.Name(config.GetginServerName()),
+		web.Address(config.GetginServerAddress()),
 		web.Registry(setupRegistry(config)),
 	)
-	return webService
+	return ginServer
 }
 
 func setupRegistry(config ports.Config) registry.Registry {
@@ -104,9 +106,9 @@ func setupLogger() {
 	)
 }
 
-func (s *service) StartRcpService() error {
-	if s.rpcService != nil {
-		err := s.rpcService.Run()
+func (s *service) StartGrpcService() error {
+	if s.grpcService != nil {
+		err := s.grpcService.Run()
 		if err != nil {
 			return fmt.Errorf("failed to start rcp service: %w", err)
 		}
@@ -115,9 +117,9 @@ func (s *service) StartRcpService() error {
 	return fmt.Errorf("rpc service is not initialized")
 }
 
-func (s *service) StartWebService() error {
-	if s.webService != nil {
-		err := s.webService.Run()
+func (s *service) StartginServer() error {
+	if s.ginServer != nil {
+		err := s.ginServer.Run()
 		if err != nil {
 			return fmt.Errorf("failed to start web service: %w", err)
 		}
@@ -126,5 +128,5 @@ func (s *service) StartWebService() error {
 	return fmt.Errorf("web service is not initialized")
 }
 
-func (s *service) GetRcpService() micro.Service { return s.rpcService }
-func (s *service) GetWebService() web.Service   { return s.webService }
+func (s *service) GetGrcpService() micro.Service { return s.grpcService }
+func (s *service) GetginServer() web.Service     { return s.ginServer }

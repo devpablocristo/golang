@@ -36,13 +36,6 @@ func newRepository(c ports.Config) (ports.Repository, error) {
 	return instance, initError
 }
 
-func GetInstance() (ports.Repository, error) {
-	if instance == nil {
-		return nil, fmt.Errorf("PostgreSQL client is not initialized")
-	}
-	return instance, nil
-}
-
 func (r *repository) Connect(c ports.Config) error {
 	// Construcción de la cadena de conexión
 	connString := c.DNS()

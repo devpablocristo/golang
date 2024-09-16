@@ -30,13 +30,6 @@ func newRepository(config ports.Config) (ports.Repository, error) {
 	return instance, initError
 }
 
-func GetInstance() (ports.Repository, error) {
-	if instance == nil {
-		return nil, fmt.Errorf("cassandra client is not initialized")
-	}
-	return instance, nil
-}
-
 func (c *repository) Connect(config ports.Config) error {
 	cluster := gocql.NewCluster(config.GetHosts()...)
 	cluster.Keyspace = config.GetKeyspace()

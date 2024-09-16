@@ -10,7 +10,6 @@ func Bootstrap() (ports.Server, error) {
 	config := newConfig(
 		viper.GetString("ROUTER_PORT"),
 		viper.GetString("API_VERSION"),
-		viper.GetString("JWT_SECRET_KEY"),
 	)
 
 	if err := config.Validate(); err != nil {

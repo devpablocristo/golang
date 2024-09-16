@@ -27,6 +27,10 @@ func NewGrpcClient() ports.GrpcClient {
 	}
 }
 
+func (c *grpcClient) GetClient() sdkports.Client {
+	return c.client // Devuelve la instancia creada en NewGrpcClient
+}
+
 // GetUserUUID obtiene el UUID del usuario desde el servicio de usuarios
 func (g *grpcClient) GetUserUUID(ctx context.Context, cred *entities.LoginCredentials) (string, error) {
 	req := &pb.GetUserRequest{

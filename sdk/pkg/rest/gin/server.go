@@ -1,7 +1,6 @@
 package sdkgin
 
 import (
-	"fmt"
 	"net/http"
 	"sync"
 
@@ -16,7 +15,7 @@ var (
 	initError error
 )
 
-type service struct {
+type server struct {
 	router *gin.Engine
 	config ports.Config
 }
@@ -30,31 +29,27 @@ func newServer(config ports.Config) (ports.Server, error) {
 		}
 
 		r := gin.Default()
-		client := &service{
+		instance = &server{
 			config: config,
 			router: r,
 		}
-		instance = client
 	})
 	return instance, initError
 }
 
-func GetInstance() (ports.Server, error) {
-	if instance == nil {
-		return nil, fmt.Errorf("gin client is not initialized")
-	}
-	return instance, nil
+func (server *server) RunServer() error {
+	return server.router.Run(":" + server.config.GetRouterPort())
 }
 
-func (client *service) RunServer() error {
-	return client.router.Run(":" + client.config.GetRouterPort())
+func (server *server) GetRouter() *gin.Engine {
+	return server.router
 }
 
-func (client *service) GetRouter() *gin.Engine {
-	return client.router
+func (server *server) GetApiVersion() string {
+	return server.config.GetApiVersion()
 }
 
 // WrapH envuelve un http.Handler en un gin.HandlerFunc.
-func (client *service) WrapH(h http.Handler) gin.HandlerFunc {
+func (server *server) WrapH(h http.Handler) gin.HandlerFunc {
 	return gin.WrapH(h)
 }

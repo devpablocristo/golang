@@ -58,14 +58,6 @@ func (client *Client) GetConnection() (*grpc.ClientConn, error) {
 	return client.conn, nil
 }
 
-// Getinstance returns the instance of gRPC client
-func GetInstance() (ports.Client, error) {
-	if instance == nil {
-		return nil, fmt.Errorf("gRPC client is not initialized")
-	}
-	return instance, nil
-}
-
 // InvokeMethod invokes a gRPC method
 func (client *Client) InvokeMethod(ctx context.Context, method string, request, response any) error {
 	// Additional check to avoid invoking with a nil connection

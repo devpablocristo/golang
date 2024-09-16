@@ -6,17 +6,17 @@ import (
 )
 
 type Service interface {
-	StartWebService() error
-	StartRcpService() error
-	GetRcpService() micro.Service
-	GetWebService() web.Service
+	StartRestServer() error
+	StartGrpcService() error
+	GetGrpcService() micro.Service
+	GetRestServer() web.Service
 }
 
 type Config interface {
-	GetRcpServiceName() string
-	GetWebServiceName() string
-	GetRcpServiceAddress() string
-	GetWebServiceAddress() string
+	GetGrpcServiceName() string
+	GetGinServerName() string
+	GetGrpcServiceAddress() string
+	GinServerAddress() string
 	GetConsulAddress() string
 	Validate() error
 }

@@ -51,14 +51,6 @@ func newServer(config ports.Config) (ports.Server, error) {
 	return instance, initErr
 }
 
-// Getinstance devuelve la instancia de servidor gRPC
-func Getinstance() (ports.Server, error) {
-	if instance == nil {
-		return nil, fmt.Errorf("gRPC server is not initialized")
-	}
-	return instance, nil
-}
-
 func (s *Server) Start() error {
 	return s.server.Serve(s.listener)
 }
