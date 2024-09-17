@@ -11,14 +11,15 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-// Estructura para almacenar información por archivo
-type FileInfo struct {
-	Interfaces    []string
-	NonInterfaces []string
+// Estructura para almacenar información por paquete
+type PackageInfo struct {
+	Interfaces      map[string]bool
+	StandardVars    map[string]bool
+	NonStandardVars map[string]string // Mapa de variable y su paquete de origen
 }
 
-// Función para analizar un paquete completo en lugar de solo un archivo
-func analyzeGoPackage(pkgPath string, fileInfo *FileInfo) error {
+// Función para analizar un paquete completo
+func analyzeGoPackage(pkgPath string, pkgInfo *PackageInfo) error {
 	cfg := &packages.Config{
 		Mode:  packages.NeedTypes | packages.NeedSyntax | packages.NeedTypesInfo,
 		Dir:   pkgPath,
@@ -41,20 +42,24 @@ func analyzeGoPackage(pkgPath string, fileInfo *FileInfo) error {
 		ast.Inspect(syntax, func(n ast.Node) bool {
 			switch x := n.(type) {
 			case *ast.ValueSpec:
-				// Para cada variable, verificamos si es una interfaz
+				// Ignorar los valores de las funciones
 				for _, name := range x.Names {
-					if x.Type != nil && isInterfaceType(pkg.TypesInfo.TypeOf(x.Type)) {
-						fileInfo.Interfaces = append(fileInfo.Interfaces, name.Name)
-					} else {
-						fileInfo.NonInterfaces = append(fileInfo.NonInterfaces, name.Name)
+					if !isFunctionOrReceiver(name.Name) {
+						if x.Type != nil && isInterfaceType(pkg.TypesInfo.TypeOf(x.Type)) {
+							pkgInfo.Interfaces[name.Name] = true
+						} else {
+							categorizeVariable(name.Name, pkg.TypesInfo.TypeOf(x.Type), pkgInfo)
+						}
 					}
 				}
 			case *ast.Field: // Para parámetros de funciones o campos de estructuras
 				for _, name := range x.Names {
-					if x.Type != nil && isInterfaceType(pkg.TypesInfo.TypeOf(x.Type)) {
-						fileInfo.Interfaces = append(fileInfo.Interfaces, name.Name)
-					} else {
-						fileInfo.NonInterfaces = append(fileInfo.NonInterfaces, name.Name)
+					if !isFunctionOrReceiver(name.Name) {
+						if x.Type != nil && isInterfaceType(pkg.TypesInfo.TypeOf(x.Type)) {
+							pkgInfo.Interfaces[name.Name] = true
+						} else {
+							categorizeVariable(name.Name, pkg.TypesInfo.TypeOf(x.Type), pkgInfo)
+						}
 					}
 				}
 			}
@@ -63,6 +68,44 @@ func analyzeGoPackage(pkgPath string, fileInfo *FileInfo) error {
 	}
 
 	return nil
+}
+
+// Función para determinar si un nombre corresponde a una función o un receiver
+func isFunctionOrReceiver(name string) bool {
+	return strings.HasPrefix(name, "Get") || strings.HasPrefix(name, "Save") || name == "s"
+}
+
+// Función para categorizar una variable entre estándar o no estándar
+func categorizeVariable(varName string, typ types.Type, pkgInfo *PackageInfo) {
+	if typ == nil {
+		return
+	}
+
+	if isStandardPackage(typ) {
+		pkgInfo.StandardVars[varName] = true
+	} else {
+		pkgPath := getPackagePath(typ)
+		pkgInfo.NonStandardVars[varName] = pkgPath
+	}
+}
+
+// Función para verificar si un tipo es parte de la librería estándar
+func isStandardPackage(typ types.Type) bool {
+	if typ == nil {
+		return false
+	}
+	pkg := typ.String()
+	return !strings.Contains(pkg, ".")
+}
+
+// Obtener el paquete de una variable no estándar
+func getPackagePath(typ types.Type) string {
+	if named, ok := typ.(*types.Named); ok {
+		if pkg := named.Obj().Pkg(); pkg != nil {
+			return pkg.Path()
+		}
+	}
+	return "desconocido"
 }
 
 // Función para verificar si un tipo es una interfaz
@@ -74,41 +117,47 @@ func isInterfaceType(typ types.Type) bool {
 	return ok
 }
 
-// Función para imprimir los resultados del análisis
-func printResults(fileInfo *FileInfo, filePath string) {
-	fmt.Printf("Archivo: %s\n", filePath)
+// Función para imprimir los resultados del análisis por paquete
+func printResults(pkgInfo *PackageInfo, pkgPath string) {
+	fmt.Printf("Paquete: %s\n", pkgPath)
 
 	// Imprimir variables que son interfaces
 	fmt.Println("    Interfaces encontradas:")
-	for _, iface := range fileInfo.Interfaces {
+	for iface := range pkgInfo.Interfaces {
 		fmt.Printf("      - %s\n", iface)
 	}
 
-	// Imprimir variables que no son interfaces
-	fmt.Println("    No son interfaces:")
-	for _, nonIface := range fileInfo.NonInterfaces {
-		fmt.Printf("      - %s\n", nonIface)
+	// Imprimir variables estándar
+	fmt.Println("    Variables estándar:")
+	for stdVar := range pkgInfo.StandardVars {
+		fmt.Printf("      - %s\n", stdVar)
+	}
+
+	// Imprimir variables no estándar con su paquete
+	fmt.Println("    Variables no estándar:")
+	for varName, pkgPath := range pkgInfo.NonStandardVars {
+		fmt.Printf("      - %s (paquete: %s)\n", varName, pkgPath)
 	}
 	fmt.Println("-----------------------------")
 }
 
-// Función para buscar el directorio que contiene user_service.go
-func findUserServiceGoFile(repoPath string) (string, error) {
-	var userServiceDir string
+// Función para buscar el paquete que contiene el archivo user_service.go
+func findUserServicePackage(repoPath string) (string, error) {
+	var userServicePkg string
 	err := filepath.Walk(repoPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if !info.IsDir() && strings.HasSuffix(info.Name(), "user_service.go") {
-			userServiceDir = filepath.Dir(path)
+			userServicePkg = filepath.Dir(path)
 			return filepath.SkipDir // Detener la búsqueda cuando encontramos el archivo
 		}
 		return nil
 	})
-	if userServiceDir == "" {
+	if userServicePkg == "" {
 		return "", fmt.Errorf("no se encontró el archivo user_service.go")
 	}
-	return userServiceDir, err
+	return userServicePkg, err
 }
 
 func main() {
@@ -119,24 +168,28 @@ func main() {
 
 	repoPath := os.Args[1]
 
-	// Buscar el directorio del archivo user_service.go
-	pkgPath, err := findUserServiceGoFile(repoPath)
+	// Buscar el paquete del archivo user_service.go
+	pkgPath, err := findUserServicePackage(repoPath)
 	if err != nil {
-		fmt.Printf("Error al buscar el archivo: %v\n", err)
+		fmt.Printf("Error al buscar el paquete: %v\n", err)
 		return
 	}
 
-	// Almacenar información del archivo user_service.go
-	fileInfo := &FileInfo{}
+	// Almacenar información del paquete
+	pkgInfo := &PackageInfo{
+		Interfaces:      make(map[string]bool),
+		StandardVars:    make(map[string]bool),
+		NonStandardVars: make(map[string]string),
+	}
 
-	// Analizar el paquete que contiene user_service.go
+	// Analizar el paquete completo
 	fmt.Println("Analizando el paquete que contiene user_service.go...")
-	err = analyzeGoPackage(pkgPath, fileInfo)
+	err = analyzeGoPackage(pkgPath, pkgInfo)
 	if err != nil {
 		fmt.Printf("Error al analizar el paquete: %v\n", err)
 		return
 	}
 
-	// Imprimir los resultados
-	printResults(fileInfo, pkgPath)
+	// Imprimir los resultados por paquete
+	printResults(pkgInfo, pkgPath)
 }
