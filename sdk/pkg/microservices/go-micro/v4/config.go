@@ -1,43 +1,27 @@
 package sdkgomicro
 
 import (
-	"fmt"
-
 	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
+
+	grpcclient "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
+	grpcserver "github.com/devpablocristo/golang/sdk/pkg/grpc/server/ports"
+	ginport "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
 
 type config struct {
-	grpcServiceName    string
-	grpcServiceAddress string
-	ginServerName      string
-	ginServerAddress   string
-	consulAddress      string
+	grpcClient    grpcclient.Client
+	grpcServer    grpcserver.Server
+	ginClient     ginport.Server
+	consulAddress string
 }
 
-func newConfig(grpcN, grpcA, ginN, ginA, cA string) ports.Config {
+func newConfig(grpcClient grpcclient.Client, grpcServer grpcserver.Server, ginServer ginport.Server, consulAddress string) ports.Config {
 	return &config{
-		grpcServiceName:    grpcN,
-		grpcServiceAddress: grpcA,
-		ginServerName:      ginN,
-		ginServerAddress:   ginA,
-		consulAddress:      cA,
+		grpcClient:    grpcClient,
+		grpcServer:    grpcServer,
+		ginClient:     ginServer,
+		consulAddress: consulAddress,
 	}
-}
-
-func (config *config) GetGrpcServiceName() string {
-	return config.grpcServiceName
-}
-
-func (config *config) GetGinServerName() string {
-	return config.ginServerName
-}
-
-func (config *config) GetGrpcServiceAddress() string {
-	return config.grpcServiceAddress
-}
-
-func (config *config) GetGinServerAddress() string {
-	return config.ginServerAddress
 }
 
 func (config *config) GetConsulAddress() string {
@@ -45,8 +29,6 @@ func (config *config) GetConsulAddress() string {
 }
 
 func (config *config) Validate() error {
-	if config.grpcServiceName == "" && config.ginServerName == "" {
-		return fmt.Errorf("missing service name: web or/and rpc")
-	}
+
 	return nil
 }

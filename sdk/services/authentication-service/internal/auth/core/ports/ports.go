@@ -3,6 +3,8 @@ package authports
 import (
 	"context"
 
+	sdkports "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
+
 	entities "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/core/entities"
 )
 
@@ -19,6 +21,7 @@ type JwtService interface {
 // GrpcClient define las operaciones del cliente gRPC
 type GrpcClient interface {
 	GetUserUUID(context.Context, *entities.LoginCredentials) (string, error)
+	GetClient() sdkports.Client
 }
 
 type RedisService interface {

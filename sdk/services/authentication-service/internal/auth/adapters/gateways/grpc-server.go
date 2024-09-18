@@ -35,6 +35,10 @@ func (s *GreeterGrpcServer) Start() error {
 	return nil
 }
 
+func (s *GreeterGrpcServer) GetServer() sdkports.Server {
+	return s.grpcServer
+}
+
 // func (s *GreeterGrpcServer) GreetUnary(ctx context.Context, req *pb.GreetUnaryRequest) (*pb.GreetUnaryResponse, error) {
 // 	name := req.GetGreeting().GetFirstName() + " " + req.GetGreeting().GetLastName()
 // 	greeting, err := s.useCases.Greet(ctx, name)

@@ -11,6 +11,7 @@ import (
 	sdk "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
 	sdkports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 	dto "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/adapters/gateways/dto"
+
 	ports "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/core/ports"
 )
 
@@ -41,8 +42,8 @@ func (h *GinHandler) Start() error {
 	return h.ginServer.RunServer()
 }
 
-func (h *GinHandler) GetRouter() *gin.Engine {
-	return h.ginServer.GetRouter()
+func (h *GinHandler) GetServer() sdkports.Server {
+	return h.ginServer
 }
 
 func (h *GinHandler) routes() {

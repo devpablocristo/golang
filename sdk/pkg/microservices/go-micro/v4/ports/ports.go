@@ -13,10 +13,6 @@ type Service interface {
 }
 
 type Config interface {
-	GetGrpcServiceName() string
-	GetGinServerName() string
-	GetGrpcServiceAddress() string
-	GinServerAddress() string
 	GetConsulAddress() string
 	Validate() error
 }

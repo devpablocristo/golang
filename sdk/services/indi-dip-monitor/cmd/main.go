@@ -18,9 +18,10 @@ import (
 )
 
 // ---------------------------
-// Estructuras principales
+// Estructuras principales y análisis de dependencias
 // ---------------------------
 
+// EntityInfo representa información sobre una entidad dentro de un archivo (struct, variable, etc.)
 type EntityInfo struct {
 	Name        string
 	Type        string
@@ -31,6 +32,7 @@ type EntityInfo struct {
 	Layer       string
 }
 
+// FileImport representa un archivo Go y las entidades que contiene
 type FileImport struct {
 	Name     string
 	Path     string
@@ -38,15 +40,18 @@ type FileImport struct {
 	Entities []EntityInfo
 }
 
+// DependencyAnalyzer es la estructura principal para analizar dependencias
 type DependencyAnalyzer struct {
 	PackagesInfo         []FileImport
 	DependencyViolations []string
 }
 
+// NewDependencyAnalyzer crea una nueva instancia de DependencyAnalyzer
 func NewDependencyAnalyzer() *DependencyAnalyzer {
 	return &DependencyAnalyzer{}
 }
 
+// AddFileImport agrega un archivo con sus entidades analizadas al DependencyAnalyzer
 func (da *DependencyAnalyzer) AddFileImport(name, path, layer string, entities []EntityInfo) {
 	da.PackagesInfo = append(da.PackagesInfo, FileImport{
 		Name:     name,
@@ -57,9 +62,10 @@ func (da *DependencyAnalyzer) AddFileImport(name, path, layer string, entities [
 }
 
 // ---------------------------
-// Estructuras para Métricas
+// Estructuras para manejar métricas y resultados
 // ---------------------------
 
+// Metric representa una métrica con un autor, score y evidencias de violaciones DIP
 type Metric struct {
 	MetricID  string     `json:"metric_id"`
 	GitAuthor string     `json:"git_author"`
@@ -67,6 +73,7 @@ type Metric struct {
 	Evidence  []Evidence `json:"evidence"`
 }
 
+// Evidence representa evidencia de una violación de DIP, incluyendo el commit, archivo, línea y entidad afectada
 type Evidence struct {
 	CommitID   string `json:"commit_id"`
 	File       string `json:"file"`
@@ -74,24 +81,28 @@ type Evidence struct {
 	EntityName string `json:"entity_name"`
 }
 
+// LayerConfig representa la configuración de capas desde el archivo YAML
 type LayerConfig struct {
 	Layers map[string][]string `yaml:"layers"`
 }
 
+// SkillData representa los datos de una habilidad, incluyendo el score y la evidencia encontrada
 type SkillData struct {
 	Score    int
 	Evidence []Evidence
 }
 
+// Skill representa una habilidad a evaluar, como las violaciones DIP
 type Skill struct {
 	ID   string
 	Name string
 }
 
 // ---------------------------
-// Carga de configuración de capas
+// Carga de configuración de capas desde YAML
 // ---------------------------
 
+// loadLayerConfig carga la configuración de capas desde un archivo YAML
 func loadLayerConfig(path string) (LayerConfig, error) {
 	var config LayerConfig
 	content, err := os.ReadFile(path)
@@ -103,9 +114,10 @@ func loadLayerConfig(path string) (LayerConfig, error) {
 }
 
 // ---------------------------
-// Manejo de archivos en el repositorio
+// Manejo de archivos en el repositorio con go-git
 // ---------------------------
 
+// getFilesToAnalyze devuelve una lista de archivos Go para analizar en un repositorio
 func getFilesToAnalyze(repo *git.Repository) ([]string, error) {
 	var filesToAnalyze []string
 
@@ -118,7 +130,6 @@ func getFilesToAnalyze(repo *git.Repository) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		// Solo analizar archivos Go
 		if !info.IsDir() && filepath.Ext(path) == ".go" {
 			relPath, err := filepath.Rel(worktree.Filesystem.Root(), path)
 			if err != nil {
@@ -129,13 +140,10 @@ func getFilesToAnalyze(repo *git.Repository) ([]string, error) {
 		return nil
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	return filesToAnalyze, nil
+	return filesToAnalyze, err
 }
 
+// getFileAuthor obtiene el autor del archivo en el repositorio git
 func getFileAuthor(repo *git.Repository, file string) (string, error) {
 	commits, err := repo.Log(&git.LogOptions{FileName: &file})
 	if err != nil {
@@ -150,6 +158,7 @@ func getFileAuthor(repo *git.Repository, file string) (string, error) {
 	return commit.Author.Email, nil
 }
 
+// getCommitID obtiene el ID del commit para un archivo en el repositorio git
 func getCommitID(repo *git.Repository, file string) (string, error) {
 	commits, err := repo.Log(&git.LogOptions{FileName: &file})
 	if err != nil {
@@ -165,9 +174,10 @@ func getCommitID(repo *git.Repository, file string) (string, error) {
 }
 
 // ---------------------------
-// Clasificación y análisis
+// Clasificación y análisis de archivos
 // ---------------------------
 
+// classifyFile clasifica y analiza un archivo Go
 func classifyFile(filePath string, layer string, config LayerConfig, analyzer *DependencyAnalyzer) map[string]SkillData {
 	result := make(map[string]SkillData)
 	for _, skill := range skills {
@@ -183,10 +193,7 @@ func classifyFile(filePath string, layer string, config LayerConfig, analyzer *D
 	return result
 }
 
-// ---------------------------
-// Extracción de información de archivos
-// ---------------------------
-
+// listVariablesStructsParamsAndInterfaces extrae entidades (structs, variables, etc.) de un archivo Go
 func listVariablesStructsParamsAndInterfaces(filePath string, config LayerConfig) ([]EntityInfo, error) {
 	cfg := &packages.Config{Mode: packages.NeedSyntax | packages.NeedTypes | packages.NeedTypesInfo, Dir: filepath.Dir(filePath)}
 	pkgs, err := packages.Load(cfg, "./...")
@@ -219,9 +226,10 @@ func listVariablesStructsParamsAndInterfaces(filePath string, config LayerConfig
 }
 
 // ---------------------------
-// Procesamiento de structs
+// Procesamiento de variables, funciones y structs
 // ---------------------------
 
+// processStructFields procesa las entidades de tipo struct en un archivo Go
 func processStructFields(typeDecl *ast.TypeSpec, pkg *packages.Package, imports map[string]string, config LayerConfig, results *[]EntityInfo) {
 	if structType, ok := typeDecl.Type.(*ast.StructType); ok {
 		for _, field := range structType.Fields.List {
@@ -230,9 +238,7 @@ func processStructFields(typeDecl *ast.TypeSpec, pkg *packages.Package, imports 
 			layer := getLayerForType(fieldType, config)
 
 			for _, fieldName := range field.Names {
-				// Obtener línea correcta del campo del struct
 				line := pkg.Fset.Position(field.Pos()).Line
-
 				*results = append(*results, EntityInfo{
 					Name:        fieldName.Name,
 					Type:        fieldType,
@@ -247,10 +253,7 @@ func processStructFields(typeDecl *ast.TypeSpec, pkg *packages.Package, imports 
 	}
 }
 
-// ---------------------------
-// Procesamiento de funciones y variables
-// ---------------------------
-
+// processVariables procesa las variables globales o locales en un archivo Go
 func processVariables(decl *ast.GenDecl, pkg *packages.Package, imports map[string]string, config LayerConfig, results *[]EntityInfo) {
 	for _, spec := range decl.Specs {
 		if vspec, ok := spec.(*ast.ValueSpec); ok {
@@ -263,9 +266,7 @@ func processVariables(decl *ast.GenDecl, pkg *packages.Package, imports map[stri
 				layer := getLayerForType(varType, config)
 				kind := getKindFromObj(pkg.TypesInfo.ObjectOf(name))
 
-				// Obtener línea correcta
 				line := pkg.Fset.Position(name.Pos()).Line
-
 				*results = append(*results, EntityInfo{
 					Name:        name.Name,
 					Type:        varType,
@@ -280,6 +281,7 @@ func processVariables(decl *ast.GenDecl, pkg *packages.Package, imports map[stri
 	}
 }
 
+// processFunctionParamsAndResults procesa los parámetros y resultados de una función Go
 func processFunctionParamsAndResults(funcDecl *ast.FuncDecl, pkg *packages.Package, imports map[string]string, config LayerConfig, results *[]EntityInfo) {
 	processParamsOrResults(funcDecl.Type.Params, "Function Parameter", pkg, imports, config, results)
 	processParamsOrResults(funcDecl.Type.Results, "Function Return Type", pkg, imports, config, results)
@@ -293,10 +295,7 @@ func processFunctionParamsAndResults(funcDecl *ast.FuncDecl, pkg *packages.Packa
 						kind := getKindFromObj(obj)
 						varType := obj.Type().String()
 						layer := getLayerForType(varType, config)
-
-						// Obtener línea correcta de la variable local
 						line := pkg.Fset.Position(ident.Pos()).Line
-
 						*results = append(*results, EntityInfo{
 							Name:        ident.Name,
 							Type:        varType,
@@ -314,6 +313,7 @@ func processFunctionParamsAndResults(funcDecl *ast.FuncDecl, pkg *packages.Packa
 	})
 }
 
+// processParamsOrResults procesa los parámetros o resultados de una función Go
 func processParamsOrResults(fields *ast.FieldList, category string, pkg *packages.Package, imports map[string]string, config LayerConfig, results *[]EntityInfo) {
 	if fields == nil {
 		return
@@ -324,9 +324,7 @@ func processParamsOrResults(fields *ast.FieldList, category string, pkg *package
 		layer := getLayerForType(paramType, config)
 
 		for _, paramName := range param.Names {
-			// Obtener línea correcta del parámetro
 			line := pkg.Fset.Position(paramName.Pos()).Line
-
 			*results = append(*results, EntityInfo{
 				Name:        paramName.Name,
 				Type:        paramType,
@@ -341,9 +339,10 @@ func processParamsOrResults(fields *ast.FieldList, category string, pkg *package
 }
 
 // ---------------------------
-// Utilidades de análisis
+// Utilidades para análisis de tipos y archivos
 // ---------------------------
 
+// getVariableType devuelve el tipo de una variable en Go
 func getVariableType(expr ast.Expr, name *ast.Ident, pkg *packages.Package, imports map[string]string) string {
 	if expr != nil {
 		return getTypeFromAST(expr, imports)
@@ -351,6 +350,7 @@ func getVariableType(expr ast.Expr, name *ast.Ident, pkg *packages.Package, impo
 	return pkg.TypesInfo.ObjectOf(name).Type().String()
 }
 
+// isGlobalVariable determina si una variable es global o local
 func isGlobalVariable(line int, pkg *packages.Package) bool {
 	for _, file := range pkg.Syntax {
 		for _, decl := range file.Decls {
@@ -365,6 +365,7 @@ func isGlobalVariable(line int, pkg *packages.Package) bool {
 	return true
 }
 
+// getKindFromObj devuelve el tipo (struct o interface) de una entidad en Go
 func getKindFromObj(obj types.Object) string {
 	if obj == nil {
 		return "unknown"
@@ -378,6 +379,7 @@ func getKindFromObj(obj types.Object) string {
 	return "other"
 }
 
+// getTypeFromAST devuelve el tipo de una entidad desde su representación AST
 func getTypeFromAST(expr ast.Expr, imports map[string]string) string {
 	switch t := expr.(type) {
 	case *ast.Ident:
@@ -394,54 +396,11 @@ func getTypeFromAST(expr ast.Expr, imports map[string]string) string {
 	return "unknown"
 }
 
-func getLayerForType(typeName string, config LayerConfig) string {
-	for layer, paths := range config.Layers {
-		for _, path := range paths {
-			if strings.Contains(typeName, path) {
-				return layer
-			}
-		}
-	}
-	return "other"
-}
-
-func getPackageName(filePath string) (string, error) {
-	fset := token.NewFileSet()
-	node, err := parser.ParseFile(fset, filePath, nil, parser.PackageClauseOnly)
-	if err != nil {
-		return "", err
-	}
-	return node.Name.Name, nil
-}
-
-func getFileFromPackage(pkg *packages.Package, filePath string) (*ast.File, error) {
-	for _, file := range pkg.Syntax {
-		if pkg.Fset.Position(file.Pos()).Filename == filePath {
-			return file, nil
-		}
-	}
-	return nil, fmt.Errorf("file not found in package")
-}
-
-func extractImports(file *ast.File) map[string]string {
-	imports := make(map[string]string)
-	for _, i := range file.Imports {
-		alias := ""
-		if i.Name != nil {
-			alias = i.Name.Name
-		} else {
-			parts := strings.Split(strings.Trim(i.Path.Value, "\""), "/")
-			alias = parts[len(parts)-1]
-		}
-		imports[alias] = strings.Trim(i.Path.Value, "\"")
-	}
-	return imports
-}
-
 // ---------------------------
 // Incremento del score y manejo de violaciones
 // ---------------------------
 
+// incrementScore incrementa el puntaje si se encuentra una violación DIP
 func incrementScore(results map[string]SkillData, skillID string, evidence Evidence) {
 	skillData := results[skillID]
 	skillData.Score += 1
@@ -449,8 +408,8 @@ func incrementScore(results map[string]SkillData, skillID string, evidence Evide
 	results[skillID] = skillData
 }
 
+// getResults procesa los resultados de un análisis de dependencias
 func getResults(analyzer *DependencyAnalyzer, results map[string]SkillData) {
-
 	for _, file := range analyzer.PackagesInfo {
 		for _, entity := range file.Entities {
 			if shouldDisplayEntity(file.Layer, entity) {
@@ -459,44 +418,34 @@ func getResults(analyzer *DependencyAnalyzer, results map[string]SkillData) {
 					Line:       entity.Position,
 					EntityName: entity.Name,
 				}
-
 				incrementScore(results, "dip_violation", evidence)
-
-				// fmt.Printf("  Category: %s, Name: %s, Type: %s, Kind: %s, Layer: %s, Line: %d\n",
-				// 	entity.Category, entity.Name, entity.Type, entity.Kind, entity.Layer, entity.Position)
 			}
 		}
 	}
 }
 
 // ---------------------------
-// Verificación de capas y exclusión de entidades
+// Filtrado de entidades según capas
 // ---------------------------
 
+// shouldDisplayEntity determina si una entidad debe mostrarse basado en su capa y tipo
 func shouldDisplayEntity(fileLayer string, entity EntityInfo) bool {
-	// Si el archivo está en la capa "domain", no mostrar entidades de la capa "domain"
 	if fileLayer == "domain" && entity.Layer == "domain" {
 		return false
 	}
-
-	// Si el archivo está en la capa "application", no mostrar entidades de las capas "application" o "domain"
 	if fileLayer == "application" && (entity.Layer == "application" || entity.Layer == "domain") {
 		return false
 	}
-
-	// Si el archivo no está en las capas "domain" ni "application", no analizar
 	if fileLayer != "domain" && fileLayer != "application" {
 		return false
 	}
-
-	// Excluir interfaces, tipos primitivos y tipos de la librería estándar
 	if entity.Kind == "interface" || isPrimitiveType(entity.Type) || isStandardLibraryType(entity.Type) {
 		return false
 	}
-
 	return true
 }
 
+// isPrimitiveType determina si un tipo es primitivo
 func isPrimitiveType(varType string) bool {
 	primitives := []string{"int", "string", "bool", "float32", "float64", "byte", "rune", "complex64", "complex128"}
 	for _, primitive := range primitives {
@@ -507,14 +456,16 @@ func isPrimitiveType(varType string) bool {
 	return false
 }
 
+// isStandardLibraryType determina si el tipo pertenece a la librería estándar
 func isStandardLibraryType(varType string) bool {
 	return !strings.Contains(varType, "/")
 }
 
 // ---------------------------
-// Análisis del repositorio
+// Análisis completo del repositorio
 // ---------------------------
 
+// analyzeRepo realiza el análisis del repositorio y devuelve las métricas encontradas
 func analyzeRepo(repoPath string) ([]Metric, error) {
 	repo, err := git.PlainOpen(repoPath)
 	if err != nil {
@@ -533,7 +484,6 @@ func analyzeRepo(repoPath string) ([]Metric, error) {
 	}
 
 	results := make(map[string]map[string]SkillData)
-
 	analyzer := NewDependencyAnalyzer()
 
 	for _, filePath := range filesToAnalyze {
@@ -550,11 +500,8 @@ func analyzeRepo(repoPath string) ([]Metric, error) {
 
 		layer := determineLayer(filePath, layerConfig)
 
-		// Ignorar archivos que no sean de las capas "domain" o "application"
 		if layer == "domain" || layer == "application" {
-
 			fileResults := classifyFile(fullPath, layer, layerConfig, analyzer)
-
 			if _, exists := results[author]; !exists {
 				results[author] = make(map[string]SkillData)
 				for _, skill := range skills {
@@ -564,12 +511,10 @@ func analyzeRepo(repoPath string) ([]Metric, error) {
 
 			for skillID, data := range fileResults {
 				skillData := results[author][skillID]
-
 				if data.Score > skillData.Score {
 					skillData.Score = data.Score
 					skillData.Evidence = []Evidence{}
 				}
-
 				if data.Score == skillData.Score {
 					for _, line := range data.Evidence {
 						skillData.Evidence = append(skillData.Evidence, Evidence{
@@ -580,7 +525,6 @@ func analyzeRepo(repoPath string) ([]Metric, error) {
 						})
 					}
 				}
-
 				results[author][skillID] = skillData
 			}
 		}
@@ -617,7 +561,6 @@ func main() {
 	}
 
 	repoPath := os.Args[1]
-
 	metrics, err := analyzeRepo(repoPath)
 	if err != nil {
 		log.Fatal(err)
@@ -633,6 +576,7 @@ func main() {
 	fmt.Println(string(jsonOutput))
 }
 
+// getKindFromType devuelve el tipo (struct o interface) de una entidad en Go
 func getKindFromType(expr ast.Expr, pkg *packages.Package) string {
 	if typ, ok := pkg.TypesInfo.Types[expr]; ok {
 		switch typ.Type.Underlying().(type) {
@@ -645,10 +589,59 @@ func getKindFromType(expr ast.Expr, pkg *packages.Package) string {
 	return "other"
 }
 
+// determineLayer determina la capa a la que pertenece un archivo basado en su ruta
 func determineLayer(filePath string, config LayerConfig) string {
 	for layer, paths := range config.Layers {
 		for _, path := range paths {
 			if strings.Contains(filePath, path) {
+				return layer
+			}
+		}
+	}
+	return "other"
+}
+
+// getPackageName obtiene el nombre del paquete de un archivo Go
+func getPackageName(filePath string) (string, error) {
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, filePath, nil, parser.PackageClauseOnly)
+	if err != nil {
+		return "", err
+	}
+	return node.Name.Name, nil
+}
+
+// getFileFromPackage obtiene el archivo Go a partir del paquete
+func getFileFromPackage(pkg *packages.Package, filePath string) (*ast.File, error) {
+	for _, file := range pkg.Syntax {
+		if pkg.Fset.Position(file.Pos()).Filename == filePath {
+			return file, nil
+		}
+	}
+	return nil, fmt.Errorf("archivo no encontrado en el paquete")
+}
+
+// extractImports extrae las importaciones del archivo Go
+func extractImports(file *ast.File) map[string]string {
+	imports := make(map[string]string)
+	for _, i := range file.Imports {
+		alias := ""
+		if i.Name != nil {
+			alias = i.Name.Name
+		} else {
+			parts := strings.Split(strings.Trim(i.Path.Value, "\""), "/")
+			alias = parts[len(parts)-1]
+		}
+		imports[alias] = strings.Trim(i.Path.Value, "\"")
+	}
+	return imports
+}
+
+// getLayerForType determina la capa a la que pertenece un tipo específico
+func getLayerForType(typeName string, config LayerConfig) string {
+	for layer, paths := range config.Layers {
+		for _, path := range paths {
+			if strings.Contains(typeName, path) {
 				return layer
 			}
 		}

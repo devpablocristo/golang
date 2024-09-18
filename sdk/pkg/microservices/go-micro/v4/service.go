@@ -76,6 +76,7 @@ func setupGrpcService(config ports.Config) micro.Service {
 		micro.Server(grpcserver.NewServer()),
 		micro.Client(grpcclient.NewClient()),
 		micro.Registry(setupRegistry(config)),
+		micro.
 	)
 
 	grpcService.Init()
@@ -87,7 +88,7 @@ func setupginServer(config ports.Config) web.Service {
 	ginServer := web.NewService(
 		web.Name(config.GetginServerName()),
 		web.Address(config.GetginServerAddress()),
-		web.Registry(setupRegistry(config)),
+		web.Registry(setupRegistry(config)),	
 	)
 	return ginServer
 }

@@ -22,17 +22,19 @@ func init() {
 }
 
 func main() {
-
+	//
 	grpcClient := authconn.NewGrpcClient()
 	redisService := authconn.NewRedisService()
 	jwtService := authconn.NewJwtService()
-
+	//
 	authUsecases := auth.NewUseCases(grpcClient, jwtService, redisService)
-
-	grpcServer := authgtw.NewGrpcServer(greeterUseCases, gServer)
+	//
+	grpcServer := authgtw.NewGrpcServer(authUsecases)
 	authHandler := authgtw.NewGinHandler(authUsecases)
+	//
 
-	gomicroService, err := sdkgm.Bootstrap(grpcClient.GetClient, grpcServer.GetServer, authHandler.GetServer)
+	gomicroService, err := sdkgm.Bootstrap(grpcClient.GetClient(), grpcServer.GetServer(), authHandler.GetServer())
+
 	if err != nil {
 		log.Fatalf("GoMicro Service error: %v", err)
 	}

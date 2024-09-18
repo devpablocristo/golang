@@ -3,21 +3,19 @@ package sdkgomicro
 import (
 	"github.com/spf13/viper"
 
+	grpcclient "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
+	grpcserver "github.com/devpablocristo/golang/sdk/pkg/grpc/server/ports"
 	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
+	ginport "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 )
 
-// rest (gin, std, chi), rpc(grpc, thrift), messaging(rabbitmq, kafka), websocket, graph ql
-// primera version: gin, grpc, rabbitmq, websocket
-func Bootstrap(ginClient ginport.Server, grpcClient grpcclient.Client, grpcServer grpcserver.Server) (ports.Service, error) {
-
-	
-	
-
+// NOTE: rest (gin, std, chi), rpc(grpc, thrift), messaging(rabbitmq, kafka), websocket, graph ql
+// TODO: Agregar rabbitmq y websocket
+func Bootstrap(grpcClient grpcclient.Client, grpcServer grpcserver.Server, ginServer ginport.Server) (ports.Service, error) {
 	config := newConfig(
-		viper.GetString("GOMICRO_RPC_SERVICE_NAME"),
-		":"+viper.GetString("GOMICRO_RPC_SERVICE_ADDRESS"),
-		viper.GetString("GOMICRO_WEB_SERVICE_NAME"),
-		":"+viper.GetString("GOMICRO_WEB_SERVICE_ADDRESS"),
+		grpcClient,
+		grpcServer,
+		ginServer,
 		viper.GetString("CONSUL_ADDRESS"),
 	)
 
