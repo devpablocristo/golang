@@ -24,7 +24,7 @@ import (
 type EntityInfo struct {
 	Name        string
 	Type        string
-	Position    int // Esta será la línea del código
+	Position    int
 	Category    string
 	Kind        string
 	IsInterface bool
@@ -462,8 +462,8 @@ func getResults(analyzer *DependencyAnalyzer, results map[string]SkillData) {
 
 				incrementScore(results, "dip_violation", evidence)
 
-				fmt.Printf("  Category: %s, Name: %s, Type: %s, Kind: %s, Layer: %s, Line: %d\n",
-					entity.Category, entity.Name, entity.Type, entity.Kind, entity.Layer, entity.Position)
+				// fmt.Printf("  Category: %s, Name: %s, Type: %s, Kind: %s, Layer: %s, Line: %d\n",
+				// 	entity.Category, entity.Name, entity.Type, entity.Kind, entity.Layer, entity.Position)
 			}
 		}
 	}
@@ -573,9 +573,10 @@ func analyzeRepo(repoPath string) ([]Metric, error) {
 				if data.Score == skillData.Score {
 					for _, line := range data.Evidence {
 						skillData.Evidence = append(skillData.Evidence, Evidence{
-							CommitID: commitID,
-							File:     filePath,
-							Line:     line.Line,
+							CommitID:   commitID,
+							File:       filePath,
+							Line:       line.Line,
+							EntityName: line.EntityName,
 						})
 					}
 				}
