@@ -1,445 +1,502 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"go/types"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/go-git/go-git/v5"
 	"golang.org/x/tools/go/packages"
 	"gopkg.in/yaml.v2"
 )
 
-// Definición de la configuración del sistema
-type LayerConfig struct {
-	Layers Layers `yaml:"layers"`
+// ---------------------------
+// Estructuras principales
+// ---------------------------
+
+type EntityInfo struct {
+	Name        string
+	Type        string
+	Position    int // Esta será la línea del código
+	Category    string
+	Kind        string
+	IsInterface bool
+	Layer       string
 }
 
-// Definición de las capas del sistema
-type Layers struct {
-	Domain         []string `yaml:"domain"`
-	Application    []string `yaml:"application"`
-	Infrastructure []string `yaml:"infrastructure"`
-}
-
-// Estructura para almacenar información de los paquetes importados y violaciones de dependencias
 type FileImport struct {
 	Name     string
 	Path     string
 	Layer    string
-	Entities []EntityInfo // Para almacenar las entidades analizadas dentro de este archivo
+	Entities []EntityInfo
 }
 
-// Estructura para almacenar información sobre variables, parámetros, campos de structs, etc.
-type EntityInfo struct {
-	Name        string
-	Type        string
-	Position    int
-	Category    string
-	IsInterface bool
-}
-
-// Estructura para almacenar violaciones y resultados
 type DependencyAnalyzer struct {
 	PackagesInfo         []FileImport
 	DependencyViolations []string
 }
 
-// Inicializar un nuevo analizador de dependencias
 func NewDependencyAnalyzer() *DependencyAnalyzer {
-	return &DependencyAnalyzer{
-		PackagesInfo:         []FileImport{},
-		DependencyViolations: []string{},
-	}
+	return &DependencyAnalyzer{}
 }
 
-// Añadir información de un archivo importado
 func (da *DependencyAnalyzer) AddFileImport(name, path, layer string, entities []EntityInfo) {
-	fileImport := FileImport{
+	da.PackagesInfo = append(da.PackagesInfo, FileImport{
 		Name:     name,
 		Path:     path,
 		Layer:    layer,
 		Entities: entities,
-	}
-	da.PackagesInfo = append(da.PackagesInfo, fileImport)
+	})
 }
 
-// Añadir una violación de dependencias
-func (da *DependencyAnalyzer) AddViolation(violation string) {
-	da.DependencyViolations = append(da.DependencyViolations, violation)
+// ---------------------------
+// Estructuras para Métricas
+// ---------------------------
+
+type Metric struct {
+	MetricID  string     `json:"metric_id"`
+	GitAuthor string     `json:"git_author"`
+	Score     int        `json:"score"`
+	Evidence  []Evidence `json:"evidence"`
 }
 
-// Cargar el archivo monitor.yml
+type Evidence struct {
+	CommitID   string `json:"commit_id"`
+	File       string `json:"file"`
+	Line       int    `json:"line"`
+	EntityName string `json:"entity_name"`
+}
+
+type LayerConfig struct {
+	Layers map[string][]string `yaml:"layers"`
+}
+
+type SkillData struct {
+	Score    int
+	Evidence []Evidence
+}
+
+type Skill struct {
+	ID   string
+	Name string
+}
+
+// ---------------------------
+// Carga de configuración de capas
+// ---------------------------
+
 func loadLayerConfig(path string) (LayerConfig, error) {
 	var config LayerConfig
-
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return config, err
 	}
-
 	err = yaml.Unmarshal(content, &config)
-	if err != nil {
-		return config, err
-	}
-
-	return config, nil
+	return config, err
 }
 
-// Función principal
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run main.go <repo_path>")
-		return
-	}
+// ---------------------------
+// Manejo de archivos en el repositorio
+// ---------------------------
 
-	repoPath := os.Args[1]
+func getFilesToAnalyze(repo *git.Repository) ([]string, error) {
+	var filesToAnalyze []string
 
-	// Cargar el archivo monitor.yml para las capas
-	layerConfig, err := loadLayerConfig(filepath.Join(repoPath, "monitor.yml"))
+	worktree, err := repo.Worktree()
 	if err != nil {
-		fmt.Printf("Error loading layer configuration: %v\n", err)
-		return
+		return nil, err
 	}
 
-	// Inicializar el analizador de dependencias
-	analyzer := NewDependencyAnalyzer()
-
-	// Recorrer todos los archivos y clasificarlos
-	err = filepath.Walk(repoPath, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(worktree.Filesystem.Root(), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
+		// Solo analizar archivos Go
 		if !info.IsDir() && filepath.Ext(path) == ".go" {
-			classifyFile(path, layerConfig, analyzer, repoPath)
+			relPath, err := filepath.Rel(worktree.Filesystem.Root(), path)
+			if err != nil {
+				return err
+			}
+			filesToAnalyze = append(filesToAnalyze, relPath)
 		}
 		return nil
 	})
 
 	if err != nil {
-		fmt.Printf("Error walking the path %v: %v\n", repoPath, err)
-		return
+		return nil, err
 	}
 
-	// Realizar el análisis de la inversión de dependencias
-	analyzeDependencyInversion(analyzer)
-
-	// Imprimir el resultado final
-	printResults(analyzer)
+	return filesToAnalyze, nil
 }
 
-// Clasificar archivos por capas
-func classifyFile(filePath string, config LayerConfig, analyzer *DependencyAnalyzer, repoPath string) {
-	absFilePath, _ := filepath.Abs(filePath)
-	entities, _ := listVariablesStructsParamsAndInterfaces(filePath)
-
-	for _, domainPath := range config.Layers.Domain {
-		domainAbsPath, _ := filepath.Abs(filepath.Join(repoPath, domainPath))
-		if isSubPath(domainAbsPath, absFilePath) {
-			pkgName, _ := getPackageName(filePath)
-			analyzer.AddFileImport(pkgName, absFilePath, "domain", entities)
-			return
-		}
-	}
-
-	for _, applicationPath := range config.Layers.Application {
-		applicationAbsPath, _ := filepath.Abs(filepath.Join(repoPath, applicationPath))
-		if isSubPath(applicationAbsPath, absFilePath) {
-			pkgName, _ := getPackageName(filePath)
-			analyzer.AddFileImport(pkgName, absFilePath, "application", entities)
-			return
-		}
-	}
-
-	for _, infrastructurePath := range config.Layers.Infrastructure {
-		infrastructureAbsPath, _ := filepath.Abs(filepath.Join(repoPath, infrastructurePath))
-		if isSubPath(infrastructureAbsPath, absFilePath) {
-			pkgName, _ := getPackageName(filePath)
-			analyzer.AddFileImport(pkgName, absFilePath, "infrastructure", entities)
-			return
-		}
-	}
-
-	fmt.Printf("File: %s does not belong to any known layer\n", filePath)
-}
-
-// Función para verificar si un directorio es subdirectorio de otro
-func isSubPath(basePath, targetPath string) bool {
-	relPath, err := filepath.Rel(basePath, targetPath)
+func getFileAuthor(repo *git.Repository, file string) (string, error) {
+	commits, err := repo.Log(&git.LogOptions{FileName: &file})
 	if err != nil {
-		return false
+		return "", err
 	}
-	return !strings.HasPrefix(relPath, "..") && relPath != "."
-}
 
-// Función para obtener el nombre del paquete
-func getPackageName(filePath string) (string, error) {
-	fset := token.NewFileSet()
-	node, err := parser.ParseFile(fset, filePath, nil, parser.PackageClauseOnly)
+	commit, err := commits.Next()
 	if err != nil {
-		return "", fmt.Errorf("error parsing file: %v", err)
+		return "", err
 	}
-	if node.Name != nil {
-		return node.Name.Name, nil
-	}
-	return "", fmt.Errorf("package name not found in file: %s", filePath)
+
+	return commit.Author.Email, nil
 }
 
-// Función para analizar la inversión de dependencias
-func analyzeDependencyInversion(analyzer *DependencyAnalyzer) {
-	filteredPackages := filterPackagesByLayer(analyzer.PackagesInfo, []string{"application"})
-
-	for _, file := range filteredPackages {
-		fmt.Printf("Analyzing file: %s\n", file.Path)
+func getCommitID(repo *git.Repository, file string) (string, error) {
+	commits, err := repo.Log(&git.LogOptions{FileName: &file})
+	if err != nil {
+		return "", err
 	}
+
+	objectCommit, err := commits.Next()
+	if err != nil {
+		return "", err
+	}
+
+	return objectCommit.Hash.String(), nil
 }
 
-// Función que filtra los archivos según las capas dadas
-func filterPackagesByLayer(packages []FileImport, allowedLayers []string) []FileImport {
-	var filtered []FileImport
-	for _, pkg := range packages {
-		for _, layer := range allowedLayers {
-			if pkg.Layer == layer {
-				filtered = append(filtered, pkg)
-				break
-			}
-		}
+// ---------------------------
+// Clasificación y análisis
+// ---------------------------
+
+func classifyFile(filePath string, layer string, config LayerConfig, analyzer *DependencyAnalyzer) map[string]SkillData {
+	result := make(map[string]SkillData)
+	for _, skill := range skills {
+		result[skill.ID] = SkillData{Score: 0, Evidence: []Evidence{}}
 	}
-	return filtered
+
+	entities, _ := listVariablesStructsParamsAndInterfaces(filePath, config)
+	pkgName, _ := getPackageName(filePath)
+	analyzer.AddFileImport(pkgName, filePath, layer, entities)
+
+	getResults(analyzer, result)
+
+	return result
 }
 
-// Función para imprimir los resultados finales
-func printResults(analyzer *DependencyAnalyzer) {
-	for _, file := range analyzer.PackagesInfo {
-		fmt.Printf("\nFile: %s\nLayer: %s\n", file.Path, file.Layer)
-		for _, entity := range file.Entities {
-			if !entity.IsInterface && !isPrimitiveType(entity.Type) {
-				fmt.Printf("  Category: %s, Name: %s, Type: %s, Line: %d\n", entity.Category, entity.Name, entity.Type, entity.Position)
-			}
-		}
-	}
-}
+// ---------------------------
+// Extracción de información de archivos
+// ---------------------------
 
-// Función para inspeccionar y listar todas las variables, campos de structs, parámetros de funciones, tipos de retorno e interfaces en el AST de un archivo Go
-func listVariablesStructsParamsAndInterfaces(filePath string) ([]EntityInfo, error) {
-	fset := token.NewFileSet()
-	cfg := &packages.Config{
-		Mode: packages.NeedSyntax | packages.NeedTypes | packages.NeedTypesInfo,
-		Dir:  filepath.Dir(filePath),
-	}
+func listVariablesStructsParamsAndInterfaces(filePath string, config LayerConfig) ([]EntityInfo, error) {
+	cfg := &packages.Config{Mode: packages.NeedSyntax | packages.NeedTypes | packages.NeedTypesInfo, Dir: filepath.Dir(filePath)}
 	pkgs, err := packages.Load(cfg, "./...")
-	if err != nil {
-		return nil, fmt.Errorf("failed to load package: %w", err)
-	}
-
-	if len(pkgs) == 0 {
-		return nil, fmt.Errorf("no packages found")
+	if err != nil || len(pkgs) == 0 {
+		return nil, err
 	}
 
 	var results []EntityInfo
-	var pkg *packages.Package
-	var file *ast.File
-	for _, p := range pkgs {
-		for _, f := range p.Syntax {
-			if pkgs[0].Fset.Position(f.Pos()).Filename == filePath {
-				pkg = p
-				file = f
-				break
-			}
-		}
+	pkg := pkgs[0]
+	file, err := getFileFromPackage(pkg, filePath)
+	if err != nil {
+		return nil, err
 	}
 
-	if file == nil {
-		return nil, fmt.Errorf("file not found in package")
-	}
-
-	imports := make(map[string]string)
-	localVariables := make(map[string]bool)
-
-	for _, i := range file.Imports {
-		importPath := strings.Trim(i.Path.Value, "\"")
-		alias := ""
-		if i.Name != nil {
-			alias = i.Name.Name
-		} else {
-			parts := strings.Split(importPath, "/")
-			alias = parts[len(parts)-1]
-		}
-		imports[alias] = importPath
-	}
+	imports := extractImports(file)
 
 	ast.Inspect(file, func(n ast.Node) bool {
-		if decl, ok := n.(*ast.GenDecl); ok && decl.Tok == token.VAR {
-			if _, inFunction := findFunctionScope(n); !inFunction {
-				for _, spec := range decl.Specs {
-					if vspec, ok := spec.(*ast.ValueSpec); ok {
-						for _, name := range vspec.Names {
-							if localVariables[name.Name] {
-								continue
-							}
-							var varType string
-							if vspec.Type != nil {
-								varType = getTypeFromAST(vspec.Type, imports)
-							} else {
-								obj := pkg.TypesInfo.ObjectOf(name)
-								varType = obj.Type().String()
-							}
-							isInterface := isInterface(vspec.Type, pkg)
-							results = append(results, EntityInfo{
-								Name:        name.Name,
-								Type:        varType,
-								Position:    fset.Position(name.Pos()).Line,
-								Category:    "Global Variable",
-								IsInterface: isInterface,
-							})
-						}
-					}
-				}
-			}
+		switch decl := n.(type) {
+		case *ast.GenDecl:
+			processVariables(decl, pkg, imports, config, &results)
+		case *ast.FuncDecl:
+			processFunctionParamsAndResults(decl, pkg, imports, config, &results)
+		case *ast.TypeSpec:
+			processStructFields(decl, pkg, imports, config, &results)
 		}
-
-		if funcDecl, ok := n.(*ast.FuncDecl); ok {
-			if funcDecl.Type.Params != nil {
-				for _, param := range funcDecl.Type.Params.List {
-					paramType := getTypeFromAST(param.Type, imports)
-					isInterface := isInterface(param.Type, pkg)
-					for _, paramName := range param.Names {
-						results = append(results, EntityInfo{
-							Name:        paramName.Name,
-							Type:        paramType,
-							Position:    fset.Position(paramName.Pos()).Line,
-							Category:    "Function Parameter",
-							IsInterface: isInterface,
-						})
-					}
-				}
-			}
-
-			if funcDecl.Type.Results != nil {
-				for _, result := range funcDecl.Type.Results.List {
-					resultType := getTypeFromAST(result.Type, imports)
-					isInterface := isInterface(result.Type, pkg)
-					results = append(results, EntityInfo{
-						Type:        resultType,
-						Position:    fset.Position(result.Pos()).Line,
-						Category:    "Function Return Type",
-						IsInterface: isInterface,
-					})
-				}
-			}
-
-			ast.Inspect(funcDecl.Body, func(n ast.Node) bool {
-				if declStmt, ok := n.(*ast.DeclStmt); ok {
-					if genDecl, ok := declStmt.Decl.(*ast.GenDecl); ok && genDecl.Tok == token.VAR {
-						for _, spec := range genDecl.Specs {
-							if vspec, ok := spec.(*ast.ValueSpec); ok {
-								for _, name := range vspec.Names {
-									var varType string
-									if vspec.Type != nil {
-										varType = getTypeFromAST(vspec.Type, imports)
-									} else {
-										obj := pkg.TypesInfo.ObjectOf(name)
-										varType = obj.Type().String()
-									}
-									localVariables[name.Name] = true
-									isInterface := isInterface(vspec.Type, pkg)
-									results = append(results, EntityInfo{
-										Name:        name.Name,
-										Type:        varType,
-										Position:    fset.Position(name.Pos()).Line,
-										Category:    "Local Variable",
-										IsInterface: isInterface,
-									})
-								}
-							}
-						}
-					}
-				}
-
-				if assign, ok := n.(*ast.AssignStmt); ok && assign.Tok == token.DEFINE {
-					for _, lhs := range assign.Lhs {
-						if ident, ok := lhs.(*ast.Ident); ok {
-							obj := pkg.TypesInfo.ObjectOf(ident)
-							varType := obj.Type().String()
-							localVariables[ident.Name] = true
-							isInterface := isInterface(ident, pkg)
-							results = append(results, EntityInfo{
-								Name:        ident.Name,
-								Type:        varType,
-								Position:    fset.Position(ident.Pos()).Line,
-								Category:    "Local Variable",
-								IsInterface: isInterface,
-							})
-						}
-					}
-				}
-				return true
-			})
-		}
-
-		if typeDecl, ok := n.(*ast.TypeSpec); ok {
-			if structType, ok := typeDecl.Type.(*ast.StructType); ok {
-				for _, field := range structType.Fields.List {
-					var fieldType string
-					if len(field.Names) > 0 {
-						fieldName := field.Names[0].Name
-						fieldType = getTypeFromAST(field.Type, imports)
-						isInterface := isInterface(field.Type, pkg)
-						results = append(results, EntityInfo{
-							Name:        fieldName,
-							Type:        fieldType,
-							Position:    fset.Position(field.Pos()).Line,
-							Category:    "Struct Field",
-							IsInterface: isInterface,
-						})
-					}
-				}
-			}
-		}
-
 		return true
 	})
 
 	return results, nil
 }
 
-// Función de ayuda para verificar si un tipo dado es una interfaz
-func isInterface(expr ast.Expr, pkg *packages.Package) bool {
-	if typ, ok := pkg.TypesInfo.Types[expr]; ok {
-		_, isInterface := typ.Type.Underlying().(*types.Interface)
-		return isInterface
+// ---------------------------
+// Procesamiento de structs
+// ---------------------------
+
+func processStructFields(typeDecl *ast.TypeSpec, pkg *packages.Package, imports map[string]string, config LayerConfig, results *[]EntityInfo) {
+	if structType, ok := typeDecl.Type.(*ast.StructType); ok {
+		for _, field := range structType.Fields.List {
+			fieldType := getTypeFromAST(field.Type, imports)
+			kind := getKindFromType(field.Type, pkg)
+			layer := getLayerForType(fieldType, config)
+
+			for _, fieldName := range field.Names {
+				// Obtener línea correcta del campo del struct
+				line := pkg.Fset.Position(field.Pos()).Line
+
+				*results = append(*results, EntityInfo{
+					Name:        fieldName.Name,
+					Type:        fieldType,
+					Position:    line,
+					Category:    "Struct Field",
+					Kind:        kind,
+					IsInterface: kind == "interface",
+					Layer:       layer,
+				})
+			}
+		}
 	}
-	return false
 }
 
-// Función de ayuda para extraer el tipo de una variable o parámetro de función desde un nodo AST, incluyendo manejo de punteros y alias de paquetes
+// ---------------------------
+// Procesamiento de funciones y variables
+// ---------------------------
+
+func processVariables(decl *ast.GenDecl, pkg *packages.Package, imports map[string]string, config LayerConfig, results *[]EntityInfo) {
+	for _, spec := range decl.Specs {
+		if vspec, ok := spec.(*ast.ValueSpec); ok {
+			for _, name := range vspec.Names {
+				varType := getVariableType(vspec.Type, name, pkg, imports)
+				category := "Global Variable"
+				if !isGlobalVariable(pkg.Fset.Position(name.Pos()).Line, pkg) {
+					category = "Local Variable"
+				}
+				layer := getLayerForType(varType, config)
+				kind := getKindFromObj(pkg.TypesInfo.ObjectOf(name))
+
+				// Obtener línea correcta
+				line := pkg.Fset.Position(name.Pos()).Line
+
+				*results = append(*results, EntityInfo{
+					Name:        name.Name,
+					Type:        varType,
+					Position:    line,
+					Category:    category,
+					Kind:        kind,
+					IsInterface: kind == "interface",
+					Layer:       layer,
+				})
+			}
+		}
+	}
+}
+
+func processFunctionParamsAndResults(funcDecl *ast.FuncDecl, pkg *packages.Package, imports map[string]string, config LayerConfig, results *[]EntityInfo) {
+	processParamsOrResults(funcDecl.Type.Params, "Function Parameter", pkg, imports, config, results)
+	processParamsOrResults(funcDecl.Type.Results, "Function Return Type", pkg, imports, config, results)
+
+	ast.Inspect(funcDecl.Body, func(n ast.Node) bool {
+		if assignStmt, ok := n.(*ast.AssignStmt); ok {
+			for _, lhs := range assignStmt.Lhs {
+				if ident, ok := lhs.(*ast.Ident); ok {
+					obj := pkg.TypesInfo.ObjectOf(ident)
+					if obj != nil {
+						kind := getKindFromObj(obj)
+						varType := obj.Type().String()
+						layer := getLayerForType(varType, config)
+
+						// Obtener línea correcta de la variable local
+						line := pkg.Fset.Position(ident.Pos()).Line
+
+						*results = append(*results, EntityInfo{
+							Name:        ident.Name,
+							Type:        varType,
+							Position:    line,
+							Category:    "Local Variable",
+							Kind:        kind,
+							IsInterface: kind == "interface",
+							Layer:       layer,
+						})
+					}
+				}
+			}
+		}
+		return true
+	})
+}
+
+func processParamsOrResults(fields *ast.FieldList, category string, pkg *packages.Package, imports map[string]string, config LayerConfig, results *[]EntityInfo) {
+	if fields == nil {
+		return
+	}
+	for _, param := range fields.List {
+		paramType := getTypeFromAST(param.Type, imports)
+		kind := getKindFromType(param.Type, pkg)
+		layer := getLayerForType(paramType, config)
+
+		for _, paramName := range param.Names {
+			// Obtener línea correcta del parámetro
+			line := pkg.Fset.Position(paramName.Pos()).Line
+
+			*results = append(*results, EntityInfo{
+				Name:        paramName.Name,
+				Type:        paramType,
+				Position:    line,
+				Category:    category,
+				Kind:        kind,
+				IsInterface: kind == "interface",
+				Layer:       layer,
+			})
+		}
+	}
+}
+
+// ---------------------------
+// Utilidades de análisis
+// ---------------------------
+
+func getVariableType(expr ast.Expr, name *ast.Ident, pkg *packages.Package, imports map[string]string) string {
+	if expr != nil {
+		return getTypeFromAST(expr, imports)
+	}
+	return pkg.TypesInfo.ObjectOf(name).Type().String()
+}
+
+func isGlobalVariable(line int, pkg *packages.Package) bool {
+	for _, file := range pkg.Syntax {
+		for _, decl := range file.Decls {
+			if funcDecl, ok := decl.(*ast.FuncDecl); ok {
+				start, end := pkg.Fset.Position(funcDecl.Pos()).Line, pkg.Fset.Position(funcDecl.End()).Line
+				if line >= start && line <= end {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
+func getKindFromObj(obj types.Object) string {
+	if obj == nil {
+		return "unknown"
+	}
+	switch obj.Type().Underlying().(type) {
+	case *types.Interface:
+		return "interface"
+	case *types.Struct:
+		return "struct"
+	}
+	return "other"
+}
+
 func getTypeFromAST(expr ast.Expr, imports map[string]string) string {
 	switch t := expr.(type) {
 	case *ast.Ident:
 		return t.Name
 	case *ast.SelectorExpr:
 		if pkgIdent, ok := t.X.(*ast.Ident); ok {
-			pkgAlias := pkgIdent.Name
-			if pkgPath, ok := imports[pkgAlias]; ok {
-				return fmt.Sprintf("%s.%s", pkgPath, t.Sel.Name)
-			}
-			return fmt.Sprintf("%s.%s", pkgAlias, t.Sel.Name)
+			return fmt.Sprintf("%s.%s", imports[pkgIdent.Name], t.Sel.Name)
 		}
 	case *ast.StarExpr:
-		// Manejar tipos punteros (e.g., *Type)
 		return "*" + getTypeFromAST(t.X, imports)
 	case *ast.ArrayType:
-		// Manejar tipos de arrays (e.g., []Type)
 		return "[]" + getTypeFromAST(t.Elt, imports)
 	}
 	return "unknown"
 }
 
-// Función que verifica si el tipo es primitivo (int, string, etc.)
+func getLayerForType(typeName string, config LayerConfig) string {
+	for layer, paths := range config.Layers {
+		for _, path := range paths {
+			if strings.Contains(typeName, path) {
+				return layer
+			}
+		}
+	}
+	return "other"
+}
+
+func getPackageName(filePath string) (string, error) {
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, filePath, nil, parser.PackageClauseOnly)
+	if err != nil {
+		return "", err
+	}
+	return node.Name.Name, nil
+}
+
+func getFileFromPackage(pkg *packages.Package, filePath string) (*ast.File, error) {
+	for _, file := range pkg.Syntax {
+		if pkg.Fset.Position(file.Pos()).Filename == filePath {
+			return file, nil
+		}
+	}
+	return nil, fmt.Errorf("file not found in package")
+}
+
+func extractImports(file *ast.File) map[string]string {
+	imports := make(map[string]string)
+	for _, i := range file.Imports {
+		alias := ""
+		if i.Name != nil {
+			alias = i.Name.Name
+		} else {
+			parts := strings.Split(strings.Trim(i.Path.Value, "\""), "/")
+			alias = parts[len(parts)-1]
+		}
+		imports[alias] = strings.Trim(i.Path.Value, "\"")
+	}
+	return imports
+}
+
+// ---------------------------
+// Incremento del score y manejo de violaciones
+// ---------------------------
+
+func incrementScore(results map[string]SkillData, skillID string, evidence Evidence) {
+	skillData := results[skillID]
+	skillData.Score += 1
+	skillData.Evidence = append(skillData.Evidence, evidence)
+	results[skillID] = skillData
+}
+
+func getResults(analyzer *DependencyAnalyzer, results map[string]SkillData) {
+
+	for _, file := range analyzer.PackagesInfo {
+		for _, entity := range file.Entities {
+			if shouldDisplayEntity(file.Layer, entity) {
+				evidence := Evidence{
+					File:       file.Path,
+					Line:       entity.Position,
+					EntityName: entity.Name,
+				}
+
+				incrementScore(results, "dip_violation", evidence)
+
+				fmt.Printf("  Category: %s, Name: %s, Type: %s, Kind: %s, Layer: %s, Line: %d\n",
+					entity.Category, entity.Name, entity.Type, entity.Kind, entity.Layer, entity.Position)
+			}
+		}
+	}
+}
+
+// ---------------------------
+// Verificación de capas y exclusión de entidades
+// ---------------------------
+
+func shouldDisplayEntity(fileLayer string, entity EntityInfo) bool {
+	// Si el archivo está en la capa "domain", no mostrar entidades de la capa "domain"
+	if fileLayer == "domain" && entity.Layer == "domain" {
+		return false
+	}
+
+	// Si el archivo está en la capa "application", no mostrar entidades de las capas "application" o "domain"
+	if fileLayer == "application" && (entity.Layer == "application" || entity.Layer == "domain") {
+		return false
+	}
+
+	// Si el archivo no está en las capas "domain" ni "application", no analizar
+	if fileLayer != "domain" && fileLayer != "application" {
+		return false
+	}
+
+	// Excluir interfaces, tipos primitivos y tipos de la librería estándar
+	if entity.Kind == "interface" || isPrimitiveType(entity.Type) || isStandardLibraryType(entity.Type) {
+		return false
+	}
+
+	return true
+}
+
 func isPrimitiveType(varType string) bool {
 	primitives := []string{"int", "string", "bool", "float32", "float64", "byte", "rune", "complex64", "complex128"}
 	for _, primitive := range primitives {
@@ -450,10 +507,150 @@ func isPrimitiveType(varType string) bool {
 	return false
 }
 
-// Función de ayuda para determinar si estamos dentro del alcance de una función
-func findFunctionScope(n ast.Node) (string, bool) {
-	if funcDecl, ok := n.(*ast.FuncDecl); ok {
-		return funcDecl.Name.Name, true
+func isStandardLibraryType(varType string) bool {
+	return !strings.Contains(varType, "/")
+}
+
+// ---------------------------
+// Análisis del repositorio
+// ---------------------------
+
+func analyzeRepo(repoPath string) ([]Metric, error) {
+	repo, err := git.PlainOpen(repoPath)
+	if err != nil {
+		fmt.Printf("Error opening repository: %v\n", err)
+		return nil, err
 	}
-	return "", false
+
+	layerConfig, err := loadLayerConfig(filepath.Join(repoPath, "monitor.yml"))
+	if err != nil {
+		return nil, fmt.Errorf("error loading layer configuration: %v", err)
+	}
+
+	filesToAnalyze, err := getFilesToAnalyze(repo)
+	if err != nil {
+		return nil, err
+	}
+
+	results := make(map[string]map[string]SkillData)
+
+	analyzer := NewDependencyAnalyzer()
+
+	for _, filePath := range filesToAnalyze {
+		fullPath := filepath.Join(repoPath, filePath)
+		author, err := getFileAuthor(repo, filePath)
+		if err != nil {
+			return nil, err
+		}
+
+		commitID, err := getCommitID(repo, filePath)
+		if err != nil {
+			return nil, err
+		}
+
+		layer := determineLayer(filePath, layerConfig)
+
+		// Ignorar archivos que no sean de las capas "domain" o "application"
+		if layer == "domain" || layer == "application" {
+
+			fileResults := classifyFile(fullPath, layer, layerConfig, analyzer)
+
+			if _, exists := results[author]; !exists {
+				results[author] = make(map[string]SkillData)
+				for _, skill := range skills {
+					results[author][skill.ID] = SkillData{Score: 0, Evidence: []Evidence{}}
+				}
+			}
+
+			for skillID, data := range fileResults {
+				skillData := results[author][skillID]
+
+				if data.Score > skillData.Score {
+					skillData.Score = data.Score
+					skillData.Evidence = []Evidence{}
+				}
+
+				if data.Score == skillData.Score {
+					for _, line := range data.Evidence {
+						skillData.Evidence = append(skillData.Evidence, Evidence{
+							CommitID: commitID,
+							File:     filePath,
+							Line:     line.Line,
+						})
+					}
+				}
+
+				results[author][skillID] = skillData
+			}
+		}
+	}
+
+	var output []Metric
+	for author, scores := range results {
+		for _, skill := range skills {
+			skillID := skill.ID
+			output = append(output, Metric{
+				MetricID:  skillID,
+				GitAuthor: author,
+				Score:     scores[skillID].Score,
+				Evidence:  scores[skillID].Evidence,
+			})
+		}
+	}
+
+	return output, nil
+}
+
+// ---------------------------
+// Programa principal
+// ---------------------------
+
+var skills = []Skill{
+	{ID: "dip_violation", Name: "Proper usage of DIP"},
+}
+
+func main() {
+	if len(os.Args) != 2 {
+		fmt.Println("Usage: go run main.go <repo_path>")
+		return
+	}
+
+	repoPath := os.Args[1]
+
+	metrics, err := analyzeRepo(repoPath)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	jsonOutput, err := json.MarshalIndent(metrics, "", "  ")
+	if err != nil {
+		fmt.Printf("Error marshaling JSON: %v\n", err)
+		return
+	}
+
+	fmt.Println(string(jsonOutput))
+}
+
+func getKindFromType(expr ast.Expr, pkg *packages.Package) string {
+	if typ, ok := pkg.TypesInfo.Types[expr]; ok {
+		switch typ.Type.Underlying().(type) {
+		case *types.Interface:
+			return "interface"
+		case *types.Struct:
+			return "struct"
+		}
+	}
+	return "other"
+}
+
+func determineLayer(filePath string, config LayerConfig) string {
+	for layer, paths := range config.Layers {
+		for _, path := range paths {
+			if strings.Contains(filePath, path) {
+				return layer
+			}
+		}
+	}
+	return "other"
 }
