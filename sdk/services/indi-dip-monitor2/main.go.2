@@ -1,0 +1,207 @@
+package main
+
+import (
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"gopkg.in/yaml.v2"
+)
+
+type LayerConfig struct {
+	Layers map[string][]string `yaml:"layers"`
+}
+
+type TypeInfo struct {
+	PackageName string
+	TypeName    string
+	TypeKind    string // struct, interface, etc.
+	Layer       string // Capa a la que pertenece (domain, application, infrastructure, other)
+}
+
+type VariableInfo struct {
+	VarName     string
+	PackageName string
+	TypeName    string
+	Layer       string
+}
+
+type FileTypeInfo struct {
+	FilePath  string
+	TypesInfo []TypeInfo
+	VarsInfo  []VariableInfo
+}
+
+func main() {
+	// Ruta del repositorio a analizar
+	repoPath := "/home/pablo/Projects/Pablo/github.com/devpablocristo/meli/monitor-projects/regular"
+
+	// Leer el archivo monitor.yml desde el repositorio
+	configFile := filepath.Join(repoPath, "monitor.yml")
+	layerConfig, err := loadConfig(configFile)
+	if err != nil {
+		fmt.Println("Error cargando el archivo monitor.yml:", err)
+		return
+	}
+
+	// Analizar todos los archivos .go en el repositorio
+	results, err := analyzeRepo(repoPath, layerConfig)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// Imprimir resultados por archivo
+	for _, fileInfo := range results {
+		fmt.Printf("Archivo: %s\n", fileInfo.FilePath)
+		for _, typeInfo := range fileInfo.TypesInfo {
+			fmt.Printf("\tPackage: %s, Type: %s, Kind: %s, Layer: %s\n", typeInfo.PackageName, typeInfo.TypeName, typeInfo.TypeKind, typeInfo.Layer)
+		}
+		for _, varInfo := range fileInfo.VarsInfo {
+			fmt.Printf("\tVariable: %s, Package: %s, Type: %s, Layer: %s\n", varInfo.VarName, varInfo.PackageName, varInfo.TypeName, varInfo.Layer)
+		}
+	}
+}
+
+func loadConfig(configFile string) (*LayerConfig, error) {
+	config := &LayerConfig{}
+	data, err := os.ReadFile(configFile)
+	if err != nil {
+		return nil, err
+	}
+	err = yaml.Unmarshal(data, config)
+	if err != nil {
+		return nil, err
+	}
+	return config, nil
+}
+
+func analyzeRepo(repoPath string, layerConfig *LayerConfig) ([]FileTypeInfo, error) {
+	var results []FileTypeInfo
+
+	// Recorrer el directorio del repositorio para encontrar todos los archivos .go
+	err := filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Solo procesar archivos .go
+		if !d.IsDir() && strings.HasSuffix(path, ".go") {
+			// Obtener los tipos y variables definidos en el archivo
+			typesInfo, varsInfo, err := analyzeFile(path, layerConfig)
+			if err != nil {
+				fmt.Println("Error procesando archivo:", path, "Error:", err)
+				return nil // Continuar con el siguiente archivo
+			}
+
+			// Agregar los resultados de este archivo
+			results = append(results, FileTypeInfo{
+				FilePath:  path,
+				TypesInfo: typesInfo,
+				VarsInfo:  varsInfo,
+			})
+		}
+		return nil
+	})
+
+	return results, err
+}
+
+func analyzeFile(filename string, layerConfig *LayerConfig) ([]TypeInfo, []VariableInfo, error) {
+	var typesInfo []TypeInfo
+	var varsInfo []VariableInfo
+
+	// Crear un nuevo conjunto de tokens
+	fset := token.NewFileSet()
+
+	// Parsear el archivo .go
+	node, err := parser.ParseFile(fset, filename, nil, parser.AllErrors)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Obtener el nombre del paquete
+	packageName := node.Name.Name
+
+	// Determinar la capa a la que pertenece el archivo
+	layer := getLayerForFile(filename, layerConfig)
+
+	// Recorrer los nodos del archivo para encontrar tipos y variables
+	ast.Inspect(node, func(n ast.Node) bool {
+		// Filtrar por declaraciones de tipo
+		if genDecl, ok := n.(*ast.GenDecl); ok && genDecl.Tok == token.TYPE {
+			for _, spec := range genDecl.Specs {
+				typeSpec := spec.(*ast.TypeSpec)
+
+				// Determinar si es un struct o interface
+				var typeKind string
+				switch typeSpec.Type.(type) {
+				case *ast.StructType:
+					typeKind = "struct"
+				case *ast.InterfaceType:
+					typeKind = "interface"
+				default:
+					typeKind = "other"
+				}
+
+				// Agregar a la lista de tipos definidos
+				typesInfo = append(typesInfo, TypeInfo{
+					PackageName: packageName,
+					TypeName:    typeSpec.Name.Name,
+					TypeKind:    typeKind,
+					Layer:       layer, // Añadir la capa correspondiente
+				})
+			}
+		}
+
+		// Filtrar por declaraciones de variables
+		if valueSpec, ok := n.(*ast.ValueSpec); ok {
+			for _, name := range valueSpec.Names {
+				// Obtener el tipo de la variable
+				typeName := fmt.Sprintf("%s", valueSpec.Type)
+
+				// Determinar el layer basado en el tipo
+				varTypeLayer := getLayerForType(typeName, layerConfig)
+
+				varsInfo = append(varsInfo, VariableInfo{
+					VarName:     name.Name,
+					PackageName: packageName,
+					TypeName:    typeName,
+					Layer:       varTypeLayer, // Capa correspondiente al tipo de la variable
+				})
+			}
+		}
+		return true
+	})
+
+	return typesInfo, varsInfo, nil
+}
+
+// getLayerForType busca el layer basado en el tipo de la variable
+func getLayerForType(typeName string, layerConfig *LayerConfig) string {
+	for layer, paths := range layerConfig.Layers {
+		for _, path := range paths {
+			if strings.Contains(typeName, path) {
+				return layer
+			}
+		}
+	}
+	return "other" // Si no coincide con ninguna capa, devolver "other"
+}
+
+func getLayerForFile(filename string, layerConfig *LayerConfig) string {
+	// Determinar la capa a la que pertenece el archivo basándonos en su ruta
+	for layer, paths := range layerConfig.Layers {
+		for _, path := range paths {
+			if strings.Contains(filename, path) {
+				return layer
+			}
+		}
+	}
+	return "other" // Si no coincide con ninguna capa, devolver "other"
+}

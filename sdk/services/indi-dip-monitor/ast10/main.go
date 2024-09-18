@@ -3,36 +3,14 @@ package main
 import (
 	"fmt"
 	"go/ast"
-	"go/parser"
 	"go/token"
 	"go/types"
-	"os"
+	"log"
 	"path/filepath"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
-	"gopkg.in/yaml.v2"
 )
-
-// Definición de la configuración del sistema
-type LayerConfig struct {
-	Layers Layers `yaml:"layers"`
-}
-
-// Definición de las capas del sistema
-type Layers struct {
-	Domain         []string `yaml:"domain"`
-	Application    []string `yaml:"application"`
-	Infrastructure []string `yaml:"infrastructure"`
-}
-
-// Estructura para almacenar información de los paquetes importados y violaciones de dependencias
-type FileImport struct {
-	Name     string
-	Path     string
-	Layer    string
-	Entities []EntityInfo // Para almacenar las entidades analizadas dentro de este archivo
-}
 
 // Estructura para almacenar información sobre variables, parámetros, campos de structs, etc.
 type EntityInfo struct {
@@ -40,193 +18,15 @@ type EntityInfo struct {
 	Type        string
 	Position    int
 	Category    string
-	IsInterface bool
-}
-
-// Estructura para almacenar violaciones y resultados
-type DependencyAnalyzer struct {
-	PackagesInfo         []FileImport
-	DependencyViolations []string
-}
-
-// Inicializar un nuevo analizador de dependencias
-func NewDependencyAnalyzer() *DependencyAnalyzer {
-	return &DependencyAnalyzer{
-		PackagesInfo:         []FileImport{},
-		DependencyViolations: []string{},
-	}
-}
-
-// Añadir información de un archivo importado
-func (da *DependencyAnalyzer) AddFileImport(name, path, layer string, entities []EntityInfo) {
-	fileImport := FileImport{
-		Name:     name,
-		Path:     path,
-		Layer:    layer,
-		Entities: entities,
-	}
-	da.PackagesInfo = append(da.PackagesInfo, fileImport)
-}
-
-// Añadir una violación de dependencias
-func (da *DependencyAnalyzer) AddViolation(violation string) {
-	da.DependencyViolations = append(da.DependencyViolations, violation)
-}
-
-// Cargar el archivo monitor.yml
-func loadLayerConfig(path string) (LayerConfig, error) {
-	var config LayerConfig
-
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return config, err
-	}
-
-	err = yaml.Unmarshal(content, &config)
-	if err != nil {
-		return config, err
-	}
-
-	return config, nil
-}
-
-// Función principal
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run main.go <repo_path>")
-		return
-	}
-
-	repoPath := os.Args[1]
-
-	// Cargar el archivo monitor.yml para las capas
-	layerConfig, err := loadLayerConfig(filepath.Join(repoPath, "monitor.yml"))
-	if err != nil {
-		fmt.Printf("Error loading layer configuration: %v\n", err)
-		return
-	}
-
-	// Inicializar el analizador de dependencias
-	analyzer := NewDependencyAnalyzer()
-
-	// Recorrer todos los archivos y clasificarlos
-	err = filepath.Walk(repoPath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && filepath.Ext(path) == ".go" {
-			classifyFile(path, layerConfig, analyzer, repoPath)
-		}
-		return nil
-	})
-
-	if err != nil {
-		fmt.Printf("Error walking the path %v: %v\n", repoPath, err)
-		return
-	}
-
-	// Realizar el análisis de la inversión de dependencias
-	analyzeDependencyInversion(analyzer)
-
-	// Imprimir el resultado final
-	printResults(analyzer)
-}
-
-// Clasificar archivos por capas
-func classifyFile(filePath string, config LayerConfig, analyzer *DependencyAnalyzer, repoPath string) {
-	absFilePath, _ := filepath.Abs(filePath)
-	entities, _ := listVariablesStructsParamsAndInterfaces(filePath)
-
-	for _, domainPath := range config.Layers.Domain {
-		domainAbsPath, _ := filepath.Abs(filepath.Join(repoPath, domainPath))
-		if isSubPath(domainAbsPath, absFilePath) {
-			pkgName, _ := getPackageName(filePath)
-			analyzer.AddFileImport(pkgName, absFilePath, "domain", entities)
-			return
-		}
-	}
-
-	for _, applicationPath := range config.Layers.Application {
-		applicationAbsPath, _ := filepath.Abs(filepath.Join(repoPath, applicationPath))
-		if isSubPath(applicationAbsPath, absFilePath) {
-			pkgName, _ := getPackageName(filePath)
-			analyzer.AddFileImport(pkgName, absFilePath, "application", entities)
-			return
-		}
-	}
-
-	for _, infrastructurePath := range config.Layers.Infrastructure {
-		infrastructureAbsPath, _ := filepath.Abs(filepath.Join(repoPath, infrastructurePath))
-		if isSubPath(infrastructureAbsPath, absFilePath) {
-			pkgName, _ := getPackageName(filePath)
-			analyzer.AddFileImport(pkgName, absFilePath, "infrastructure", entities)
-			return
-		}
-	}
-
-	fmt.Printf("File: %s does not belong to any known layer\n", filePath)
-}
-
-// Función para verificar si un directorio es subdirectorio de otro
-func isSubPath(basePath, targetPath string) bool {
-	relPath, err := filepath.Rel(basePath, targetPath)
-	if err != nil {
-		return false
-	}
-	return !strings.HasPrefix(relPath, "..") && relPath != "."
-}
-
-// Función para obtener el nombre del paquete
-func getPackageName(filePath string) (string, error) {
-	fset := token.NewFileSet()
-	node, err := parser.ParseFile(fset, filePath, nil, parser.PackageClauseOnly)
-	if err != nil {
-		return "", fmt.Errorf("error parsing file: %v", err)
-	}
-	if node.Name != nil {
-		return node.Name.Name, nil
-	}
-	return "", fmt.Errorf("package name not found in file: %s", filePath)
-}
-
-// Función para analizar la inversión de dependencias
-func analyzeDependencyInversion(analyzer *DependencyAnalyzer) {
-	filteredPackages := filterPackagesByLayer(analyzer.PackagesInfo, []string{"application"})
-
-	for _, file := range filteredPackages {
-		fmt.Printf("Analyzing file: %s\n", file.Path)
-	}
-}
-
-// Función que filtra los archivos según las capas dadas
-func filterPackagesByLayer(packages []FileImport, allowedLayers []string) []FileImport {
-	var filtered []FileImport
-	for _, pkg := range packages {
-		for _, layer := range allowedLayers {
-			if pkg.Layer == layer {
-				filtered = append(filtered, pkg)
-				break
-			}
-		}
-	}
-	return filtered
-}
-
-// Función para imprimir los resultados finales
-func printResults(analyzer *DependencyAnalyzer) {
-	for _, file := range analyzer.PackagesInfo {
-		fmt.Printf("\nFile: %s\nLayer: %s\n", file.Path, file.Layer)
-		for _, entity := range file.Entities {
-			if !entity.IsInterface && !isPrimitiveType(entity.Type) {
-				fmt.Printf("  Category: %s, Name: %s, Type: %s, Line: %d\n", entity.Category, entity.Name, entity.Type, entity.Position)
-			}
-		}
-	}
+	IsInterface bool // Nuevo campo para indicar si el tipo es una interfaz
 }
 
 // Función para inspeccionar y listar todas las variables, campos de structs, parámetros de funciones, tipos de retorno e interfaces en el AST de un archivo Go
 func listVariablesStructsParamsAndInterfaces(filePath string) ([]EntityInfo, error) {
+	// Crear un nuevo token.FileSet para rastrear información de posición
 	fset := token.NewFileSet()
+
+	// Cargar el paquete que contiene el archivo para resolver tipos
 	cfg := &packages.Config{
 		Mode: packages.NeedSyntax | packages.NeedTypes | packages.NeedTypesInfo,
 		Dir:  filepath.Dir(filePath),
@@ -240,7 +40,7 @@ func listVariablesStructsParamsAndInterfaces(filePath string) ([]EntityInfo, err
 		return nil, fmt.Errorf("no packages found")
 	}
 
-	var results []EntityInfo
+	// Encontrar el archivo correcto en el paquete
 	var pkg *packages.Package
 	var file *ast.File
 	for _, p := range pkgs {
@@ -257,38 +57,52 @@ func listVariablesStructsParamsAndInterfaces(filePath string) ([]EntityInfo, err
 		return nil, fmt.Errorf("file not found in package")
 	}
 
+	// Mapas para almacenar importaciones, variables locales y resultados
 	imports := make(map[string]string)
-	localVariables := make(map[string]bool)
+	localVariables := make(map[string]bool) // Rastrear variables locales
 
+	// Lista para almacenar todos los resultados
+	var results []EntityInfo
+
+	// Recopilar todas las importaciones
 	for _, i := range file.Imports {
 		importPath := strings.Trim(i.Path.Value, "\"")
 		alias := ""
 		if i.Name != nil {
 			alias = i.Name.Name
 		} else {
+			// Si no hay alias, usar la última parte de la ruta de importación
 			parts := strings.Split(importPath, "/")
 			alias = parts[len(parts)-1]
 		}
 		imports[alias] = importPath
 	}
 
+	// Recorrer el AST y encontrar declaraciones de variables, structs, parámetros de funciones, tipos de retorno e interfaces
 	ast.Inspect(file, func(n ast.Node) bool {
+		// Considerar solo declaraciones de variables a nivel superior como variables globales
 		if decl, ok := n.(*ast.GenDecl); ok && decl.Tok == token.VAR {
 			if _, inFunction := findFunctionScope(n); !inFunction {
+				// Estamos fuera de cualquier función o método, por lo que estas son variables globales
 				for _, spec := range decl.Specs {
 					if vspec, ok := spec.(*ast.ValueSpec); ok {
 						for _, name := range vspec.Names {
+							// Si esta variable fue declarada localmente, omitirla
 							if localVariables[name.Name] {
 								continue
 							}
+
 							var varType string
 							if vspec.Type != nil {
 								varType = getTypeFromAST(vspec.Type, imports)
 							} else {
 								obj := pkg.TypesInfo.ObjectOf(name)
-								varType = obj.Type().String()
+								varType = obj.Type().String() // Manejar tipos inferidos
 							}
+
 							isInterface := isInterface(vspec.Type, pkg)
+
+							// Agregar la variable global a los resultados
 							results = append(results, EntityInfo{
 								Name:        name.Name,
 								Type:        varType,
@@ -302,7 +116,16 @@ func listVariablesStructsParamsAndInterfaces(filePath string) ([]EntityInfo, err
 			}
 		}
 
+		// Buscar declaraciones de funciones y manejar variables locales dentro del cuerpo de la función
 		if funcDecl, ok := n.(*ast.FuncDecl); ok {
+			// Agregar la función a los resultados
+			results = append(results, EntityInfo{
+				Name:     funcDecl.Name.Name,
+				Position: fset.Position(funcDecl.Pos()).Line,
+				Category: "Function",
+			})
+
+			// Recopilar parámetros de entrada
 			if funcDecl.Type.Params != nil {
 				for _, param := range funcDecl.Type.Params.List {
 					paramType := getTypeFromAST(param.Type, imports)
@@ -319,6 +142,7 @@ func listVariablesStructsParamsAndInterfaces(filePath string) ([]EntityInfo, err
 				}
 			}
 
+			// Recopilar tipos de retorno
 			if funcDecl.Type.Results != nil {
 				for _, result := range funcDecl.Type.Results.List {
 					resultType := getTypeFromAST(result.Type, imports)
@@ -332,6 +156,7 @@ func listVariablesStructsParamsAndInterfaces(filePath string) ([]EntityInfo, err
 				}
 			}
 
+			// Recorrer declaraciones de variables locales dentro del cuerpo de la función
 			ast.Inspect(funcDecl.Body, func(n ast.Node) bool {
 				if declStmt, ok := n.(*ast.DeclStmt); ok {
 					if genDecl, ok := declStmt.Decl.(*ast.GenDecl); ok && genDecl.Tok == token.VAR {
@@ -343,10 +168,15 @@ func listVariablesStructsParamsAndInterfaces(filePath string) ([]EntityInfo, err
 										varType = getTypeFromAST(vspec.Type, imports)
 									} else {
 										obj := pkg.TypesInfo.ObjectOf(name)
-										varType = obj.Type().String()
+										varType = obj.Type().String() // Manejar tipos inferidos
 									}
+
+									// Registrar la variable como local
 									localVariables[name.Name] = true
+
 									isInterface := isInterface(vspec.Type, pkg)
+
+									// Agregar la variable local a los resultados
 									results = append(results, EntityInfo{
 										Name:        name.Name,
 										Type:        varType,
@@ -359,14 +189,19 @@ func listVariablesStructsParamsAndInterfaces(filePath string) ([]EntityInfo, err
 						}
 					}
 				}
-
+				// Manejar declaraciones cortas (:=)
 				if assign, ok := n.(*ast.AssignStmt); ok && assign.Tok == token.DEFINE {
 					for _, lhs := range assign.Lhs {
 						if ident, ok := lhs.(*ast.Ident); ok {
 							obj := pkg.TypesInfo.ObjectOf(ident)
 							varType := obj.Type().String()
+
+							// Registrar la variable como local
 							localVariables[ident.Name] = true
+
 							isInterface := isInterface(ident, pkg)
+
+							// Agregar la variable local a los resultados
 							results = append(results, EntityInfo{
 								Name:        ident.Name,
 								Type:        varType,
@@ -381,14 +216,24 @@ func listVariablesStructsParamsAndInterfaces(filePath string) ([]EntityInfo, err
 			})
 		}
 
+		// Buscar declaraciones de structs
 		if typeDecl, ok := n.(*ast.TypeSpec); ok {
 			if structType, ok := typeDecl.Type.(*ast.StructType); ok {
+				// Agregar la declaración del struct a los resultados
+				results = append(results, EntityInfo{
+					Name:     typeDecl.Name.Name,
+					Position: fset.Position(typeDecl.Pos()).Line,
+					Category: "Struct",
+				})
+
+				// Agregar los campos del struct a los resultados
 				for _, field := range structType.Fields.List {
 					var fieldType string
 					if len(field.Names) > 0 {
 						fieldName := field.Names[0].Name
 						fieldType = getTypeFromAST(field.Type, imports)
 						isInterface := isInterface(field.Type, pkg)
+
 						results = append(results, EntityInfo{
 							Name:        fieldName,
 							Type:        fieldType,
@@ -439,21 +284,26 @@ func getTypeFromAST(expr ast.Expr, imports map[string]string) string {
 	return "unknown"
 }
 
-// Función que verifica si el tipo es primitivo (int, string, etc.)
-func isPrimitiveType(varType string) bool {
-	primitives := []string{"int", "string", "bool", "float32", "float64", "byte", "rune", "complex64", "complex128"}
-	for _, primitive := range primitives {
-		if varType == primitive {
-			return true
-		}
-	}
-	return false
-}
-
-// Función de ayuda para determinar si estamos dentro del alcance de una función
+// Función de ayuda para determinar si estamos dentro de un alcance de función
 func findFunctionScope(n ast.Node) (string, bool) {
 	if funcDecl, ok := n.(*ast.FuncDecl); ok {
 		return funcDecl.Name.Name, true
 	}
 	return "", false
+}
+
+func main() {
+	// Ruta al archivo Go que quieres analizar
+	filePath := "/home/pablo/Projects/Pablo/github.com/devpablocristo/meli/monitor-projects/regular/internal/core/services/user_service.go"
+
+	// Llamar a la función para listar variables, structs, parámetros de funciones, tipos de retorno e interfaces en el archivo Go proporcionado
+	results, err := listVariablesStructsParamsAndInterfaces(filePath)
+	if err != nil {
+		log.Fatalf("Error: %v\n", err)
+	}
+
+	// Imprimir los resultados
+	for _, entity := range results {
+		fmt.Printf("Category: %s, Name: %s, Type: %s, Line: %d, IsInterface: %v\n", entity.Category, entity.Name, entity.Type, entity.Position, entity.IsInterface)
+	}
 }
