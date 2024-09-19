@@ -8,7 +8,7 @@ import (
 
 func Bootstrap() (ports.Server, error) {
 	config := newConfig(
-		viper.GetString("ROUTER_PORT"),
+		viper.GetString("WEB_SERVER_PORT"),
 		viper.GetString("API_VERSION"),
 	)
 

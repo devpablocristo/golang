@@ -16,6 +16,8 @@ func Bootstrap(grpcClient grpcclient.Client, grpcServer grpcserver.Server, ginSe
 		grpcClient,
 		grpcServer,
 		ginServer,
+		viper.GetString("GRPC_SERVICE_NAME"),
+		viper.GetString("WEB_SERVER_NAME"),
 		viper.GetString("CONSUL_ADDRESS"),
 	)
 

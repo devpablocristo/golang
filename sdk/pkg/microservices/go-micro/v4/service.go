@@ -32,7 +32,7 @@ var (
 
 type service struct {
 	grpcService micro.Service
-	ginServer   web.Service
+	webServer   web.Service
 	client      client.Client
 	server      server.Server
 	auth        auth.Auth
@@ -56,9 +56,11 @@ func newService(config ports.Config) (ports.Service, error) {
 		setupLogger()
 
 		instance = &service{
-			grpcService: setupRcpService(config),
-			ginServer:   setupGinServer(config),
+			grpcService: setupGrcpService(config),
+			webServer:   setupGinServer(config),
 		}
+
+		instance.SetGinRouter()webServer.Handle("/", webServer.GetRouter() añgo asi
 	})
 
 	if initError != nil {
@@ -76,7 +78,7 @@ func setupGrpcService(config ports.Config) micro.Service {
 		micro.Server(grpcserver.NewServer()),
 		micro.Client(grpcclient.NewClient()),
 		micro.Registry(setupRegistry(config)),
-		micro.
+		micro.Broker(),
 	)
 
 	grpcService.Init()
@@ -85,12 +87,12 @@ func setupGrpcService(config ports.Config) micro.Service {
 }
 
 func setupginServer(config ports.Config) web.Service {
-	ginServer := web.NewService(
+	webServer := web.NewService(
 		web.Name(config.GetginServerName()),
 		web.Address(config.GetginServerAddress()),
-		web.Registry(setupRegistry(config)),	
+		web.Registry(setupRegistry(config)),
 	)
-	return ginServer
+	return webServer
 }
 
 func setupRegistry(config ports.Config) registry.Registry {
@@ -119,8 +121,8 @@ func (s *service) StartGrpcService() error {
 }
 
 func (s *service) StartginServer() error {
-	if s.ginServer != nil {
-		err := s.ginServer.Run()
+	if s.webServer != nil {
+		err := s.webServer.Run()
 		if err != nil {
 			return fmt.Errorf("failed to start web service: %w", err)
 		}
@@ -130,4 +132,5 @@ func (s *service) StartginServer() error {
 }
 
 func (s *service) GetGrcpService() micro.Service { return s.grpcService }
-func (s *service) GetginServer() web.Service     { return s.ginServer }
+func (s *service) GetGinServer() web.Service     { return s.webServer }
+func (s *service) SetWebRouter() web.Service     { return s.webServer.Handle("/", webServer.GetRouter()) }
