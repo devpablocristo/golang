@@ -7,31 +7,24 @@ import (
 	sdk "github.com/devpablocristo/golang/sdk/pkg/jwt/v5"
 	sdkports "github.com/devpablocristo/golang/sdk/pkg/jwt/v5/ports"
 	entities "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/core/entities"
+	ports "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/core/ports"
 )
 
-// JwtService define la interfaz del servicio JWT
-type JwtService interface {
-	GenerateToken(userUUID string) (*entities.Token, error)
-}
-
-// jwtService es la estructura que implementa la interfaz JwtService
 type jwtService struct {
-	JwtService sdkports.Service // Usa el cliente JWT del SDK
+	JwtService sdkports.Service
 }
 
-// NewJwtService crea una nueva instancia de jwtService usando el cliente JWT del SDK
-func NewJwtService() JwtService {
-	js, err := sdk.Bootstrap() // Inicializa el cliente JWT desde el SDK
+func NewJwtService() (ports.JwtService, error) {
+	js, err := sdk.Bootstrap()
 	if err != nil {
 		log.Fatalf("JWT Service error: %v", err)
 	}
 
 	return &jwtService{
 		JwtService: js,
-	}
+	}, nil
 }
 
-// GenerateToken genera un JWT para un usuario dado su UUID
 func (j *jwtService) GenerateToken(userUUID string) (*entities.Token, error) {
 	// Definir los claims del JWT
 	claims := map[string]interface{}{

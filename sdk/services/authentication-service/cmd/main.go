@@ -31,7 +31,10 @@ func main() {
 		log.Fatalf("Error: %v", err)
 	}
 
-	jwtService := authconn.NewJwtService()
+	jwtService, err := authconn.NewJwtService()
+	if err != nil {
+		log.Fatalf("GoMicro Service error: %v", err)
+	}
 
 	authUsecases := auth.NewUseCases(grpcClient, jwtService, redisService)
 

@@ -9,12 +9,12 @@ import (
 )
 
 type useCases struct {
-	grpcClient ports.Client
+	grpcClient ports.GrpcClient
 	jwtService ports.JwtService
 }
 
 // NewUseCases crea una nueva instancia de useCases
-func NewUseCases(gc ports.Client, js ports.JwtService, rd ports.RedisService) ports.UseCases {
+func NewUseCases(gc ports.GrpcClient, js ports.JwtService, rd ports.RedisService) ports.UseCases {
 	return &useCases{
 		grpcClient: gc,
 		jwtService: js,
