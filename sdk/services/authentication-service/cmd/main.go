@@ -33,7 +33,7 @@ func main() {
 	authHandler := authgtw.NewGinHandler(authUsecases)
 	//
 
-	gomicroService, err := sdkgm.Bootstrap(grpcClient.GetClient(), grpcServer.GetServer(), authHandler.GetServer())
+	gomicroService, err := sdkgm.Bootstrap(grpcClient.GetClient(), grpcServer.GetServer(), authHandler.GetRouter())
 
 	if err != nil {
 		log.Fatalf("GoMicro Service error: %v", err)
