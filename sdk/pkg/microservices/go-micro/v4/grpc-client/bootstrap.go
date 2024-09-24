@@ -1,11 +1,11 @@
 package sdkgomicro
 
 import (
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
+	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/ports"
 )
 
-func BootstrapGrpcClient() (ports.GrpcClient, error) {
-	config := newConfigGrpcClient()
+func Bootstrap() (ports.Client, error) {
+	config := newConfig()
 
-	return newGrpcClient(config)
+	return newClient(config)
 }

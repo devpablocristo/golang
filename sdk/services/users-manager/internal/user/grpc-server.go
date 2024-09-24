@@ -12,7 +12,7 @@ type Grpc struct {
 	ucs ports.UseCases
 }
 
-func NewGrpc(ucs ports.UseCases) ports.GrpcServer {
+func NewGrpc(ucs ports.UseCases) ports.Server {
 	return &Grpc{
 		ucs: ucs,
 	}

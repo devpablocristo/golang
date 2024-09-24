@@ -12,7 +12,7 @@ type grpcClient struct {
 	client sdkports.Client
 }
 
-func NewGrpcClient(c sdkports.Client) ports.GrpcClient {
+func NewGrpcClient(c sdkports.Client) ports.Client {
 	return &grpcClient{
 		client: c,
 	}

@@ -1,9 +1,9 @@
 package sdkgomicro
 
-import "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
+import "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/ports"
 
-type configGrpcClient struct{}
+type config struct{}
 
-func newConfigGrpcClient() ports.ConfigGrpcClient {
-	return &configGrpcClient{}
+func newConfig() ports.Config {
+	return &config{}
 }

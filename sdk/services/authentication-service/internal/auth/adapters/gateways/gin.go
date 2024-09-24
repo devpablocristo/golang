@@ -1,7 +1,7 @@
 package authgtw
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,10 +22,10 @@ type GinHandler struct {
 	secret     string
 }
 
-func NewGinHandler(u ports.UseCases) *GinHandler {
+func NewGinHandler(u ports.UseCases) (*GinHandler, error) {
 	ginServer, err := sdk.Bootstrap()
 	if err != nil {
-		log.Fatalf("Gin Service error: %v", err)
+		return nil, fmt.Errorf("Gin Service error: %w", err)
 	}
 
 	return &GinHandler{
@@ -33,7 +33,7 @@ func NewGinHandler(u ports.UseCases) *GinHandler {
 		ginServer:  ginServer,
 		apiVersion: ginServer.GetApiVersion(),
 		secret:     viper.GetString("JWT_SECRET_KEY"),
-	}
+	}, nil
 }
 
 func (h *GinHandler) Start() error {
@@ -42,8 +42,8 @@ func (h *GinHandler) Start() error {
 	return h.ginServer.RunServer()
 }
 
-func (h *GinHandler) GetServer() sdkports.Server {
-	return h.ginServer
+func (h *GinHandler) GetRouter() *gin.Engine {
+	return h.ginServer.GetRouter()
 }
 
 func (h *GinHandler) routes() {

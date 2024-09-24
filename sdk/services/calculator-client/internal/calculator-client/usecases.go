@@ -8,10 +8,10 @@ import (
 )
 
 type useCases struct {
-	grpcClient ports.GrpcClient
+	grpcClient ports.Client
 }
 
-func NewUseCases(gc ports.GrpcClient) ports.UseCases {
+func NewUseCases(gc ports.Client) ports.UseCases {
 	return &useCases{
 		grpcClient: gc,
 	}

@@ -1,11 +1,11 @@
 package authgtw
 
 import (
-	"log"
+	"fmt"
 
 	pb "github.com/devpablocristo/golang/sdk/pb"
-	sdkgrpcserver "github.com/devpablocristo/golang/sdk/pkg/grpc/server"
-	sdkports "github.com/devpablocristo/golang/sdk/pkg/grpc/server/ports"
+	sdk "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-server"
+	sdkports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-server/ports"
 	ports "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/core/ports"
 )
 
@@ -15,24 +15,16 @@ type GreeterGrpcServer struct {
 	grpcServer                    sdkports.Server
 }
 
-func NewGrpcServer(ucs ports.UseCases) *GreeterGrpcServer {
-	gsv, err := sdkgrpcserver.Bootstrap()
+func NewGrpcServer(ucs ports.UseCases) (*GreeterGrpcServer, error) {
+	gsv, err := sdk.Bootstrap()
 	if err != nil {
-		log.Fatalf("failed to initialize gRPC server: %v", err)
+		return nil, fmt.Errorf("failed to initialize gRPC server: %w", err)
 	}
 
 	return &GreeterGrpcServer{
 		useCases:   ucs,
 		grpcServer: gsv,
-	}
-}
-
-func (s *GreeterGrpcServer) Start() error {
-	s.grpcServer.RegisterService(&pb.Greeter_ServiceDesc, s)
-	if err := s.grpcServer.Start(); err != nil {
-		return err
-	}
-	return nil
+	}, nil
 }
 
 func (s *GreeterGrpcServer) GetServer() sdkports.Server {

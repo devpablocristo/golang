@@ -2,6 +2,9 @@ package sdkgomicro
 
 import (
 	"fmt"
+
+	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/web-server/ports"
+
 )
 
 type config struct {
@@ -12,13 +15,13 @@ type config struct {
 	webServerPort int
 }
 
-func newConfigWebServer(
+func newConfig(
 	webRouter interface{},
 	webServerName string,
 	consulAddress string,
 	webServerHost string,
 	webServerPort int,
-) *config {
+) ports.Config{
 	return &config{
 		webRouter:     webRouter,
 		webServerName: webServerName,
@@ -28,23 +31,23 @@ func newConfigWebServer(
 	}
 }
 
-func (c *config) GetWebRouter() interface{} {
+func (c *config) GetRouter() interface{} {
 	return c.webRouter
 }
 
-func (c *config) GetWebServerName() string {
+func (c *config) GetServerName() string {
 	return c.webServerName
 }
 
-func (c *config) GetWebServerHost() string {
+func (c *config) GetServerHost() string {
 	return c.webServerHost
 }
 
-func (c *config) GetWebServerPort() int {
+func (c *config) GetServerPort() int {
 	return c.webServerPort
 }
 
-func (c *config) GetWebServerAddress() string {
+func (c *config) GetServerAddress() string {
 	return fmt.Sprintf("%s:%d", c.webServerHost, c.webServerPort)
 }
 

@@ -3,14 +3,16 @@ package sdkgomicro
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
+	sdkclient "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/ports"
+	sdkserver "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-server/ports"
+	sdkservice "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-service/ports"
 )
 
-func BootstrapMicroService(server ports.GrpcServer, client ports.GrpcClient) (ports.GrpcService, error) {
-	config := newConfigGrpcService(
+func Bootstrap(server sdkserver.Server, client sdkclient.Client) (sdkservice.Service, error) {
+	config := newConfig(
 		viper.GetString("MICRO_SERVICE_NAME"),
-		server.Server(),
-		client.Client(),
+		server.GetServer(),
+		client.GetClient(),
 		viper.GetString("CONSUL_ADDRESS"),
 	)
 
@@ -18,5 +20,5 @@ func BootstrapMicroService(server ports.GrpcServer, client ports.GrpcClient) (po
 		return nil, err
 	}
 
-	return newGrpcService(config)
+	return newService(config)
 }

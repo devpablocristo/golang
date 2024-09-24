@@ -6,23 +6,23 @@ import (
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/server"
 
-	"github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-service/ports"
 )
 
-type configGrpcService struct {
+type config struct {
 	serviceName   string
 	server        server.Server
 	client        client.Client
 	consulAddress string
 }
 
-func newConfigGrpcService(
+func newConfig(
 	serviceName string,
 	server server.Server,
 	client client.Client,
 	consulAddress string,
-) ports.ConfigGrpcService {
-	return &configGrpcService{
+) ports.Config {
+	return &config{
 		serviceName:   serviceName,
 		server:        server,
 		client:        client,
@@ -30,23 +30,23 @@ func newConfigGrpcService(
 	}
 }
 
-func (c *configGrpcService) GetServiceName() string {
+func (c *config) GetServiceName() string {
 	return c.serviceName
 }
 
-func (c *configGrpcService) GetServer() server.Server {
+func (c *config) GetServer() server.Server {
 	return c.server
 }
 
-func (c *configGrpcService) GetClient() client.Client {
+func (c *config) GetClient() client.Client {
 	return c.client
 }
 
-func (c *configGrpcService) GetConsulAddress() string {
+func (c *config) GetConsulAddress() string {
 	return c.consulAddress
 }
 
-func (c *configGrpcService) Validate() error {
+func (c *config) Validate() error {
 	if c.serviceName == "" {
 		return fmt.Errorf("missing service name")
 	}

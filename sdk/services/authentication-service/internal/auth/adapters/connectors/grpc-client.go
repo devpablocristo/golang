@@ -2,11 +2,11 @@ package authconn
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	pb "github.com/devpablocristo/golang/sdk/pb"
-	sdk "github.com/devpablocristo/golang/sdk/pkg/grpc/client"
-	sdkports "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
+	sdk "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client"
+	sdkports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/ports"
 	entities "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/core/entities"
 	ports "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/core/ports"
 )
@@ -16,33 +16,34 @@ type grpcClient struct {
 }
 
 // NewGrpcClient crea un nuevo cliente gRPC para interactuar con el servicio de usuarios
-func NewGrpcClient() ports.GrpcClient {
-	c, err := sdk.Bootstrap()
+func NewGrpcClient() (ports.GrpcClient, error) {
+	c, err := sdk.Bootstrap() // Usamos tu método Bootstrap del SDK go-micro
 	if err != nil {
-		log.Fatalf("Failed to initialize gRPC client: %v", err)
+		return nil, fmt.Errorf("failed to initialize Go Micro gRPC client: %w", err)
 	}
 
 	return &grpcClient{
 		client: c,
-	}
+	}, nil
 }
 
-func (c *grpcClient) GetClient() sdkports.Client {
-	return c.client // Devuelve la instancia creada en NewGrpcClient
+func (g *grpcClient) GetClient() sdkports.Client {
+	return g.client
 }
 
-// GetUserUUID obtiene el UUID del usuario desde el servicio de usuarios
 func (g *grpcClient) GetUserUUID(ctx context.Context, cred *entities.LoginCredentials) (string, error) {
 	req := &pb.GetUserRequest{
 		Username:     cred.Username,
 		PasswordHash: cred.PasswordHash,
 	}
 
+	client := g.client.GetClient()
+	request := client.NewRequest("user.UserService", "GetUserUUID", req)
+
 	var res pb.GetUserResponse
 
-	err := g.client.InvokeMethod(ctx, "/user.UserService/GetUserUUID", req, &res)
-	if err != nil {
-		return "", err
+	if err := g.client.GetClient().Call(ctx, request, &res); err != nil {
+		return "", fmt.Errorf("error calling GetUserUUID: %w", err)
 	}
 
 	return res.UUID, nil

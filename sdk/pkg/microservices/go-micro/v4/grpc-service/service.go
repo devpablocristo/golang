@@ -1,18 +1,19 @@
 package sdkgomicro
 
 import (
-	"fmt"
+	"os"
 	"sync"
 
+	"github.com/go-micro/plugins/v4/registry/consul"
 	"go-micro.dev/v4"
+	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/registry"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
-	"github.com/go-micro/plugins/v4/registry/consul"
+	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-service/ports"
 )
 
 var (
-	instance  ports.GrpcService
+	instance  ports.Service
 	once      sync.Once
 	initError error
 )
@@ -21,12 +22,9 @@ type service struct {
 	grpcService micro.Service
 }
 
-func newGrpcService(config ports.ConfigGrpcService) (ports.GrpcService, error) {
+func newService(config ports.Config) (ports.Service, error) {
 	once.Do(func() {
-		if err := config.Validate(); err != nil {
-			initError = fmt.Errorf("config validation error: %w", err)
-			return
-		}
+		setupLogger()
 
 		instance = &service{
 			grpcService: setupGrpcService(config),
@@ -40,7 +38,7 @@ func newGrpcService(config ports.ConfigGrpcService) (ports.GrpcService, error) {
 	return instance, nil
 }
 
-func setupGrpcService(config ports.ConfigGrpcService) micro.Service {
+func setupGrpcService(config ports.Config) micro.Service {
 	service := micro.NewService(
 		micro.Name(config.GetServiceName()),
 		micro.Server(config.GetServer()),
@@ -57,13 +55,20 @@ func (s *service) Run() error {
 	return s.grpcService.Run()
 }
 
-func (s *service) Service() micro.Service {
+func (s *service) GetService() micro.Service {
 	return s.grpcService
 }
 
-func setupRegistry(config ports.ConfigGrpcService) registry.Registry {
+func setupRegistry(config ports.Config) registry.Registry {
 	consulReg := consul.NewRegistry(func(op *registry.Options) {
 		op.Addrs = []string{config.GetConsulAddress()}
 	})
 	return consulReg
+}
+
+func setupLogger() {
+	logger.DefaultLogger = logger.NewLogger(
+		logger.WithLevel(logger.InfoLevel),
+		logger.WithOutput(os.Stdout),
+	)
 }

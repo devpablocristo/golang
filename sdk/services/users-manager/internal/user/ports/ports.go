@@ -27,6 +27,6 @@ type UseCases interface {
 	PublishMessage(context.Context, string) (string, error)
 }
 
-type GrpcServer interface {
+type Server interface {
 	GetUserUUID(context.Context, *pb.GetUserRequest) (*pb.GetUserResponse, error)
 }

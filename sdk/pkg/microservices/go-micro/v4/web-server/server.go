@@ -9,26 +9,26 @@ import (
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/web"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
+	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/web-server/ports"
 )
 
 var (
-	instance  ports.Service
+	instance  ports.Server
 	once      sync.Once
 	initError error
 )
 
 type service struct {
-	webServer web.Service
+	server web.Service
 }
 
-func newWebServer(config ports.ConfigWebServer) (ports.WebServer, error) {
+func newServer(config ports.Config) (ports.Server, error) {
 	once.Do(func() {
 		instance = &service{
-			webServer: setupWebServer(config),
+			server: setupWebServer(config),
 		}
 
-		err := instance.SetWebRouter(config.GetWebRouter())
+		err := instance.SetWebRouter(config.GetRouter())
 		if err != nil {
 			initError = fmt.Errorf("error setting web router: %w", err)
 			return
@@ -42,17 +42,17 @@ func newWebServer(config ports.ConfigWebServer) (ports.WebServer, error) {
 	return instance, nil
 }
 
-func setupWebServer(config ports.ConfigWebServer) web.Service {
-	webServer := web.NewService(
-		web.Name(config.GetWebServerName()),
-		web.Address(config.GetWebServerAddress()),
+func setupWebServer(config ports.Config) web.Service {
+	Server := web.NewService(
+		web.Name(config.GetServerName()),
+		web.Address(config.GetServerAddress()),
 		web.Registry(setupRegistry(config)),
 	)
 
-	return webServer
+	return Server
 }
 
-func setupRegistry(config ports.ConfigWebServer) registry.Registry {
+func setupRegistry(config ports.Config) registry.Registry {
 	consulReg := consul.NewRegistry(func(op *registry.Options) {
 		op.Addrs = []string{config.GetConsulAddress()}
 	})
@@ -62,9 +62,13 @@ func setupRegistry(config ports.ConfigWebServer) registry.Registry {
 func (s *service) SetWebRouter(router interface{}) error {
 	switch r := router.(type) {
 	case *gin.Engine:
-		s.webServer.Handle("/", r)
+		s.server.Handle("/", r)
 	default:
 		return fmt.Errorf("unsupported router type")
 	}
 	return nil
+}
+
+func (s *service) Run() error {
+	return s.server.Run()
 }

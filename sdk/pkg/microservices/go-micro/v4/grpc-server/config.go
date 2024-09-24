@@ -3,36 +3,36 @@ package sdkgomicro
 import (
 	"fmt"
 
-	"github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-server/ports"
 )
 
-type configGrpcServer struct {
+type config struct {
 	grpcServerName string
 	grpcServerHost string
 	grpcServerPort int
 }
 
-func newConfigGrpcServer(grpcServerName string, grpcServerHost string, grpcServerPort int) ports.ConfigGrpcServer {
-	return &configGrpcServer{
+func newConfig(grpcServerName string, grpcServerHost string, grpcServerPort int) ports.Config {
+	return &config{
 		grpcServerName: grpcServerName,
 		grpcServerHost: grpcServerHost,
 		grpcServerPort: grpcServerPort,
 	}
 }
 
-func (c *configGrpcServer) GetGrpcServerName() string {
+func (c *config) GetGrpcServerName() string {
 	return c.grpcServerName
 }
 
-func (c *configGrpcServer) GetGrpcServerHost() string {
+func (c *config) GetGrpcServerHost() string {
 	return c.grpcServerHost
 }
 
-func (c *configGrpcServer) GetGrpcServerPort() int {
+func (c *config) GetGrpcServerPort() int {
 	return c.grpcServerPort
 }
 
-func (c *configGrpcServer) Validate() error {
+func (c *config) Validate() error {
 	if c.grpcServerName == "" {
 		return fmt.Errorf("missing grpc service name")
 	}

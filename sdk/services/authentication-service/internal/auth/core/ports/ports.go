@@ -3,7 +3,7 @@ package authports
 import (
 	"context"
 
-	sdkports "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
+	sdkports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/ports"
 
 	entities "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/core/entities"
 )
