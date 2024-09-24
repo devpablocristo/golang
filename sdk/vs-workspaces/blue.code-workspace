@@ -11,6 +11,8 @@
         "explorer.confirmDragAndDrop": false,
         "explorer.enableDragAndDrop": false,
 
+      
+
         // Editor
         "editor.tabSize": 4,
         "editor.inlineSuggest.enabled": true,
@@ -20,7 +22,8 @@
         // Archivos
         "files.autoSave": "afterDelay",
         "files.associations": {
-            "*.jet": "javascript"
+            "*.jet": "javascript",
+            "*.env": "env"
         },
 
         // Terminal

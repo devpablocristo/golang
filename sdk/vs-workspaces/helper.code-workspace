@@ -20,7 +20,8 @@
         // Archivos
         "files.autoSave": "afterDelay",
         "files.associations": {
-            "*.jet": "javascript"
+            "*.jet": "javascript",
+            "*.env": "env"
         },
 
         // Terminal
