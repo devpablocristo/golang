@@ -30,14 +30,12 @@ func main() {
 		log.Fatalf("Redis error: %v", err)
 	}
 
-	// jwtService, err := authconn.NewJwtService()
-	// if err != nil {
-	// 	log.Fatalf("GoMicro Service error: %v", err)
-	// }
+	jwtService, err := authconn.NewJwtService()
+	if err != nil {
+		log.Fatalf("JWT Service error: %v", err)
+	}
 
-	authUsecases := auth.NewUseCases(grpcClient, redisService)
-
-	// authUsecases := auth.NewUseCases(grpcClient, jwtService, redisService)
+	authUsecases := auth.NewUseCases(grpcClient, redisService, jwtService)
 
 	grpcServer, err := authgtw.NewGrpcServer(authUsecases)
 	if err != nil {

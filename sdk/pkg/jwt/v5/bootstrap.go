@@ -18,9 +18,5 @@ func Bootstrap() (ports.Service, error) {
 		return nil, err
 	}
 
-	if err := config.Validate(); err != nil {
-		return nil, err
-	}
-
 	return newService(config.GetSecretKey())
 }

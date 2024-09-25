@@ -11,9 +11,6 @@ type config struct {
 }
 
 func newConfig(secretKey string) (ports.Config, error) {
-	if secretKey == "" {
-		return nil, fmt.Errorf("secret key cannot be empty")
-	}
 	return &config{
 		secretKey: secretKey,
 	}, nil

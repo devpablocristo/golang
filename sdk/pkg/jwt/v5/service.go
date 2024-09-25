@@ -22,11 +22,6 @@ type service struct {
 // newService inicializa el servicio JWT con una clave secreta
 func newService(secretKey string) (ports.Service, error) {
 	once.Do(func() {
-		if secretKey == "" {
-			initError = fmt.Errorf("secret key cannot be empty")
-			return
-		}
-
 		instance = &service{
 			secretKey: secretKey,
 		}

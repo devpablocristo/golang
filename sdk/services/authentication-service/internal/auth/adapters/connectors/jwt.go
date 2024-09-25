@@ -1,7 +1,7 @@
 package authconn
 
 import (
-	"log"
+	"fmt"
 	"time"
 
 	sdk "github.com/devpablocristo/golang/sdk/pkg/jwt/v5"
@@ -17,7 +17,7 @@ type jwtService struct {
 func NewJwtService() (ports.JwtService, error) {
 	js, err := sdk.Bootstrap()
 	if err != nil {
-		log.Fatalf("JWT Service error: %v", err)
+		return nil, fmt.Errorf("Bootstrap error: %w", err)
 	}
 
 	return &jwtService{
