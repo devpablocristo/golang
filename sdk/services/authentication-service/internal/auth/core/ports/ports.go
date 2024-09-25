@@ -10,7 +10,8 @@ import (
 
 // UseCases define las operaciones de casos de uso para autenticación
 type UseCases interface {
-	Login(context.Context, *entities.LoginCredentials) (*entities.Token, error)
+	//Login(context.Context, *entities.LoginCredentials) (*entities.Token, error)
+	Login(context.Context, *entities.LoginCredentials) (string, error)
 }
 
 // JwtService define las operaciones del servicio JWT

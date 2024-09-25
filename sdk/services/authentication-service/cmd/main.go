@@ -20,27 +20,28 @@ func init() {
 }
 
 func main() {
-
 	grpcClient, err := authconn.NewGrpcClient()
 	if err != nil {
-		log.Fatalf("Error: %v", err)
+		log.Fatalf("Go Micro gRPC Client error: %v", err)
 	}
 
 	redisService, err := authconn.NewRedisService()
 	if err != nil {
-		log.Fatalf("Error: %v", err)
+		log.Fatalf("Redis error: %v", err)
 	}
 
-	jwtService, err := authconn.NewJwtService()
-	if err != nil {
-		log.Fatalf("GoMicro Service error: %v", err)
-	}
+	// jwtService, err := authconn.NewJwtService()
+	// if err != nil {
+	// 	log.Fatalf("GoMicro Service error: %v", err)
+	// }
 
-	authUsecases := auth.NewUseCases(grpcClient, jwtService, redisService)
+	authUsecases := auth.NewUseCases(grpcClient, redisService)
+
+	// authUsecases := auth.NewUseCases(grpcClient, jwtService, redisService)
 
 	grpcServer, err := authgtw.NewGrpcServer(authUsecases)
 	if err != nil {
-		log.Fatalf("Error: %v", err)
+		log.Fatalf("Go Micro gRPC Server error: %v", err)
 	}
 
 	authHandler, err := authgtw.NewGinHandler(authUsecases)
@@ -50,7 +51,7 @@ func main() {
 
 	grpcService, err := sdkgmgs.Bootstrap(grpcServer.GetServer(), grpcClient.GetClient())
 	if err != nil {
-		log.Fatalf("GoMicro Service error: %v", err)
+		log.Fatalf("Go Micro service Boostrap error: %v", err)
 	}
 
 	webServer, err := sdkgmws.Bootstrap(authHandler.GetRouter())

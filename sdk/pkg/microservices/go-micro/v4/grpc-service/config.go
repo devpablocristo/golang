@@ -10,28 +10,21 @@ import (
 )
 
 type config struct {
-	serviceName   string
 	server        server.Server
 	client        client.Client
 	consulAddress string
 }
 
 func newConfig(
-	serviceName string,
 	server server.Server,
 	client client.Client,
 	consulAddress string,
 ) ports.Config {
 	return &config{
-		serviceName:   serviceName,
 		server:        server,
 		client:        client,
 		consulAddress: consulAddress,
 	}
-}
-
-func (c *config) GetServiceName() string {
-	return c.serviceName
 }
 
 func (c *config) GetServer() server.Server {
@@ -47,9 +40,6 @@ func (c *config) GetConsulAddress() string {
 }
 
 func (c *config) Validate() error {
-	if c.serviceName == "" {
-		return fmt.Errorf("missing service name")
-	}
 	if c.server == nil {
 		return fmt.Errorf("missing server")
 	}

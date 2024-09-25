@@ -4,66 +4,72 @@ import (
 	"fmt"
 
 	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/web-server/ports"
-
+	"github.com/google/uuid"
 )
 
 type config struct {
-	webRouter     interface{}
-	webServerName string
+	Router        interface{}
+	ServerName    string
 	consulAddress string
-	webServerHost string
-	webServerPort int
+	ServerHost    string
+	ServerPort    int
+	ServerID      string
 }
 
 func newConfig(
-	webRouter interface{},
-	webServerName string,
+	Router interface{},
+	ServerName string,
 	consulAddress string,
-	webServerHost string,
-	webServerPort int,
-) ports.Config{
+	ServerHost string,
+	ServerPort int,
+) ports.Config {
 	return &config{
-		webRouter:     webRouter,
-		webServerName: webServerName,
+		Router:        Router,
+		ServerName:    ServerName,
 		consulAddress: consulAddress,
-		webServerHost: webServerHost,
-		webServerPort: webServerPort,
+		ServerHost:    ServerHost,
+		ServerPort:    ServerPort,
+		ServerID:      uuid.New().String(),
 	}
 }
 
 func (c *config) GetRouter() interface{} {
-	return c.webRouter
+	return c.Router
 }
 
 func (c *config) GetServerName() string {
-	return c.webServerName
+	return c.ServerName
 }
 
 func (c *config) GetServerHost() string {
-	return c.webServerHost
+	return c.ServerHost
 }
 
 func (c *config) GetServerPort() int {
-	return c.webServerPort
+	return c.ServerPort
 }
 
 func (c *config) GetServerAddress() string {
-	return fmt.Sprintf("%s:%d", c.webServerHost, c.webServerPort)
+	return fmt.Sprintf("%s:%d", c.ServerHost, c.ServerPort)
 }
 
 func (c *config) GetConsulAddress() string {
 	return c.consulAddress
 }
 
+func (c *config) GetServerID() string {
+	return c.ServerID
+}
+
 func (c *config) Validate() error {
-	if c.webServerName == "" {
-		return fmt.Errorf("missing web server name")
+	if c.ServerName == "" {
+		return fmt.Errorf("missing server name")
 	}
-	if c.webServerHost == "" {
-		return fmt.Errorf("missing web server host")
+	if c.ServerHost == "" {
+		return fmt.Errorf("missing server host")
 	}
-	if c.webServerPort == 0 {
-		return fmt.Errorf("missing web server port")
+	if c.ServerPort == 0 {
+		return fmt.Errorf("missing server port")
 	}
 	if c.consulAddress == "" {
 		return fmt.Errorf("missing consul address")

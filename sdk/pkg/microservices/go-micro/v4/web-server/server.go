@@ -2,10 +2,12 @@ package sdkgomicro
 
 import (
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-micro/plugins/v4/registry/consul"
+	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/web"
 
@@ -24,11 +26,13 @@ type service struct {
 
 func newServer(config ports.Config) (ports.Server, error) {
 	once.Do(func() {
+		setupLogger()
+
 		instance = &service{
-			server: setupWebServer(config),
+			server: setupServer(config),
 		}
 
-		err := instance.SetWebRouter(config.GetRouter())
+		err := instance.SetRouter(config.GetRouter())
 		if err != nil {
 			initError = fmt.Errorf("error setting web router: %w", err)
 			return
@@ -42,9 +46,10 @@ func newServer(config ports.Config) (ports.Server, error) {
 	return instance, nil
 }
 
-func setupWebServer(config ports.Config) web.Service {
+func setupServer(config ports.Config) web.Service {
 	Server := web.NewService(
 		web.Name(config.GetServerName()),
+		web.Id(config.GetServerID()),
 		web.Address(config.GetServerAddress()),
 		web.Registry(setupRegistry(config)),
 	)
@@ -59,7 +64,7 @@ func setupRegistry(config ports.Config) registry.Registry {
 	return consulReg
 }
 
-func (s *service) SetWebRouter(router interface{}) error {
+func (s *service) SetRouter(router interface{}) error {
 	switch r := router.(type) {
 	case *gin.Engine:
 		s.server.Handle("/", r)
@@ -71,4 +76,11 @@ func (s *service) SetWebRouter(router interface{}) error {
 
 func (s *service) Run() error {
 	return s.server.Run()
+}
+
+func setupLogger() {
+	logger.DefaultLogger = logger.NewLogger(
+		logger.WithLevel(logger.InfoLevel),
+		logger.WithOutput(os.Stdout),
+	)
 }

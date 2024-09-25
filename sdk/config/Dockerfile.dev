@@ -7,7 +7,6 @@ RUN apt-get update && \
     go install github.com/go-delve/delve/cmd/dlv@latest && \
     go install github.com/air-verse/air@latest
 
-
 # Configurar la zona horaria a Buenos Aires, Argentina
 ENV TZ=America/Argentina/Buenos_Aires
 

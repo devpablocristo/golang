@@ -4,43 +4,50 @@ import (
 	"fmt"
 
 	"github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-server/ports"
+	"github.com/google/uuid"
 )
 
 type config struct {
-	grpcServerName string
-	grpcServerHost string
-	grpcServerPort int
+	ServerName string
+	ServerHost string
+	ServerPort int
+	ServerID   string
 }
 
-func newConfig(grpcServerName string, grpcServerHost string, grpcServerPort int) ports.Config {
+func newConfig(ServerName string, ServerHost string, ServerPort int) ports.Config {
 	return &config{
-		grpcServerName: grpcServerName,
-		grpcServerHost: grpcServerHost,
-		grpcServerPort: grpcServerPort,
+		ServerName: ServerName,
+		ServerHost: ServerHost,
+		ServerPort: ServerPort,
+		ServerID:   uuid.New().String(),
 	}
 }
 
-func (c *config) GetGrpcServerName() string {
-	return c.grpcServerName
+func (c *config) GetServerName() string {
+	return c.ServerName
 }
 
-func (c *config) GetGrpcServerHost() string {
-	return c.grpcServerHost
+func (c *config) GetServerHost() string {
+	return c.ServerHost
 }
 
-func (c *config) GetGrpcServerPort() int {
-	return c.grpcServerPort
+func (c *config) GetServerPort() int {
+	return c.ServerPort
+}
+
+func (c *config) GetServerID() string {
+	return c.ServerID
 }
 
 func (c *config) Validate() error {
-	if c.grpcServerName == "" {
-		return fmt.Errorf("missing grpc service name")
+	if c.ServerName == "" {
+		return fmt.Errorf("missing  service name")
 	}
-	if c.grpcServerHost == "" {
-		return fmt.Errorf("missing grpc server host")
+	if c.ServerHost == "" {
+		return fmt.Errorf("missing  server host")
 	}
-	if c.grpcServerPort == 0 {
-		return fmt.Errorf("missing grpc server port")
+	if c.ServerPort == 0 {
+		return fmt.Errorf("missing  server port")
 	}
 	return nil
 }

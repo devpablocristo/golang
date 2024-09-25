@@ -19,7 +19,7 @@ var (
 )
 
 type service struct {
-	grpcService micro.Service
+	Service micro.Service
 }
 
 func newService(config ports.Config) (ports.Service, error) {
@@ -27,7 +27,7 @@ func newService(config ports.Config) (ports.Service, error) {
 		setupLogger()
 
 		instance = &service{
-			grpcService: setupGrpcService(config),
+			Service: setupService(config),
 		}
 	})
 
@@ -38,9 +38,8 @@ func newService(config ports.Config) (ports.Service, error) {
 	return instance, nil
 }
 
-func setupGrpcService(config ports.Config) micro.Service {
+func setupService(config ports.Config) micro.Service {
 	service := micro.NewService(
-		micro.Name(config.GetServiceName()),
 		micro.Server(config.GetServer()),
 		micro.Client(config.GetClient()),
 		micro.Registry(setupRegistry(config)),
@@ -52,11 +51,11 @@ func setupGrpcService(config ports.Config) micro.Service {
 }
 
 func (s *service) Run() error {
-	return s.grpcService.Run()
+	return s.Service.Run()
 }
 
 func (s *service) GetService() micro.Service {
-	return s.grpcService
+	return s.Service
 }
 
 func setupRegistry(config ports.Config) registry.Registry {

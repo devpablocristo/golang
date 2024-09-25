@@ -8,7 +8,7 @@ import (
 
 func Bootstrap() (ports.Server, error) {
 	config := newConfig(
-		viper.GetString("GRPC_SERVICE_NAME"),
+		viper.GetString("GRPC_SERVER_NAME"),
 		viper.GetString("GRPC_SERVER_HOST"),
 		viper.GetInt("GRPC_SERVER_PORT"),
 	)

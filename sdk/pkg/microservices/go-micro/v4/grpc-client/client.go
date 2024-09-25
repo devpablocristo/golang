@@ -34,9 +34,7 @@ func newClient(config ports.Config) (ports.Client, error) {
 }
 
 func setupClient(config ports.Config) client.Client {
-	grpcClt := grpc.NewClient()
-
-	return grpcClt
+	return grpc.NewClient()
 }
 
 func (c *grpcClient) GetClient() client.Client {

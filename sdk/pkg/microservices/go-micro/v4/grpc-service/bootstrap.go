@@ -10,7 +10,6 @@ import (
 
 func Bootstrap(server sdkserver.Server, client sdkclient.Client) (sdkservice.Service, error) {
 	config := newConfig(
-		viper.GetString("MICRO_SERVICE_NAME"),
 		server.GetServer(),
 		client.GetClient(),
 		viper.GetString("CONSUL_ADDRESS"),

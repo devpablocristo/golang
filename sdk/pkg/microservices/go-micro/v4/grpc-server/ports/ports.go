@@ -7,8 +7,9 @@ type Server interface {
 }
 
 type Config interface {
-	GetGrpcServerName() string
-	GetGrpcServerHost() string
-	GetGrpcServerPort() int
+	GetServerName() string
+	GetServerHost() string
+	GetServerPort() int
+	GetServerID() string
 	Validate() error
 }

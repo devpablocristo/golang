@@ -27,7 +27,7 @@
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
-      "name": "Docker A",
+      "name": "Docker Main",
       "type": "go",
       "request": "attach",
       "mode": "remote",
@@ -45,7 +45,7 @@
       //"postDebugTask": "live reload" // FIXME: no funca el script
     },
     {
-      "name": "Docker B",
+      "name": "Docker Extra 1",
       "type": "go",
       "request": "attach",
       "mode": "remote",
@@ -62,7 +62,7 @@
       "showLog": false
     },
     {
-      "name": "Docker C",
+      "name": "Docker Extra 2",
       "type": "go",
       "request": "attach",
       "mode": "remote",
@@ -79,7 +79,7 @@
       "showLog": false
     },
     {
-      "name": "Docker D",
+      "name": "Docker Extra 3",
       "type": "go",
       "request": "attach",
       "mode": "remote",

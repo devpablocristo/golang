@@ -15,7 +15,7 @@ var (
 	initError error
 )
 
-type grpcServer struct {
+type Server struct {
 	server server.Server
 }
 
@@ -23,10 +23,10 @@ func newServer(config ports.Config) (ports.Server, error) {
 	once.Do(func() {
 		srv, err := setupServer(config)
 		if err != nil {
-			initError = fmt.Errorf("error setting up gRPC server: %w", err)
+			initError = fmt.Errorf("error setting up  server: %w", err)
 			return
 		}
-		instance = &grpcServer{
+		instance = &Server{
 			server: srv,
 		}
 	})
@@ -39,13 +39,15 @@ func newServer(config ports.Config) (ports.Server, error) {
 }
 
 func setupServer(config ports.Config) (server.Server, error) {
-	grpcSrv := server.NewServer(
-		server.Address(fmt.Sprintf("%s:%d", config.GetGrpcServerHost(), config.GetGrpcServerPort())),
+	s := server.NewServer(
+		server.Name(config.GetServerName()),
+		server.Id(config.GetServerID()),
+		server.Address(fmt.Sprintf("%s:%d", config.GetServerHost(), config.GetServerPort())),
 	)
 
-	return grpcSrv, nil
+	return s, nil
 }
 
-func (s *grpcServer) GetServer() server.Server {
+func (s *Server) GetServer() server.Server {
 	return s.server
 }

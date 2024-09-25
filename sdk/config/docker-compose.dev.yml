@@ -1,42 +1,43 @@
 version: "3.8"
 
 services:
-  go-micro-api:
-    container_name: "go-micro-api"
+  authentication-service:
+    container_name: "authentication-service"
     build:
       context: ..
       dockerfile: config/Dockerfile.dev
-    image: "go-micro-api:${APP_VERSION}"
+    image: "authentication-service:${APP_VERSION}"
     ports:
       - "${WEB_SERVER_PORT}:${WEB_SERVER_PORT}"
+      - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}"
       - "${DELVE_PORT}:${DELVE_PORT}"
     volumes:
       - type: bind
         source: ..
         target: /app
-      - type: bind
-        source: ../migrations
-        target: /app/migrations
+      # - type: bind
+      #   source: ../migrations
+      #   target: /app/migrations
     environment:
-      - MAIN_DIR=/app/services/go-micro/main.go
-      - APP_NAME=go-micro-api
+      - MAIN_DIR=/app/services/authentication-service/cmd/main.go
+      - APP_NAME=authentication-service
     depends_on:
-      - postgres
+      # - postgres
       - consul
-      - cassandra
-      - mysql
+      # - cassandra
+      # - mysql
       - redis
-      - prometheus
-      - grafana
-      - pyroscope
-      - mongodb
-      - rabbitmq
-      - dynamodb
+      # - prometheus
+      # - grafana
+      # - pyroscope
+      # - mongodb
+      # - rabbitmq
+      # - dynamodb
     networks:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
     command: air -c ${AIR_CONFIG}
 
   monitoring-api:
@@ -133,7 +134,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   pgadmin:
     image: dpage/pgadmin4:8.8
@@ -153,7 +154,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   consul:
     image: consul:1.15.4
@@ -164,7 +165,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   cassandra:
     image: cassandra:4.1
@@ -185,7 +186,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   datastax-studio:
     image: datastax/dse-studio:6.8.32
@@ -200,18 +201,21 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   redis:
     image: redis:7.0
     container_name: redis
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
     networks:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   mysql:
     image: mysql:8.0
@@ -229,7 +233,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   phpmyadmin:
     image: phpmyadmin:5.2.1-apache
@@ -246,7 +250,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   prometheus:
     image: prom/prometheus:v2.45.6
@@ -259,7 +263,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   grafana:
     image: grafana/grafana:10.2.8
@@ -272,7 +276,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   pyroscope:
     image: grafana/pyroscope:weekly-f76-feefa815b
@@ -285,7 +289,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   mongodb:
     image: mongo:5.0.28
@@ -301,7 +305,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   mongo-express:
     image: mongo-express:1.0.2-20-alpine3.19
@@ -319,7 +323,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   ngrok:
     image: ngrok/ngrok:3.13.0-alpine-91be825
@@ -333,7 +337,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   kong-migrations:
     image: kong:2.8.5-alpine
@@ -350,7 +354,7 @@ services:
     networks:
       - app-network
     profiles:
-      - go-micro
+      - authentication-service
 
   kong:
     image: kong:2.8.5-alpine
@@ -378,7 +382,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   rabbitmq:
     image: "rabbitmq:4.0.0-beta.3-management-alpine"
@@ -394,7 +398,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   dynamodb:
     image: amazon/dynamodb-local:1.24.0
@@ -408,7 +412,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - go-micro
+      - authentication-service
 
   vault:
     image: vault:1.13.3
@@ -432,7 +436,7 @@ services:
     cap_add:
       - IPC_LOCK
     profiles:
-      - go-micro
+      - authentication-service
 
 networks:
   app-network:

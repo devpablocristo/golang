@@ -12,7 +12,6 @@ type Service interface {
 }
 
 type Config interface {
-	GetServiceName() string
 	GetServer() server.Server
 	GetClient() client.Client
 	GetConsulAddress() string
