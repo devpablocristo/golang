@@ -14,7 +14,8 @@ type HttpLoggingOptions struct {
 	ExcludedPaths  []string
 }
 
-func HttpLoggingMiddleware(options HttpLoggingOptions) gin.HandlerFunc {
+// INFO: registra y loggea las solicitudes HTTP entrantes y las respuestas salientes
+func RequestAndResponseLogger(options HttpLoggingOptions) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check if path is excluded
 		for _, path := range options.ExcludedPaths {

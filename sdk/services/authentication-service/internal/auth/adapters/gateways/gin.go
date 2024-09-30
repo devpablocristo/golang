@@ -11,7 +11,7 @@ import (
 	sdk "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
 	sdkports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 
-	//dto "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/adapters/gateways/dto"
+	dto "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/adapters/gateways/dto"
 
 	ports "github.com/devpablocristo/golang/sdk/services/authentication-service/internal/auth/core/ports"
 )
@@ -39,7 +39,6 @@ func NewGinHandler(u ports.UseCases) (*GinHandler, error) {
 
 func (h *GinHandler) Start() error {
 	h.routes()
-
 	return h.ginServer.RunServer()
 }
 
@@ -53,13 +52,13 @@ func (h *GinHandler) routes() {
 	apiPrefix := "/api/" + h.apiVersion
 
 	validated := router.Group(apiPrefix + "/auth/loginValidated")
-	validated.Use(mware.ValidateLoginFields())
+	validated.Use(mware.ValidateCredentials())
 	{
 		validated.POST("/login", h.Login)
 	}
 
 	authorized := router.Group(apiPrefix + "/auth/protected")
-	authorized.Use(mware.JWTAuthMiddleware(h.secret))
+	authorized.Use(mware.ValidateJwt(h.secret))
 	{
 		authorized.GET("/auth-protected", h.ProtectedHandler)
 	}
@@ -72,13 +71,13 @@ func (h *GinHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// token, err := h.ucs.Login(c.Request.Context(), dto.LoginRequestToDomain(req))
-	// if err != nil {
-	// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
-	// 	return
-	// }
+	token, err := h.ucs.Login(c.Request.Context(), dto.LoginRequestToDomain(req))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		return
+	}
 
-	//c.JSON(http.StatusOK, dto.LoginResponse{Token: token.AccessToken})
+	c.JSON(http.StatusOK, dto.LoginResponse{Token: token.AccessToken})
 }
 
 func (h *GinHandler) ProtectedHandler(c *gin.Context) {

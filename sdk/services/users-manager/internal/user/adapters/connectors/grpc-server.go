@@ -4,7 +4,7 @@ import (
 	"context"
 
 	pb "github.com/devpablocristo/golang/sdk/pb"
-	ports "github.com/devpablocristo/golang/sdk/services/users-api/internal/user/ports"
+	ports "github.com/devpablocristo/golang/sdk/services/users-manager/internal/user/core/ports"
 )
 
 type Grpc struct {
@@ -18,9 +18,8 @@ func NewGrpc(ucs ports.UseCases) ports.Server {
 	}
 }
 
-func (s *Grpc) GetUserUUID(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
-
-	userUUID, err := s.ucs.GetUserUUID(ctx, req.Username, req.PasswordHash)
+func (s *Grpc) GetUserByCrentials(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserResponse, error) {
+	userUUID, err := s.ucs.GetUserByCredentials(ctx, req.Username, req.PasswordHash)
 	if err != nil {
 		return &pb.GetUserResponse{}, err
 	}

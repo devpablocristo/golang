@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 
 	sdkports "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb/ports"
-	entities "github.com/devpablocristo/golang/sdk/services/users-api/internal/user/entities"
-	ports "github.com/devpablocristo/golang/sdk/services/users-api/internal/user/ports"
+	entities "github.com/devpablocristo/golang/sdk/services/users-manager/internal/user/core/entities"
+	ports "github.com/devpablocristo/golang/sdk/services/users-manager/internal/user/core/ports"
 )
 
 type mapDbRepository struct {
@@ -37,7 +37,7 @@ func (r *mapDbRepository) SaveUser(ctx context.Context, user *entities.User) err
 	return nil
 }
 
-func (r *mapDbRepository) GetUser(ctx context.Context, UUID string) (*entities.User, error) {
+func (r *mapDbRepository) GetUserByUUID(ctx context.Context, UUID string) (*entities.User, error) {
 	db := r.service.GetDb()
 
 	user, exists := db[UUID].(*entities.User)
@@ -47,7 +47,7 @@ func (r *mapDbRepository) GetUser(ctx context.Context, UUID string) (*entities.U
 	return user, nil
 }
 
-func (r *mapDbRepository) GetUserUUID(ctx context.Context, username, passwordHash string) (string, error) {
+func (r *mapDbRepository) GetUserByCredentials(ctx context.Context, username, passwordHash string) (string, error) {
 	db := r.service.GetDb()
 
 	for _, v := range db {

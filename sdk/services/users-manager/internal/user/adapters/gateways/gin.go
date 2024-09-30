@@ -7,8 +7,8 @@ import (
 
 	mware "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
-	entities "github.com/devpablocristo/golang/sdk/services/user/internal/user/entities"
-	ports "github.com/devpablocristo/golang/sdk/services/user/internal/user/ports"
+	entities "github.com/devpablocristo/golang/sdk/services/users-manager/internal/user/core/entities"
+	ports "github.com/devpablocristo/golang/sdk/services/users-manager/internal/user/core/ports"
 )
 
 type GinHandler struct {
@@ -34,9 +34,8 @@ func (h *GinHandler) Routes(apiVersion string, secret string) {
 
 	router.GET(apiPrefix+"/health", h.Health)
 
-	s := secret
 	authorized := router.Group(apiPrefix + "/user/protected")
-	authorized.Use(mware.JWTAuthMiddleware(s))
+	authorized.Use(mware.ValidateJwt(secret))
 	{
 		authorized.GET("/user-protected", h.CreateUser)
 	}
@@ -57,8 +56,8 @@ func (h *GinHandler) CreateUser(c *gin.Context) {
 }
 
 func (h *GinHandler) GetUser(c *gin.Context) {
-	id := c.Param("id")
-	user, err := h.ucs.GetUser(c.Request.Context(), id)
+	uuid := c.Param("uuid")
+	user, err := h.ucs.GetUserByUUID(c.Request.Context(), uuid)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
@@ -82,8 +81,8 @@ func (h *GinHandler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	id := c.Param("id")
-	if err := h.ucs.UpdateUser(c.Request.Context(), &user, id); err != nil {
+	uuid := c.Param("uuid")
+	if err := h.ucs.UpdateUser(c.Request.Context(), &user, uuid); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
@@ -91,8 +90,8 @@ func (h *GinHandler) UpdateUser(c *gin.Context) {
 }
 
 func (h *GinHandler) DeleteUser(c *gin.Context) {
-	id := c.Param("id")
-	err := h.ucs.DeleteUser(c.Request.Context(), id)
+	uuid := c.Param("uuid")
+	err := h.ucs.DeleteUser(c.Request.Context(), uuid)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
