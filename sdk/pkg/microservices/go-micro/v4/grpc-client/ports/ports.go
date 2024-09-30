@@ -6,4 +6,8 @@ type Client interface {
 	GetClient() client.Client
 }
 
-type Config interface{}
+type Config interface {
+	Validate() error
+	GetConsulAddress() string
+	GetServerName() string
+}

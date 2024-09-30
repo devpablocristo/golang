@@ -8,46 +8,46 @@ import (
 )
 
 type config struct {
-	ServerName string
-	ServerHost string
-	ServerPort int
-	ServerID   string
+	serverName string
+	serverHost string
+	serverPort int
+	serverID   string
 }
 
-func newConfig(ServerName string, ServerHost string, ServerPort int) ports.Config {
+func newConfig(serverName string, serverHost string, serverPort int) ports.Config {
 	return &config{
-		ServerName: ServerName,
-		ServerHost: ServerHost,
-		ServerPort: ServerPort,
-		ServerID:   uuid.New().String(),
+		serverName: serverName,
+		serverHost: serverHost,
+		serverPort: serverPort,
+		serverID:   uuid.New().String(),
 	}
 }
 
 func (c *config) GetServerName() string {
-	return c.ServerName
+	return c.serverName
 }
 
 func (c *config) GetServerHost() string {
-	return c.ServerHost
+	return c.serverHost
 }
 
 func (c *config) GetServerPort() int {
-	return c.ServerPort
+	return c.serverPort
 }
 
 func (c *config) GetServerID() string {
-	return c.ServerID
+	return c.serverID
 }
 
 func (c *config) Validate() error {
-	if c.ServerName == "" {
-		return fmt.Errorf("missing  service name")
+	if c.serverName == "" {
+		return fmt.Errorf("missing service name")
 	}
-	if c.ServerHost == "" {
-		return fmt.Errorf("missing  server host")
+	if c.serverHost == "" {
+		return fmt.Errorf("missing server host")
 	}
-	if c.ServerPort == 0 {
-		return fmt.Errorf("missing  server port")
+	if c.serverPort == 0 {
+		return fmt.Errorf("missing server port")
 	}
 	return nil
 }
