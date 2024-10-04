@@ -3,6 +3,7 @@ package authconn
 import (
 	"context"
 	"fmt"
+	"time"
 
 	pb "github.com/devpablocristo/golang/sdk/pb"
 	sdk "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client"
@@ -12,7 +13,8 @@ import (
 )
 
 type grpcClient struct {
-	client sdkports.Client
+	client     sdkports.Client
+	serverName string
 }
 
 // NewGrpcClient crea un nuevo cliente gRPC para interactuar con el servicio de usuarios
@@ -38,11 +40,15 @@ func (g *grpcClient) GetUserUUID(ctx context.Context, cred *entities.LoginCreden
 	}
 
 	client := g.client.GetClient()
-	request := client.NewRequest("user.UserService", "GetUserUUID", req)
+	request := client.NewRequest(g.client.GetServerName(), "GetUserUUID", req)
 
 	var res pb.GetUserResponse
 
-	if err := g.client.GetClient().Call(ctx, request, &res); err != nil {
+	// Crear un contexto con timeout para la llamada gRPC
+	callCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	if err := g.client.GetClient().Call(callCtx, request, &res); err != nil {
 		return "", fmt.Errorf("error calling GetUserUUID: %w", err)
 	}
 

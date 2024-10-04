@@ -20,16 +20,16 @@ var (
 	initError error
 )
 
-type service struct {
-	server web.Service
+type server struct {
+	s web.Service
 }
 
 func newServer(config ports.Config) (ports.Server, error) {
 	once.Do(func() {
 		setupLogger()
 
-		instance = &service{
-			server: setupServer(config),
+		instance = &server{
+			s: setupServer(config),
 		}
 
 		err := instance.SetRouter(config.GetRouter())
@@ -64,18 +64,18 @@ func setupRegistry(config ports.Config) registry.Registry {
 	return consulReg
 }
 
-func (s *service) SetRouter(router interface{}) error {
+func (s *server) SetRouter(router interface{}) error {
 	switch r := router.(type) {
 	case *gin.Engine:
-		s.server.Handle("/", r)
+		s.s.Handle("/", r)
 	default:
 		return fmt.Errorf("unsupported router type")
 	}
 	return nil
 }
 
-func (s *service) Run() error {
-	return s.server.Run()
+func (s *server) Run() error {
+	return s.s.Run()
 }
 
 func setupLogger() {

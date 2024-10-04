@@ -19,7 +19,7 @@ var (
 )
 
 type service struct {
-	Service micro.Service
+	s micro.Service
 }
 
 func newService(config ports.Config) (ports.Service, error) {
@@ -27,7 +27,7 @@ func newService(config ports.Config) (ports.Service, error) {
 		setupLogger()
 
 		instance = &service{
-			Service: setupService(config),
+			s: setupService(config),
 		}
 	})
 
@@ -51,11 +51,11 @@ func setupService(config ports.Config) micro.Service {
 }
 
 func (s *service) Run() error {
-	return s.Service.Run()
+	return s.s.Run()
 }
 
 func (s *service) GetService() micro.Service {
-	return s.Service
+	return s.s
 }
 
 func setupRegistry(config ports.Config) registry.Registry {

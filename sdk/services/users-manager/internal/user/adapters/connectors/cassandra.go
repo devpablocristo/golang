@@ -1,4 +1,4 @@
-package user
+package userconn
 
 import (
 	"context"
@@ -12,17 +12,17 @@ import (
 )
 
 type cassandra struct {
-	service sdkports.Repository
+	repository sdkports.Repository
 }
 
 func NewCassandraRepository(r sdkports.Repository) ports.Repository {
 	return &cassandra{
-		service: r,
+		repository: r,
 	}
 }
 
 func (r *cassandra) SaveUser(ctx context.Context, user *entities.User) error {
-	return r.service.GetSession().Query(
+	return r.repository.GetSession().Query(
 		"INSERT INTO users (uuid, username, password, created_at) VALUES (?, ?, ?, ?)",
 		user.UUID, user.Credentials.Username, user.Credentials.PasswordHash, user.CreatedAt,
 	).Exec()
@@ -30,7 +30,7 @@ func (r *cassandra) SaveUser(ctx context.Context, user *entities.User) error {
 
 func (r *cassandra) GetUserByUUID(ctx context.Context, UUID string) (*entities.User, error) {
 	var user entities.User
-	err := r.service.GetSession().Query(
+	err := r.repository.GetSession().Query(
 		"SELECT UUID, username, password, created_at FROM users WHERE uuid = ?",
 		UUID,
 	).Consistency(gocql.One).Scan(&user.UUID, &user.Credentials.Username, &user.Credentials.PasswordHash, &user.CreatedAt)
@@ -42,7 +42,7 @@ func (r *cassandra) GetUserByUUID(ctx context.Context, UUID string) (*entities.U
 
 func (r *cassandra) GetUserByCredentials(ctx context.Context, username, passwordHash string) (string, error) {
 	var uuUUID string
-	err := r.service.GetSession().Query(
+	err := r.repository.GetSession().Query(
 		"SELECT UUID FROM users WHERE username = ? AND password = ?",
 		username, passwordHash,
 	).Consistency(gocql.One).Scan(&uuUUID)
@@ -54,7 +54,7 @@ func (r *cassandra) GetUserByCredentials(ctx context.Context, username, password
 
 func (r *cassandra) GetUserByUsername(ctx context.Context, username string) (*entities.User, error) {
 	var user entities.User
-	err := r.service.GetSession().Query(
+	err := r.repository.GetSession().Query(
 		"SELECT UUID, username, password, created_at FROM users WHERE username = ?",
 		username,
 	).Consistency(gocql.One).Scan(&user.UUID, &user.Credentials.Username, &user.Credentials.PasswordHash, &user.CreatedAt)
@@ -65,7 +65,7 @@ func (r *cassandra) GetUserByUsername(ctx context.Context, username string) (*en
 }
 
 func (r *cassandra) DeleteUser(ctx context.Context, UUID string) error {
-	return r.service.GetSession().Query(
+	return r.repository.GetSession().Query(
 		"DELETE FROM users WHERE UUID = ?",
 		UUID,
 	).Exec()
@@ -74,7 +74,7 @@ func (r *cassandra) DeleteUser(ctx context.Context, UUID string) error {
 func (r *cassandra) ListUsers(ctx context.Context) (*entities.InMemDB, error) {
 	userDB := make(entities.InMemDB)
 
-	iter := r.service.GetSession().Query("SELECT UUID, username, password, created_at FROM users").Iter()
+	iter := r.repository.GetSession().Query("SELECT UUID, username, password, created_at FROM users").Iter()
 
 	var user entities.User
 	for iter.Scan(&user.UUID, &user.Credentials.Username, &user.Credentials.PasswordHash, &user.CreatedAt) {
@@ -99,7 +99,7 @@ func (r *cassandra) UpdateUser(ctx context.Context, user *entities.User, UUID st
 		return errors.New("user not found")
 	}
 
-	return r.service.GetSession().Query(
+	return r.repository.GetSession().Query(
 		"UPDATE users SET username = ?, password = ? WHERE UUID = ?",
 		user.Credentials.Username, user.Credentials.PasswordHash, UUID,
 	).Exec()

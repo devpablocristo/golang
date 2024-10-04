@@ -42,6 +42,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/skeema/knownhosts v1.2.2 // indirect
+	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 )
 
 require (
