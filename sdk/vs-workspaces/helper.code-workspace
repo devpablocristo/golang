@@ -16,6 +16,8 @@
         "editor.inlineSuggest.enabled": true,
         "editor.dropIntoEditor.enabled": false,
         "editor.dragAndDrop": false,
+        "editor.wordWrap": "on",
+        "editor.wordWrapColumn": 80,
 
         // Archivos
         "files.autoSave": "afterDelay",

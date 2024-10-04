@@ -39,7 +39,6 @@ var errorHandlingSkills = []common.Skill{
 		Regex: regexp.MustCompile(`fmt\.Errorf\(|errors\.Wrap\(`),
 	},
 	{ID: "ignored_errors", Name: "Minimizing ignored errors"},
-	{ID: "defer_usage", Name: "Using defer to manage resource cleanup in case of errors"},
 	{ID: "log_error_count", Name: "Monitoring and minimizing frequent error logs during runtime"},
 }
 

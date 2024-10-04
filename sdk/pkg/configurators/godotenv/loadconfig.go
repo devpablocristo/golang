@@ -2,29 +2,27 @@ package sdkgodotenv
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/joho/godotenv"
 )
 
-// LoadConfig carga múltiples archivos .env desde las rutas proporcionadas.
-// Si no se especifican rutas, carga el archivo .env del directorio actual.
-// Retorna un error en caso de que no se pueda cargar algún archivo .env.
+// LoadConfig carga múltiples archivos desde las rutas completas proporcionadas.
+// Cada string en configPaths debe representar la ruta completa, incluyendo el nombre del archivo.
+// Retorna un error en caso de que no se pueda cargar algún archivo.
 func LoadConfig(configPaths ...string) error {
-	// Si no se proporcionan rutas, usa el directorio actual.
+	// Verificar que se hayan proporcionado rutas
 	if len(configPaths) == 0 {
-		configPaths = []string{"."}
+		return fmt.Errorf("no config paths provided")
 	}
 
-	// Cargar cada archivo .env desde las rutas especificadas.
-	for _, path := range configPaths {
-		envFilePath := filepath.Join(path, ".env")
-		fmt.Printf("Attempting to load .env file from: %s\n", envFilePath) // Debugging
-		if err := godotenv.Load(envFilePath); err != nil {
-			return fmt.Errorf("failed to load .env file from path %s: %w", envFilePath, err)
+	// Cargar cada archivo desde las rutas completas especificadas.
+	for _, filePath := range configPaths {
+		fmt.Printf("Attempting to load file from: %s\n", filePath) // Debugging
+		if err := godotenv.Load(filePath); err != nil {
+			return fmt.Errorf("failed to load file from path %s: %w", filePath, err)
 		}
 	}
 
-	fmt.Println("Environment variables loaded successfully from .env files")
+	fmt.Println("Files loaded successfully.")
 	return nil
 }
