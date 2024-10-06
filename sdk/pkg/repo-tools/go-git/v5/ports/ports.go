@@ -4,13 +4,14 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
-type GitClient interface {
+// GitClient es la interfaz que define las operaciones que debe soportar un cliente Git.
+type Client interface {
 	GetRepository() *git.Repository
 	PullLatest() error
-	GetFilesToAnalyze([]string, func(string) bool) ([]string, error)
-	GetFileAuthor(string) (string, error)
-	GetCommitID(string) (string, error)
-	GetRepo(string) (*git.Repository, error)
+	GetFiles(files []string, extension string) ([]string, error)
+	GetFileAuthor(file string) (string, error)
+	GetCommitID(file string) (string, error)
+	GetRepo(repoPath string) (*git.Repository, error)
 }
 
 type Config interface {

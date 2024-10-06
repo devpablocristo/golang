@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/spf13/viper"
 
@@ -26,7 +27,7 @@ func main() {
 		fmt.Printf("Error finding files: %v\n", err)
 	}
 
-	ymlFile, err := sdkff.FilesFinder("services/monitors/go/go-nuevo-dip/layers.yml")
+	ymlFile, err := sdkff.FilesFinder("services/monitors/go/projects/go-nuevo-dip/layers.yml")
 	if err != nil {
 		fmt.Printf("Error finding files: %v\n", err)
 	}
@@ -45,10 +46,27 @@ func main() {
 	debug := viper.GetBool("DEBUG")
 	fmt.Printf("App Name: %s, Debug Mode: %t\n", appName, debug)
 
-	var layersConfig LayersConfig
-	err = sdkviper.UnmarshalConfig(&layersConfig)
+	if len(os.Args) != 2 {
+		fmt.Println("Usage: go run main.go <repo_path>")
+		return
+	}
+
+	repoPath := os.Args[1]
+
+	//repo, err := sdkgogit.Bootstrap("https://github.com/devpablocristo/meli", "/home/pablo/meli", "main")
+	repo, err := sdkgogit.Bootstrap(repoPath, "/home/pablo/meli", "main")
 	if err != nil {
-		log.Fatalf("Error unmarshaling configuration: %v", err)
+		log.Fatalf("Error initializing Git client: %v", err)
+	}
+
+	err = repo.PullLatest()
+	if err != nil {
+		log.Fatalf("Error pulling latest changes: %v", err)
+	}
+
+	layersConfig, err := loadLayerConfig()
+	if err != nil {
+		log.Fatalf("Error loading layer configuration: %v", err)
 	}
 
 	fmt.Println("Layers Configuration:")
@@ -56,15 +74,14 @@ func main() {
 	fmt.Printf("Application Layers: %v\n", layersConfig.Layers.Application)
 	fmt.Printf("Infrastructure Layers: %v\n", layersConfig.Layers.Infrastructure)
 
-	goGitClient, err := sdkgogit.Bootstrap("https://github.com/devpablocristo/meli", "/home/pablo/meli", "main")
+	files, err := repo.GetFiles(nil, ".go")
 	if err != nil {
-		log.Fatalf("Error initializing Git client: %v", err)
+		log.Fatal(err)
 	}
 
-	err = goGitClient.PullLatest()
-	if err != nil {
-		log.Fatalf("Error pulling latest changes: %v", err)
-	}
+	fmt.Println(files)
 
-	fmt.Println("Repository updated successfully")
+	fmt.Println(repo.GetFileAuthor(files[0]))
+	fmt.Println(repo.GetCommitID(files[0]))
+
 }

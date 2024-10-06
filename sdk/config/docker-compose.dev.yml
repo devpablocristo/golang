@@ -1,12 +1,12 @@
 version: "3.8"
 
 services:
-  authentication-service:
-    container_name: "authentication-service"
+  authentication:
+    container_name: "authentication"
     build:
       context: ..
       dockerfile: config/Dockerfile.dev
-    image: "authentication-service:${APP_VERSION}"
+    image: "authentication:${APP_VERSION}"
     ports:
       - "${WEB_SERVER_PORT}:${WEB_SERVER_PORT}"
       - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}"
@@ -19,8 +19,8 @@ services:
       #   source: ../migrations
       #   target: /app/migrations
     environment:
-      - MAIN_DIR=/app/services/authentication-service/cmd/main.go
-      - APP_NAME=authentication-service
+      - MAIN_DIR=/app/services/authentication/cmd/main.go
+      - APP_NAME=authentication
     depends_on:
       # - postgres
       - consul
@@ -37,7 +37,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
     command: air -c ${AIR_CONFIG}
 
   monitoring-api:
@@ -134,7 +134,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   pgadmin:
     image: dpage/pgadmin4:8.8
@@ -154,7 +154,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   consul:
     image: consul:1.15.4
@@ -165,7 +165,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   cassandra:
     image: cassandra:4.1
@@ -186,7 +186,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   datastax-studio:
     image: datastax/dse-studio:6.8.32
@@ -201,7 +201,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   redis:
     image: redis:7.0
@@ -215,7 +215,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   mysql:
     image: mysql:8.0
@@ -233,7 +233,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   phpmyadmin:
     image: phpmyadmin:5.2.1-apache
@@ -250,7 +250,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   prometheus:
     image: prom/prometheus:v2.45.6
@@ -263,7 +263,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   grafana:
     image: grafana/grafana:10.2.8
@@ -276,7 +276,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   pyroscope:
     image: grafana/pyroscope:weekly-f76-feefa815b
@@ -289,7 +289,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   mongodb:
     image: mongo:5.0.28
@@ -305,7 +305,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   mongo-express:
     image: mongo-express:1.0.2-20-alpine3.19
@@ -323,7 +323,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   ngrok:
     image: ngrok/ngrok:3.13.0-alpine-91be825
@@ -337,7 +337,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   kong-migrations:
     image: kong:2.8.5-alpine
@@ -354,7 +354,7 @@ services:
     networks:
       - app-network
     profiles:
-      - authentication-service
+      - authentication
 
   kong:
     image: kong:2.8.5-alpine
@@ -382,7 +382,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   rabbitmq:
     image: "rabbitmq:4.0.0-beta.3-management-alpine"
@@ -398,7 +398,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   dynamodb:
     image: amazon/dynamodb-local:1.24.0
@@ -412,7 +412,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication-service
+      - authentication
 
   vault:
     image: vault:1.13.3
@@ -436,7 +436,7 @@ services:
     cap_add:
       - IPC_LOCK
     profiles:
-      - authentication-service
+      - authentication
 
 networks:
   app-network:

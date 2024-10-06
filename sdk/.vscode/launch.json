@@ -6,7 +6,7 @@
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceRoot}/services/indi-grpc-server/cmd/main.go",
+        "program": "${workspaceRoot}/services/monitors/go/projects/go-nuevo-dip/main.go",
         "envFile": "${workspaceRoot}/config/.env"
     },
     {

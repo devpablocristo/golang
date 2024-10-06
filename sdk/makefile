@@ -53,17 +53,17 @@ docker-logs:
 	@echo "Fetching logs for $(PROFILE) services..."
 	APP_NAME=$(APP_NAME) docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(APP_NAME)
 
-authentication-service-up:
-	@$(MAKE) docker-up PROFILE=authentication-service APP_NAME=authentication-service
+authentication-up:
+	@$(MAKE) docker-up PROFILE=authentication APP_NAME=authentication
 
-authentication-service-build:
-	@$(MAKE) docker-build PROFILE=authentication-service APP_NAME=authentication-service
+authentication-build:
+	@$(MAKE) docker-build PROFILE=authentication APP_NAME=authentication
 
-authentication-service-down:
-	@$(MAKE) docker-down PROFILE=authentication-service APP_NAME=authentication-service
+authentication-down:
+	@$(MAKE) docker-down PROFILE=authentication APP_NAME=authentication
 
-authentication-service-logs:
-	@$(MAKE) docker-logs PROFILE=authentication-service APP_NAME=authentication-service
+authentication-logs:
+	@$(MAKE) docker-logs PROFILE=authentication APP_NAME=authentication
 
 greeter-server-up:
 	@$(MAKE) docker-up PROFILE=greeter-server APP_NAME=greeter-server

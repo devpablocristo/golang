@@ -37,11 +37,14 @@ require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
+	github.com/go-git/go-git v4.7.0+incompatible // indirect
 	github.com/go-micro/plugins/v4/client/grpc v1.2.1 // indirect
 	github.com/go-micro/plugins/v4/server/grpc v1.2.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/skeema/knownhosts v1.2.2 // indirect
+	github.com/src-d/gcfg v1.4.0 // indirect
+	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 )
 

@@ -4,7 +4,7 @@ import (
 	ports "github.com/devpablocristo/golang/sdk/pkg/repo-tools/go-git/v5/ports"
 )
 
-func Bootstrap(repoRemoteUrl, repoLocalPath, repoBranch string) (ports.GitClient, error) {
+func Bootstrap(repoRemoteUrl, repoLocalPath, repoBranch string) (ports.Client, error) {
 	// config := newConfig(
 	// 	viper.GetString("GIT_REPO_URL"),
 	// 	viper.GetString("GIT_REPO_PATH"),
