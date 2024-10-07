@@ -3,11 +3,11 @@ package sdkrabbit
 import (
 	"github.com/spf13/viper"
 
-	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/consumer/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/prod-cons/ports"
 )
 
-// Bootstrap inicializa una nueva instancia de Consumer con configuración de Viper.
-func Bootstrap() (ports.Consumer, error) {
+// Bootstrap inicializa una nueva instancia de Messaging con configuración de Viper.
+func Bootstrap() (ports.Messaging, error) {
 	config := newConfig(
 		viper.GetString("RABBITMQ_HOST"),
 		viper.GetInt("RABBITMQ_PORT"),
@@ -25,5 +25,5 @@ func Bootstrap() (ports.Consumer, error) {
 		return nil, err
 	}
 
-	return newConsumer(config)
+	return newMessaging(config)
 }

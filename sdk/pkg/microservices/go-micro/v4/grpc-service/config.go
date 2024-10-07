@@ -3,6 +3,7 @@ package sdkgomicro
 import (
 	"fmt"
 
+	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/server"
 
@@ -12,17 +13,20 @@ import (
 type config struct {
 	server        server.Server
 	client        client.Client
+	broker        broker.Broker
 	consulAddress string
 }
 
 func newConfig(
 	server server.Server,
 	client client.Client,
+	broker broker.Broker, // Optional, if you want to use a message broker (e.g., RabbitMQ, Kafka) for communication between services.
 	consulAddress string,
 ) ports.Config {
 	return &config{
 		server:        server,
 		client:        client,
+		broker:        broker,
 		consulAddress: consulAddress,
 	}
 }

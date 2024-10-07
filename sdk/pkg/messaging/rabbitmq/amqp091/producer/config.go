@@ -1,9 +1,9 @@
-package producer
+package sdkrabbit
 
 import (
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/producer/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/producer/ports"
 )
 
 // config estructura que implementa la interfaz ports.Config para el productor de RabbitMQ.
@@ -38,7 +38,7 @@ func newConfig(host string, port int, user, password, vhost, exchange, exchangeT
 	}
 }
 
-// Métodos Getters y Setters para cada campo de configuración.
+// Getters y Setters
 
 func (c *config) GetHost() string     { return c.host }
 func (c *config) SetHost(host string) { c.host = host }

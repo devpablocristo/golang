@@ -16,6 +16,9 @@ type Producer interface {
 
 	// Produce envía un mensaje a la cola especificada con una opción de reply-to y ID de correlación.
 	Produce(ctx context.Context, queueName string, replyTo string, corrID string, message any) (string, error)
+
+	// ProduceWithRetry envía un mensaje con reintentos en caso de fallo.
+	ProduceWithRetry(ctx context.Context, queueName string, replyTo string, corrID string, message any, maxRetries int) (string, error)
 }
 
 // Config define la configuración específica para un productor de RabbitMQ.

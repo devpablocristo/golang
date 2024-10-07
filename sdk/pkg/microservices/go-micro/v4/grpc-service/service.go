@@ -43,7 +43,10 @@ func setupService(config ports.Config) micro.Service {
 		micro.Server(config.GetServer()),
 		micro.Client(config.GetClient()),
 		micro.Registry(setupRegistry(config)),
+		micro.Broker(config.GetBroker()),
 	)
+
+	
 
 	service.Init()
 
