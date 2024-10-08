@@ -11,62 +11,58 @@ import (
 )
 
 var (
-	consumerInstance  ports.Consumer
-	consumerOnce      sync.Once
-	consumerInitError error
+	instance  ports.Consumer
+	once      sync.Once
+	initError error
 )
 
-// rabbitMqConsumer implementa la interfaz ports.Consumer para RabbitMQ.
-type rabbitMqConsumer struct {
-	connection *amqp091.Connection
-	channel    *amqp091.Channel
-	config     ports.Config
+// consumer implementa la interfaz ports.Consumer para RabbitMQ.
+type consumer struct {
+	conn    *amqp091.Connection
+	channel *amqp091.Channel
+	config  ports.Config
 }
 
 // newConsumer crea una nueva instancia de consumidor de RabbitMQ utilizando el patrón Singleton.
 func newConsumer(config ports.Config) (ports.Consumer, error) {
-	consumerOnce.Do(func() {
+	once.Do(func() {
 		connString := fmt.Sprintf("amqp://%s:%s@%s:%d%s",
 			config.GetUser(), config.GetPassword(), config.GetHost(), config.GetPort(), config.GetVHost())
 
 		conn, err := amqp091.Dial(connString)
 		if err != nil {
-			consumerInitError = fmt.Errorf("failed to connect to RabbitMQ: %w", err)
+			initError = fmt.Errorf("failed to connect to RabbitMQ: %w", err)
 			return
 		}
 
 		ch, err := conn.Channel()
 		if err != nil {
-			consumerInitError = fmt.Errorf("failed to open a channel: %w", err)
+			initError = fmt.Errorf("failed to open a channel: %w", err)
 			conn.Close()
 			return
 		}
 
-		consumerInstance = &rabbitMqConsumer{
-			connection: conn,
-			channel:    ch,
-			config:     config,
+		instance = &consumer{
+			conn:    conn,
+			channel: ch,
+			config:  config,
 		}
 	})
 
-	return consumerInstance, consumerInitError
+	return instance, initError
 }
 
-// GetConsumerInstance devuelve la instancia única del consumidor de RabbitMQ.
-func GetConsumerInstance() (ports.Consumer, error) {
-	if consumerInstance == nil {
-		return nil, fmt.Errorf("rabbitmq consumer is not initialized")
-	}
-	return consumerInstance, nil
+func (c *consumer) GetConnection() *amqp091.Connection {
+	return c.conn
 }
 
 // Consume procesa los mensajes de la cola especificada.
 // Retorna el primer mensaje que coincide con el corrID proporcionado.
 // Si corrID está vacío, retorna el primer mensaje recibido.
-func (client *rabbitMqConsumer) Consume(ctx context.Context, queueName, corrID string) ([]byte, string, error) {
-	msgs, err := client.channel.Consume(
-		queueName, "", client.config.GetAutoAck(), client.config.GetExclusive(),
-		client.config.GetNoLocal(), client.config.GetNoWait(), nil,
+func (c *consumer) Consume(ctx context.Context, queueName, corrID string) ([]byte, string, error) {
+	msgs, err := c.channel.Consume(
+		queueName, "", c.config.GetAutoAck(), c.config.GetExclusive(),
+		c.config.GetNoLocal(), c.config.GetNoWait(), nil,
 	)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to consume from RabbitMQ: %w", err)
@@ -88,8 +84,8 @@ func (client *rabbitMqConsumer) Consume(ctx context.Context, queueName, corrID s
 }
 
 // SetupExchangeAndQueue configura el intercambio y la cola en RabbitMQ.
-func (client *rabbitMqConsumer) SetupExchangeAndQueue(exchangeName, exchangeType, queueName, routingKey string) error {
-	if err := client.channel.ExchangeDeclare(
+func (c *consumer) SetupExchangeAndQueue(exchangeName, exchangeType, queueName, routingKey string) error {
+	if err := c.channel.ExchangeDeclare(
 		exchangeName, // Nombre del intercambio
 		exchangeType, // Tipo de intercambio (direct, topic, fanout, etc.)
 		true,         // Durable
@@ -101,7 +97,7 @@ func (client *rabbitMqConsumer) SetupExchangeAndQueue(exchangeName, exchangeType
 		return fmt.Errorf("failed to declare exchange: %w", err)
 	}
 
-	if _, err := client.channel.QueueDeclare(
+	if _, err := c.channel.QueueDeclare(
 		queueName, // Nombre de la cola
 		true,      // Durable
 		false,     // Delete when unused
@@ -112,7 +108,7 @@ func (client *rabbitMqConsumer) SetupExchangeAndQueue(exchangeName, exchangeType
 		return fmt.Errorf("failed to declare queue: %w", err)
 	}
 
-	if err := client.channel.QueueBind(
+	if err := c.channel.QueueBind(
 		queueName,    // Nombre de la cola
 		routingKey,   // Clave de enrutamiento
 		exchangeName, // Nombre del intercambio
@@ -126,15 +122,15 @@ func (client *rabbitMqConsumer) SetupExchangeAndQueue(exchangeName, exchangeType
 }
 
 // Close cierra de manera segura el consumidor.
-func (client *rabbitMqConsumer) Close() error {
+func (c *consumer) Close() error {
 	var errs []error
 
-	if err := client.channel.Close(); err != nil {
+	if err := c.channel.Close(); err != nil {
 		errs = append(errs, fmt.Errorf("failed to close RabbitMQ channel: %w", err))
 	}
 
-	if err := client.connection.Close(); err != nil {
-		errs = append(errs, fmt.Errorf("failed to close RabbitMQ connection: %w", err))
+	if err := c.conn.Close(); err != nil {
+		errs = append(errs, fmt.Errorf("failed to close RabbitMQ conn: %w", err))
 	}
 
 	if len(errs) > 0 {
@@ -145,9 +141,9 @@ func (client *rabbitMqConsumer) Close() error {
 }
 
 // Channel devuelve el canal actual de RabbitMQ.
-func (client *rabbitMqConsumer) Channel() (*amqp091.Channel, error) {
-	if client.channel == nil {
+func (c *consumer) Channel() (*amqp091.Channel, error) {
+	if c.channel == nil {
 		return nil, fmt.Errorf("RabbitMQ channel is not initialized")
 	}
-	return client.channel, nil
+	return c.channel, nil
 }

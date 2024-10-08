@@ -18,9 +18,9 @@ var (
 
 // service implementa la interfaz ports.Messaging para RabbitMQ.
 type service struct {
-	connection *amqp091.Connection
-	channel    *amqp091.Channel
-	config     ports.Config
+	conn    *amqp091.Connection
+	channel *amqp091.Channel
+	config  ports.Config
 }
 
 // newMessaging crea una nueva instancia de RabbitMQ que actúa como productor y consumidor.
@@ -43,25 +43,21 @@ func newMessaging(config ports.Config) (ports.Messaging, error) {
 		}
 
 		instance = &service{
-			connection: conn,
-			channel:    ch,
-			config:     config,
+			conn:    conn,
+			channel: ch,
+			config:  config,
 		}
 	})
 
 	return instance, initError
 }
 
-// GetInstance devuelve la instancia única de RabbitMQ como productor y consumidor.
-func GetInstance() (ports.Messaging, error) {
-	if instance == nil {
-		return nil, fmt.Errorf("rabbitmq client instance is not initialized")
-	}
-	return instance, nil
+func (s *service) GetConnection() *amqp091.Connection {
+	return s.conn
 }
 
 // Publish envía un mensaje al intercambio especificado o directamente a una cola.
-func (client *service) Publish(targetType, targetName, routingKey string, body []byte) error {
+func (s *service) Publish(targetType, targetName, routingKey string, body []byte) error {
 	var err error
 	publishing := amqp091.Publishing{
 		ContentType: "text/plain",
@@ -70,7 +66,7 @@ func (client *service) Publish(targetType, targetName, routingKey string, body [
 
 	switch targetType {
 	case "exchange":
-		err = client.channel.Publish(
+		err = s.channel.Publish(
 			targetName, // Exchange
 			routingKey, // Routing key
 			false,      // Mandatory
@@ -78,7 +74,7 @@ func (client *service) Publish(targetType, targetName, routingKey string, body [
 			publishing,
 		)
 	case "queue":
-		err = client.channel.Publish(
+		err = s.channel.Publish(
 			"",         // No exchange (direct to queue)
 			targetName, // Queue name
 			false,      // Mandatory
@@ -97,9 +93,9 @@ func (client *service) Publish(targetType, targetName, routingKey string, body [
 }
 
 // Subscribe procesa los mensajes de un intercambio específico o una cola específica.
-func (client *service) Subscribe(ctx context.Context, targetType, targetName, exchangeType, routingKey string) (<-chan amqp091.Delivery, error) {
+func (s *service) Subscribe(ctx context.Context, targetType, targetName, exchangeType, routingKey string) (<-chan amqp091.Delivery, error) {
 	if targetType == "exchange" {
-		if err := client.channel.ExchangeDeclare(
+		if err := s.channel.ExchangeDeclare(
 			targetName,   // Nombre del intercambio
 			exchangeType, // Tipo de intercambio (direct, topic, fanout, etc.)
 			true,         // Durable
@@ -112,7 +108,7 @@ func (client *service) Subscribe(ctx context.Context, targetType, targetName, ex
 		}
 	}
 
-	queue, err := client.channel.QueueDeclare(
+	queue, err := s.channel.QueueDeclare(
 		targetName, // Nombre de la cola
 		true,       // Durable
 		false,      // Delete when unused
@@ -125,7 +121,7 @@ func (client *service) Subscribe(ctx context.Context, targetType, targetName, ex
 	}
 
 	if targetType == "exchange" {
-		if err := client.channel.QueueBind(
+		if err := s.channel.QueueBind(
 			queue.Name, // Nombre de la cola
 			routingKey, // Clave de enrutamiento
 			targetName, // Nombre del intercambio
@@ -136,13 +132,13 @@ func (client *service) Subscribe(ctx context.Context, targetType, targetName, ex
 		}
 	}
 
-	msgs, err := client.channel.Consume(
-		queue.Name,                 // Nombre de la cola
-		"",                         // Consumer
-		client.config.GetAutoAck(), // Auto-acknowledge
-		client.config.GetExclusive(),
-		client.config.GetNoLocal(),
-		client.config.GetNoWait(),
+	msgs, err := s.channel.Consume(
+		queue.Name,            // Nombre de la cola
+		"",                    // Consumer
+		s.config.GetAutoAck(), // Auto-acknowledge
+		s.config.GetExclusive(),
+		s.config.GetNoLocal(),
+		s.config.GetNoWait(),
 		nil, // Arguments
 	)
 	if err != nil {
@@ -171,8 +167,8 @@ func (client *service) Subscribe(ctx context.Context, targetType, targetName, ex
 }
 
 // SetupExchangeAndQueue configura el intercambio y la cola en RabbitMQ.
-func (client *service) SetupExchangeAndQueue(exchangeName, exchangeType, queueName, routingKey string) error {
-	if err := client.channel.ExchangeDeclare(
+func (s *service) SetupExchangeAndQueue(exchangeName, exchangeType, queueName, routingKey string) error {
+	if err := s.channel.ExchangeDeclare(
 		exchangeName, // Nombre del intercambio
 		exchangeType, // Tipo de intercambio (direct, topic, fanout, etc.)
 		true,         // Durable
@@ -184,7 +180,7 @@ func (client *service) SetupExchangeAndQueue(exchangeName, exchangeType, queueNa
 		return fmt.Errorf("failed to declare exchange: %w", err)
 	}
 
-	if _, err := client.channel.QueueDeclare(
+	if _, err := s.channel.QueueDeclare(
 		queueName, // Nombre de la cola
 		true,      // Durable
 		false,     // Delete when unused
@@ -195,7 +191,7 @@ func (client *service) SetupExchangeAndQueue(exchangeName, exchangeType, queueNa
 		return fmt.Errorf("failed to declare queue: %w", err)
 	}
 
-	if err := client.channel.QueueBind(
+	if err := s.channel.QueueBind(
 		queueName,    // Nombre de la cola
 		routingKey,   // Clave de enrutamiento
 		exchangeName, // Nombre del intercambio
@@ -209,15 +205,15 @@ func (client *service) SetupExchangeAndQueue(exchangeName, exchangeType, queueNa
 }
 
 // Close cierra de manera segura la conexión de RabbitMQ.
-func (client *service) Close() error {
+func (s *service) Close() error {
 	var errs []error
 
-	if err := client.channel.Close(); err != nil {
+	if err := s.channel.Close(); err != nil {
 		errs = append(errs, fmt.Errorf("failed to close RabbitMQ channel: %w", err))
 	}
 
-	if err := client.connection.Close(); err != nil {
-		errs = append(errs, fmt.Errorf("failed to close RabbitMQ connection: %w", err))
+	if err := s.conn.Close(); err != nil {
+		errs = append(errs, fmt.Errorf("failed to close RabbitMQ conn: %w", err))
 	}
 
 	if len(errs) > 0 {

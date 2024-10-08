@@ -8,11 +8,11 @@ import (
 	sdkservice "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-service/ports"
 )
 
-func Bootstrap(server sdkserver.Server, client sdkclient.Client, broker sdkbroker.Broker) (sdkservice.Service, error) {
+func Bootstrap(server sdkserver.Server, client sdkclient.Client) (sdkservice.Service, error) {
 	config := newConfig(
 		server.GetServer(),
 		client.GetClient(),
-		broker.GetBroker(),
+		nil,
 		viper.GetString("CONSUL_ADDRESS"),
 	)
 

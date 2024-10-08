@@ -14,33 +14,33 @@ import (
 )
 
 var (
-	producerInstance  ports.Producer
-	producerOnce      sync.Once
-	producerInitError error
+	instance  ports.Producer
+	once      sync.Once
+	initError error
 )
 
-// rabbitMqProducer implementa la interfaz ports.Producer para RabbitMQ.
-type rabbitMqProducer struct {
-	connection *amqp091.Connection
-	channel    *amqp091.Channel
-	exchange   string
+// producer implementa la interfaz ports.Producer para RabbitMQ.
+type producer struct {
+	conn     *amqp091.Connection
+	channel  *amqp091.Channel
+	exchange string
 }
 
 // newProducer crea una nueva instancia de RabbitMQ que actúa como productor.
 func newProducer(config ports.Config) (ports.Producer, error) {
-	producerOnce.Do(func() {
+	once.Do(func() {
 		connString := fmt.Sprintf("amqp://%s:%s@%s:%d%s",
 			config.GetUser(), config.GetPassword(), config.GetHost(), config.GetPort(), config.GetVHost())
 
 		conn, err := amqp091.Dial(connString)
 		if err != nil {
-			producerInitError = fmt.Errorf("failed to connect to RabbitMQ: %w", err)
+			initError = fmt.Errorf("failed to connect to RabbitMQ: %w", err)
 			return
 		}
 
 		ch, err := conn.Channel()
 		if err != nil {
-			producerInitError = fmt.Errorf("failed to open a channel: %w", err)
+			initError = fmt.Errorf("failed to open a channel: %w", err)
 			conn.Close()
 			return
 		}
@@ -56,7 +56,7 @@ func newProducer(config ports.Config) (ports.Producer, error) {
 			nil,                      // Argumentos adicionales
 		)
 		if err != nil {
-			producerInitError = fmt.Errorf("failed to declare exchange: %w", err)
+			initError = fmt.Errorf("failed to declare exchange: %w", err)
 			ch.Close()
 			conn.Close()
 			return
@@ -65,32 +65,32 @@ func newProducer(config ports.Config) (ports.Producer, error) {
 		// Habilitar el modo de confirmación de publicador
 		err = ch.Confirm(false)
 		if err != nil {
-			producerInitError = fmt.Errorf("failed to put channel into confirm mode: %w", err)
+			initError = fmt.Errorf("failed to put channel into confirm mode: %w", err)
 			ch.Close()
 			conn.Close()
 			return
 		}
 
-		producerInstance = &rabbitMqProducer{
-			connection: conn,
-			channel:    ch,
-			exchange:   config.GetExchange(),
+		instance = &producer{
+			conn:     conn,
+			channel:  ch,
+			exchange: config.GetExchange(),
 		}
 	})
 
-	return producerInstance, producerInitError
+	return instance, initError
 }
 
 // GetInstance devuelve la instancia única de RabbitMQ como productor.
 func GetInstance() (ports.Producer, error) {
-	if producerInstance == nil {
+	if instance == nil {
 		return nil, fmt.Errorf("rabbitmq sdkrabbit instance is not initialized")
 	}
-	return producerInstance, nil
+	return instance, nil
 }
 
 // Produce envía un mensaje a la cola especificada con una opción de reply-to y ID de correlación.
-func (p *rabbitMqProducer) Produce(ctx context.Context, queueName, replyTo, corrID string, message any) (string, error) {
+func (p *producer) Produce(ctx context.Context, queueName, replyTo, corrID string, message any) (string, error) {
 	// Convertir el mensaje a JSON
 	body, err := json.Marshal(message)
 	if err != nil {
@@ -139,7 +139,7 @@ func (p *rabbitMqProducer) Produce(ctx context.Context, queueName, replyTo, corr
 }
 
 // ProduceWithRetry envía un mensaje con reintentos en caso de fallo.
-func (p *rabbitMqProducer) ProduceWithRetry(ctx context.Context, queueName, replyTo, corrID string, message any, maxRetries int) (string, error) {
+func (p *producer) ProduceWithRetry(ctx context.Context, queueName, replyTo, corrID string, message any, maxRetries int) (string, error) {
 	var err error
 	for i := 0; i < maxRetries; i++ {
 		corrID, err = p.Produce(ctx, queueName, replyTo, corrID, message)
@@ -153,7 +153,7 @@ func (p *rabbitMqProducer) ProduceWithRetry(ctx context.Context, queueName, repl
 }
 
 // Channel devuelve el canal actual de RabbitMQ.
-func (p *rabbitMqProducer) Channel() (*amqp091.Channel, error) {
+func (p *producer) Channel() (*amqp091.Channel, error) {
 	if p.channel == nil {
 		return nil, fmt.Errorf("RabbitMQ channel is not initialized")
 	}
@@ -161,15 +161,15 @@ func (p *rabbitMqProducer) Channel() (*amqp091.Channel, error) {
 }
 
 // Close cierra de manera segura el productor de RabbitMQ.
-func (p *rabbitMqProducer) Close() error {
+func (p *producer) Close() error {
 	var errs []error
 
 	if err := p.channel.Close(); err != nil {
 		errs = append(errs, fmt.Errorf("failed to close RabbitMQ channel: %w", err))
 	}
 
-	if err := p.connection.Close(); err != nil {
-		errs = append(errs, fmt.Errorf("failed to close RabbitMQ connection: %w", err))
+	if err := p.conn.Close(); err != nil {
+		errs = append(errs, fmt.Errorf("failed to close RabbitMQ conn: %w", err))
 	}
 
 	if len(errs) > 0 {
@@ -177,4 +177,8 @@ func (p *rabbitMqProducer) Close() error {
 	}
 
 	return nil
+}
+
+func (p *producer) GetConnection() *amqp091.Connection {
+	return p.conn
 }

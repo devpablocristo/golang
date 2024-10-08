@@ -12,6 +12,7 @@ type Messaging interface {
 	Subscribe(ctx context.Context, targetType, targetName, exchangeType, routingKey string) (<-chan amqp091.Delivery, error)
 	SetupExchangeAndQueue(exchangeName, exchangeType, queueName, routingKey string) error
 	Close() error
+	GetConnection() *amqp091.Connection
 }
 
 // Config define la configuración específica para RabbitMQ.

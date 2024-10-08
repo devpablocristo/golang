@@ -19,6 +19,8 @@ type Producer interface {
 
 	// ProduceWithRetry envía un mensaje con reintentos en caso de fallo.
 	ProduceWithRetry(ctx context.Context, queueName string, replyTo string, corrID string, message any, maxRetries int) (string, error)
+
+	GetConnection() *amqp091.Connection
 }
 
 // Config define la configuración específica para un productor de RabbitMQ.

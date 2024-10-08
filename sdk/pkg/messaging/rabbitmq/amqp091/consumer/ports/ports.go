@@ -12,6 +12,7 @@ type Consumer interface {
 	Close() error
 	Consume(ctx context.Context, queueName, corrID string) ([]byte, string, error)
 	SetupExchangeAndQueue(exchangeName, exchangeType, queueName, routingKey string) error
+	GetConnection() *amqp091.Connection
 }
 
 // Config define la configuración específica para un consumidor de RabbitMQ.
