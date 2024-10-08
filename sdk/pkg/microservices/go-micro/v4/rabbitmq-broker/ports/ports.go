@@ -4,19 +4,22 @@ import (
 	"context"
 
 	"github.com/rabbitmq/amqp091-go"
+	"go-micro.dev/v4/broker"
 )
 
-// Messaging define las operaciones para un sistema de mensajería RabbitMQ.
-type Service interface {
+// Broker define las operaciones para un sistema de mensajería RabbitMQ.
+type Broker interface {
 	Publish(string, string, string, []byte) error
-	Subscribe(context.Context, string, string, string, string) (<-chan amqp091.Delivery, error)
-	SetupExchangeAndQueue(string, string, string, string) error
+	Subscribe(context.Context, func(amqp091.Delivery), string) error
 	Close() error
-	GetConnection() *amqp091.Connection
+	GetBroker() broker.Broker
 }
 
 // Config define la configuración específica para RabbitMQ.
 type Config interface {
+	GetName() string
+	SetName(string)
+
 	GetHost() string
 	SetHost(string)
 

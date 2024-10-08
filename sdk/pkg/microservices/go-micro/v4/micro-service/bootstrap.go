@@ -6,13 +6,14 @@ import (
 	sdkclient "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/ports"
 	sdkserver "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-server/ports"
 	sdkservice "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/micro-service/ports"
+	sdkbroker "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/rabbitmq-broker/ports"
 )
 
-func Bootstrap(server sdkserver.Server, client sdkclient.Client) (sdkservice.Service, error) {
+func Bootstrap(server sdkserver.Server, client sdkclient.Client, broker sdkbroker.Broker) (sdkservice.Service, error) {
 	config := newConfig(
 		server.GetServer(),
 		client.GetClient(),
-		nil,
+		broker.GetBroker(),
 		viper.GetString("CONSUL_ADDRESS"),
 	)
 

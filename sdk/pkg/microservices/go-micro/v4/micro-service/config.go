@@ -20,7 +20,7 @@ type config struct {
 func newConfig(
 	server server.Server,
 	client client.Client,
-	broker broker.Broker, // Optional, if you want to use a message broker (e.g., RabbitMQ, Kafka) for communication between services.
+	broker broker.Broker,
 	consulAddress string,
 ) ports.Config {
 	return &config{
@@ -36,6 +36,10 @@ func (c *config) GetServer() server.Server {
 }
 
 func (c *config) GetClient() client.Client {
+	return c.client
+}
+
+func (c *config) GetBroker() client.Client {
 	return c.client
 }
 

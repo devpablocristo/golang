@@ -10,42 +10,42 @@ import (
 type Consumer interface {
 	Channel() (*amqp091.Channel, error)
 	Close() error
-	Consume(ctx context.Context, queueName, corrID string) ([]byte, string, error)
-	SetupExchangeAndQueue(exchangeName, exchangeType, queueName, routingKey string) error
+	Consume(context.Context, string, string) ([]byte, string, error)
+	SetupExchangeAndQueue(string, string, string, string) error
 	GetConnection() *amqp091.Connection
 }
 
 // Config define la configuración específica para un consumidor de RabbitMQ.
 type Config interface {
 	GetHost() string
-	SetHost(host string)
+	SetHost(string)
 
 	GetPort() int
-	SetPort(port int)
+	SetPort(int)
 
 	GetUser() string
-	SetUser(user string)
+	SetUser(string)
 
 	GetPassword() string
-	SetPassword(password string)
+	SetPassword(string)
 
 	GetVHost() string
-	SetVHost(vhost string)
+	SetVHost(string)
 
 	GetQueue() string
-	SetQueue(queue string)
+	SetQueue(string)
 
 	GetAutoAck() bool
-	SetAutoAck(autoAck bool)
+	SetAutoAck(bool)
 
 	GetExclusive() bool
-	SetExclusive(exclusive bool)
+	SetExclusive(bool)
 
 	GetNoLocal() bool
-	SetNoLocal(noLocal bool)
+	SetNoLocal(bool)
 
 	GetNoWait() bool
-	SetNoWait(noWait bool)
+	SetNoWait(bool)
 
 	Validate() error
 }

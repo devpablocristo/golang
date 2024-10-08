@@ -15,10 +15,10 @@ type Producer interface {
 	Close() error
 
 	// Produce envía un mensaje a la cola especificada con una opción de reply-to y ID de correlación.
-	Produce(ctx context.Context, queueName string, replyTo string, corrID string, message any) (string, error)
+	Produce(context.Context, string, string, string, any) (string, error)
 
 	// ProduceWithRetry envía un mensaje con reintentos en caso de fallo.
-	ProduceWithRetry(ctx context.Context, queueName string, replyTo string, corrID string, message any, maxRetries int) (string, error)
+	ProduceWithRetry(context.Context, string, string, string, any, int) (string, error)
 
 	GetConnection() *amqp091.Connection
 }
@@ -26,37 +26,37 @@ type Producer interface {
 // Config define la configuración específica para un productor de RabbitMQ.
 type Config interface {
 	GetHost() string
-	SetHost(host string)
+	SetHost(string)
 
 	GetPort() int
-	SetPort(port int)
+	SetPort(int)
 
 	GetUser() string
-	SetUser(user string)
+	SetUser(string)
 
 	GetPassword() string
-	SetPassword(password string)
+	SetPassword(string)
 
 	GetVHost() string
-	SetVHost(vhost string)
+	SetVHost(string)
 
 	GetExchange() string
-	SetExchange(exchange string)
+	SetExchange(string)
 
 	GetExchangeType() string
-	SetExchangeType(exchangeType string)
+	SetExchangeType(string)
 
 	IsDurable() bool
-	SetDurable(durable bool)
+	SetDurable(bool)
 
 	IsAutoDelete() bool
-	SetAutoDelete(autoDelete bool)
+	SetAutoDelete(bool)
 
 	IsInternal() bool
-	SetInternal(internal bool)
+	SetInternal(bool)
 
 	IsNoWait() bool
-	SetNoWait(noWait bool)
+	SetNoWait(bool)
 
 	Validate() error
 }
