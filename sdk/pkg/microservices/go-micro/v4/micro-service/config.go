@@ -7,7 +7,7 @@ import (
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/server"
 
-	"github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-service/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/micro-service/ports"
 )
 
 type config struct {

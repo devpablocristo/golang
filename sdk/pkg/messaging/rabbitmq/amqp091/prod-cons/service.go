@@ -11,25 +11,22 @@ import (
 )
 
 var (
-	instance  ports.Messaging
+	instance  ports.Service
 	once      sync.Once
 	initError error
 )
 
-// service implementa la interfaz ports.Messaging para RabbitMQ.
 type service struct {
 	conn    *amqp091.Connection
 	channel *amqp091.Channel
 	config  ports.Config
+	mutex   sync.Mutex
 }
 
-// newMessaging crea una nueva instancia de RabbitMQ que actúa como productor y consumidor.
-func newMessaging(config ports.Config) (ports.Messaging, error) {
+// newService crea una nueva instancia de RabbitMQ que actúa como productor y consumidor.
+func newService(config ports.Config) (ports.Service, error) {
 	once.Do(func() {
-		connString := fmt.Sprintf("amqp://%s:%s@%s:%d%s",
-			config.GetUser(), config.GetPassword(), config.GetHost(), config.GetPort(), config.GetVHost())
-
-		conn, err := amqp091.Dial(connString)
+		conn, err := amqp091.Dial(config.GetAddress())
 		if err != nil {
 			initError = fmt.Errorf("failed to connect to RabbitMQ: %w", err)
 			return
@@ -38,6 +35,63 @@ func newMessaging(config ports.Config) (ports.Messaging, error) {
 		ch, err := conn.Channel()
 		if err != nil {
 			initError = fmt.Errorf("failed to open a channel: %w", err)
+			conn.Close()
+			return
+		}
+
+		// Declarar el intercambio según la configuración
+		err = ch.ExchangeDeclare(
+			config.GetExchange(),
+			config.GetExchangeType(),
+			true,  // Durable
+			false, // Auto-deleted
+			false, // Internal
+			config.GetNoWait(),
+			nil, // Arguments adicionales
+		)
+		if err != nil {
+			initError = fmt.Errorf("failed to declare exchange: %w", err)
+			ch.Close()
+			conn.Close()
+			return
+		}
+
+		// Declarar la cola
+		_, err = ch.QueueDeclare(
+			config.GetQueue(),
+			true,  // Durable
+			false, // Delete when unused
+			config.GetExclusive(),
+			config.GetNoWait(),
+			nil, // Arguments adicionales
+		)
+		if err != nil {
+			initError = fmt.Errorf("failed to declare queue: %w", err)
+			ch.Close()
+			conn.Close()
+			return
+		}
+
+		// Enlazar la cola al intercambio con la clave de enrutamiento
+		err = ch.QueueBind(
+			config.GetQueue(),
+			config.GetRoutingKey(),
+			config.GetExchange(),
+			false, // No-wait
+			nil,   // Arguments adicionales
+		)
+		if err != nil {
+			initError = fmt.Errorf("failed to bind queue: %w", err)
+			ch.Close()
+			conn.Close()
+			return
+		}
+
+		// Habilitar el modo de confirmación de publicador
+		err = ch.Confirm(false)
+		if err != nil {
+			initError = fmt.Errorf("failed to enable confirm mode: %w", err)
+			ch.Close()
 			conn.Close()
 			return
 		}
@@ -52,12 +106,11 @@ func newMessaging(config ports.Config) (ports.Messaging, error) {
 	return instance, initError
 }
 
-func (s *service) GetConnection() *amqp091.Connection {
-	return s.conn
-}
-
 // Publish envía un mensaje al intercambio especificado o directamente a una cola.
-func (s *service) Publish(targetType, targetName, routingKey string, body []byte) error {
+func (m *service) Publish(targetType, targetName, routingKey string, body []byte) error {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	var err error
 	publishing := amqp091.Publishing{
 		ContentType: "text/plain",
@@ -66,7 +119,7 @@ func (s *service) Publish(targetType, targetName, routingKey string, body []byte
 
 	switch targetType {
 	case "exchange":
-		err = s.channel.Publish(
+		err = m.channel.Publish(
 			targetName, // Exchange
 			routingKey, // Routing key
 			false,      // Mandatory
@@ -74,7 +127,7 @@ func (s *service) Publish(targetType, targetName, routingKey string, body []byte
 			publishing,
 		)
 	case "queue":
-		err = s.channel.Publish(
+		err = m.channel.Publish(
 			"",         // No exchange (direct to queue)
 			targetName, // Queue name
 			false,      // Mandatory
@@ -93,52 +146,55 @@ func (s *service) Publish(targetType, targetName, routingKey string, body []byte
 }
 
 // Subscribe procesa los mensajes de un intercambio específico o una cola específica.
-func (s *service) Subscribe(ctx context.Context, targetType, targetName, exchangeType, routingKey string) (<-chan amqp091.Delivery, error) {
+func (m *service) Subscribe(ctx context.Context, targetType, targetName, exchangeType, routingKey string) (<-chan amqp091.Delivery, error) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	if targetType == "exchange" {
-		if err := s.channel.ExchangeDeclare(
-			targetName,   // Nombre del intercambio
-			exchangeType, // Tipo de intercambio (direct, topic, fanout, etc.)
-			true,         // Durable
-			false,        // Auto-deleted
-			false,        // Internal
-			false,        // No-wait
-			nil,          // Arguments
+		if err := m.channel.ExchangeDeclare(
+			targetName,
+			exchangeType,
+			true,  // Durable
+			false, // Auto-deleted
+			false, // Internal
+			m.config.GetNoWait(),
+			nil, // Arguments adicionales
 		); err != nil {
 			return nil, fmt.Errorf("failed to declare exchange: %w", err)
 		}
 	}
 
-	queue, err := s.channel.QueueDeclare(
-		targetName, // Nombre de la cola
-		true,       // Durable
-		false,      // Delete when unused
-		false,      // Exclusive
-		false,      // No-wait
-		nil,        // Arguments
+	queue, err := m.channel.QueueDeclare(
+		targetName,
+		true,  // Durable
+		false, // Delete when unused
+		m.config.GetExclusive(),
+		m.config.GetNoWait(),
+		nil, // Arguments adicionales
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to declare queue: %w", err)
 	}
 
 	if targetType == "exchange" {
-		if err := s.channel.QueueBind(
-			queue.Name, // Nombre de la cola
-			routingKey, // Clave de enrutamiento
-			targetName, // Nombre del intercambio
-			false,      // No-wait
-			nil,        // Arguments
+		if err := m.channel.QueueBind(
+			queue.Name,
+			routingKey,
+			targetName,
+			false, // No-wait
+			nil,   // Arguments adicionales
 		); err != nil {
 			return nil, fmt.Errorf("failed to bind queue: %w", err)
 		}
 	}
 
-	msgs, err := s.channel.Consume(
-		queue.Name,            // Nombre de la cola
-		"",                    // Consumer
-		s.config.GetAutoAck(), // Auto-acknowledge
-		s.config.GetExclusive(),
-		s.config.GetNoLocal(),
-		s.config.GetNoWait(),
+	msgs, err := m.channel.Consume(
+		queue.Name,
+		"", // Consumer
+		m.config.GetAutoAck(),
+		m.config.GetExclusive(),
+		m.config.GetNoLocal(),
+		m.config.GetNoWait(),
 		nil, // Arguments
 	)
 	if err != nil {
@@ -167,36 +223,39 @@ func (s *service) Subscribe(ctx context.Context, targetType, targetName, exchang
 }
 
 // SetupExchangeAndQueue configura el intercambio y la cola en RabbitMQ.
-func (s *service) SetupExchangeAndQueue(exchangeName, exchangeType, queueName, routingKey string) error {
-	if err := s.channel.ExchangeDeclare(
+func (m *service) SetupExchangeAndQueue(exchangeName, exchangeType, queueName, routingKey string) error {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	if err := m.channel.ExchangeDeclare(
 		exchangeName, // Nombre del intercambio
 		exchangeType, // Tipo de intercambio (direct, topic, fanout, etc.)
 		true,         // Durable
 		false,        // Auto-deleted
 		false,        // Internal
-		false,        // No-wait
-		nil,          // Arguments
+		m.config.GetNoWait(),
+		nil, // Arguments adicionales
 	); err != nil {
 		return fmt.Errorf("failed to declare exchange: %w", err)
 	}
 
-	if _, err := s.channel.QueueDeclare(
+	if _, err := m.channel.QueueDeclare(
 		queueName, // Nombre de la cola
 		true,      // Durable
 		false,     // Delete when unused
-		false,     // Exclusive
-		false,     // No-wait
-		nil,       // Arguments
+		m.config.GetExclusive(),
+		m.config.GetNoWait(),
+		nil, // Arguments adicionales
 	); err != nil {
 		return fmt.Errorf("failed to declare queue: %w", err)
 	}
 
-	if err := s.channel.QueueBind(
+	if err := m.channel.QueueBind(
 		queueName,    // Nombre de la cola
 		routingKey,   // Clave de enrutamiento
 		exchangeName, // Nombre del intercambio
 		false,        // No-wait
-		nil,          // Arguments
+		nil,          // Arguments adicionales
 	); err != nil {
 		return fmt.Errorf("failed to bind queue: %w", err)
 	}
@@ -205,20 +264,28 @@ func (s *service) SetupExchangeAndQueue(exchangeName, exchangeType, queueName, r
 }
 
 // Close cierra de manera segura la conexión de RabbitMQ.
-func (s *service) Close() error {
+func (m *service) Close() error {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
 	var errs []error
 
-	if err := s.channel.Close(); err != nil {
+	if err := m.channel.Close(); err != nil {
 		errs = append(errs, fmt.Errorf("failed to close RabbitMQ channel: %w", err))
 	}
 
-	if err := s.conn.Close(); err != nil {
-		errs = append(errs, fmt.Errorf("failed to close RabbitMQ conn: %w", err))
+	if err := m.conn.Close(); err != nil {
+		errs = append(errs, fmt.Errorf("failed to close RabbitMQ connection: %w", err))
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf("errors while closing consumer: %v", errs)
+		return fmt.Errorf("errors while closing service: %v", errs)
 	}
 
 	return nil
+}
+
+// GetConnection devuelve la conexión actual de RabbitMQ.
+func (m *service) GetConnection() *amqp091.Connection {
+	return m.conn
 }

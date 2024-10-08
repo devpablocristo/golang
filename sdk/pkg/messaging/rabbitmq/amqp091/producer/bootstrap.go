@@ -30,11 +30,5 @@ func Bootstrap() (ports.Producer, error) {
 		return nil, fmt.Errorf("configuration validation failed: %w", err)
 	}
 
-	// Crear una nueva instancia de productor
-	sdkrabbit, err := newProducer(config)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create new sdkrabbit: %w", err)
-	}
-
-	return sdkrabbit, nil
+	return newProducer(config)
 }

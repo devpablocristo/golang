@@ -5,7 +5,7 @@ import (
 
 	sdkclient "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/ports"
 	sdkserver "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-server/ports"
-	sdkservice "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-service/ports"
+	sdkservice "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/micro-service/ports"
 )
 
 func Bootstrap(server sdkserver.Server, client sdkclient.Client) (sdkservice.Service, error) {
