@@ -11,3 +11,5 @@ type Repository interface {
 }
 
 type GrpcClient interface{}
+
+type UseCases interface{}

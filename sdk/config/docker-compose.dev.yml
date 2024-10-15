@@ -118,6 +118,39 @@ services:
     command: air -c ${AIR_CONFIG}
     # command: air -c ${AIR_CONFIG_CLIENT}
 
+  ciudadanos_users:
+    container_name: "ciudadanos_users"
+    build:
+      context: ..
+      dockerfile: config/Dockerfile.dev
+    image: "ciudadanos_users:${APP_VERSION}"
+    ports:
+      - "${WEB_SERVER_PORT}:${WEB_SERVER_PORT}"
+      - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}"
+      - "${DELVE_PORT}:${DELVE_PORT}"
+    volumes:
+      - type: bind
+        source: ..
+        target: /app
+      # - type: bind
+      #   source: ../migrations
+      #   target: /app/migrations
+    environment:
+      - MAIN_DIR=/app/ciudadanos/users/cmd/main.go
+      - APP_NAME=ciudadanos_users
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ENDPOINT=http://localstack:${AWS_EDGE_PORT}
+    depends_on:
+      - localstack
+    networks:
+      - app-network
+    restart: on-failure
+    profiles:
+      - ciudadanos_users
+    command: air -c ${AIR_CONFIG}
+
   postgres:
     image: postgres:16.3
     container_name: postgres
@@ -134,7 +167,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - authentication
+      - ciudadanos_users
 
   pgadmin:
     image: dpage/pgadmin4:8.8
@@ -437,6 +470,26 @@ services:
       - IPC_LOCK
     profiles:
       - authentication
+
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    ports:
+      - "${AWS_EDGE_PORT}:${AWS_EDGE_PORT}"     # Puerto donde se exponen los servicios de AWS
+      - "${AWS_WEB_UI_PORT}:${AWS_WEB_UI_PORT}" # Puerto para la interfaz web de LocalStack (opcional)
+    environment:
+      - AWS_SERVICES=${AWS_SERVICES}             # Lista de servicios de AWS que se van a emular
+      - AWS_REGION=${AWS_REGION} # Región predeterminada para AWS
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}         # Credenciales ficticias
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_EDGE_PORT=${AWS_EDGE_PORT}           # Puerto principal para LocalStack
+    volumes:
+      - "./localstack:/var/lib/localstack" # Opcional: persistencia de datos en LocalStack
+    networks:
+      - app-network
+    restart: on-failure
+    profiles:
+      - ciudadanos_users 
 
 networks:
   app-network:

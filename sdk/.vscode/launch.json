@@ -6,7 +6,7 @@
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceRoot}/services/monitors/go/projects/go-nuevo-dip/main.go",
+        "program": "${workspaceRoot}/ciudadanos/users/cmd/main.go",
         "envFile": "${workspaceRoot}/config/.env"
     },
     {

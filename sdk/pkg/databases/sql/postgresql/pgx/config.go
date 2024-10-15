@@ -2,6 +2,8 @@ package sdkpostgresql
 
 import (
 	"fmt"
+
+	"github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool/ports"
 )
 
 type config struct {
@@ -13,7 +15,7 @@ type config struct {
 }
 
 // newConfig crea una nueva configuración con los valores proporcionados
-func newConfig(user, password, host, port, dbName string) *config {
+func newConfig(user, password, host, port, dbName string) ports.Config {
 	return &config{
 		Host:     host,
 		User:     user,
