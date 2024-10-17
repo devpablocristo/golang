@@ -24,15 +24,14 @@ func NewUseCases(js ports.JwtService) ports.UseCases {
 func (s *useCases) Login(ctx context.Context, creds *sdktypes.LoginCredentials) (*sdkjwt.Token, error) {
 	// userUUID, err := s.grpcClient.GetUserUUID(ctx, creds)
 	// if err != nil {
-	// 	return nil, fmt.Errorf("error al obtener el UUID del usuario: %w", err)
+	// 	return nil, fmt.Errorf("failed to get user UUID: %w", err)
 	// }
 
 	token, err := s.jwtService.GenerateToken("userUUID")
 	if err != nil {
-		return nil, fmt.Errorf("error generando el token de autenticación: %w", err)
+		return nil, fmt.Errorf("failed to generate token: %w", err)
 	}
 
-	// Devuelve el token generado
+	// Return the generated token
 	return token, nil
-
 }

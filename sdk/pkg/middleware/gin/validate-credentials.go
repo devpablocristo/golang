@@ -20,13 +20,13 @@ func ValidateCredentials() gin.HandlerFunc {
 
 		// Manejo del binding y retorno de error en caso de fallo
 		if err := ctx.ShouldBindJSON(&creds); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": errMissingCredentials})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "caca"}) //errMissingCredentials})
 			ctx.Abort()
 			return
 		}
 
 		// Guardar los datos validados en el contexto para el siguiente handler
-		ctx.Set("Credentials:", creds)
+		ctx.Set("creds:", creds)
 		ctx.Next()
 	}
 }

@@ -5,13 +5,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"
 
 	sdkmwr "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
 	sdkginports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 	sdktypes "github.com/devpablocristo/golang/sdk/pkg/types"
-
+	sdkjwt "github.com/golang-jwt/jwt/v5"
 
 	dto "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/adapters/gateways/dto"
 	ports "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/core/ports"
@@ -50,31 +51,47 @@ func (h *GinHandler) GetRouter() *gin.Engine {
 func (h *GinHandler) routes() {
 	router := h.ginServer.GetRouter()
 
-	apiPrefix := "/api/" + h.apiVersion
+	// Definir prefijos de ruta
+	apiBase := "/api/" + h.apiVersion + "/auth"
+	validatedPrefix := apiBase + "/validated"
+	protectedPrefix := apiBase + "/protected"
 
-	router.GET(apiPrefix+"/ping", h.Ping)
+	// Rutas públicas
+	router.GET(apiBase+"/ping", h.Ping)
 
-	validated := router.Group(apiPrefix + "/authe/loginValidated")
-	validated.Use(sdkmwr.ValidateCredentials())
+	// Rutas validadas (requieren validación de credenciales)
+	validated := router.Group(validatedPrefix)
 	{
+		// Aplicar middleware de validación de credenciales
+		validated.Use(sdkmwr.ValidateCredentials())
 		validated.POST("/login", h.Login)
 	}
 
-	authorized := router.Group(apiPrefix + "/authe/protected")
-	authorized.Use(sdkmwr.ValidateJwt(h.secret))
+	// Rutas protegidas (requieren JWT válido)
+	authorized := router.Group(protectedPrefix)
 	{
-		authorized.GET("/authe-protected", h.ProtectedHandler)
+		// Aplicar middleware de validación JWT
+		authorized.Use(sdkmwr.ValidateJwt(h.secret))
+		authorized.GET("/protected-hi", h.ProtectedHi)
 	}
 }
 
 func (h *GinHandler) Login(c *gin.Context) {
-	var req *sdktypes.LoginCredentials
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+	c.Writer.Header().Set("Content-Type", "application/json")
+
+	creds, exists := c.Get("creds:")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "credentials not found"})
+		return
+	}
+	// Convertir el valor de `creds` al tipo correcto
+	req, ok := creds.(sdktypes.LoginCredentials)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid credentials format"})
 		return
 	}
 
-	token, err := h.ucs.Login(c.Request.Context(), dto.LoginRequestToDomain(req))
+	token, err := h.ucs.Login(c.Request.Context(), dto.LoginRequestToDomain(&req))
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
@@ -83,8 +100,30 @@ func (h *GinHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.LoginResponse{Token: token.AccessToken})
 }
 
-func (h *GinHandler) ProtectedHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "ok from protected"})
+func (h *GinHandler) ProtectedHi(c *gin.Context) {
+	token, exists := c.Get("token")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "token not found"})
+		return
+	}
+
+	// Realizar type assertion para extraer los claims
+	claims, ok := token.(*sdkjwt.Token).Claims.(jwt.MapClaims)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token claims"})
+		return
+	}
+
+	//Extraer los claims que sean necesarios (por ejemplo, el 'sub')
+	sub := claims["sub"]
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": []string{
+			"hi! from protected.",
+			"Value of the 'sub' claim from the token: " + sub.(string),
+		},
+	})
+
 }
 
 func (h *GinHandler) Ping(c *gin.Context) {
