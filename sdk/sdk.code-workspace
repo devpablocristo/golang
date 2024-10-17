@@ -1,7 +1,7 @@
 {
     "folders": [
         {
-            "path": "../../sdk (Copy)"
+            "path": "."
         }
     ],
     "settings": {
@@ -17,13 +17,14 @@
         "editor.dropIntoEditor.enabled": false,
         "editor.dragAndDrop": false,
         "editor.wordWrap": "on",
-        "editor.wordWrapColumn": 80,
+        "editor.wordWrapColumn": 80
 
         // Archivos
         "files.autoSave": "afterDelay",
         "files.associations": {
             "*.jet": "javascript",
-            "*.env": "env"
+            "*.env": "env",
+            "*.env.local": "env"
         },
 
         // Terminal
@@ -35,7 +36,7 @@
         // Workbench
         "workbench.startupEditor": "none",
         "workbench.iconTheme": "vscode-icons",
-        "workbench.colorTheme": "Red",
+        "workbench.colorTheme": "Peacock Contrast (rainglow)",
         "workbench.colorCustomizations": {
             "statusBar.background": "#00b7ff",    // Color de fondo de la barra inferior
             "statusBarItem.hoverBackground": "#333333",  // Color al pasar el ratón sobre elementos en la barra

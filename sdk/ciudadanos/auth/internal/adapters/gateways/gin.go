@@ -76,6 +76,20 @@ func (h *GinHandler) routes() {
 	}
 }
 
+func (h *GinHandler) AfipLogin(c *gin.Context) {
+	cuit := c.Query("cuit")
+	if cuit == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "CUIT is required"})
+		return
+	}
+
+	err := h.ucs.AfipLogin(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "afip start error"})
+		return
+	}
+}
+
 func (h *GinHandler) Login(c *gin.Context) {
 	c.Writer.Header().Set("Content-Type", "application/json")
 

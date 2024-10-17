@@ -124,6 +124,9 @@ services:
       context: ..
       dockerfile: config/Dockerfile.dev
     image: "ciudadanos_auth:${APP_VERSION}"
+    env_file:
+      - .env
+      - .env.local
     ports:
       - "${WEB_SERVER_PORT}:${WEB_SERVER_PORT}"
       - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}"

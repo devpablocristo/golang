@@ -12,26 +12,34 @@ import (
 
 type useCases struct {
 	jwtService ports.JwtService
+	repository ports.Repository
+	httpClient ports.HttpClient
 }
 
-func NewUseCases(js ports.JwtService) ports.UseCases {
+func NewUseCases(js ports.JwtService, rp ports.Repository, hc ports.HttpClient) ports.UseCases {
 	return &useCases{
 		jwtService: js,
+		repository: rp,
+		httpClient: hc,
 	}
 }
 
 // Login maneja la lógica de autenticación de usuario
-func (s *useCases) Login(ctx context.Context, creds *sdktypes.LoginCredentials) (*sdkjwt.Token, error) {
+func (u *useCases) Login(ctx context.Context, creds *sdktypes.LoginCredentials) (*sdkjwt.Token, error) {
 	// userUUID, err := s.grpcClient.GetUserUUID(ctx, creds)
 	// if err != nil {
 	// 	return nil, fmt.Errorf("failed to get user UUID: %w", err)
 	// }
 
-	token, err := s.jwtService.GenerateToken("userUUID")
+	token, err := u.jwtService.GenerateToken("userUUID")
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate token: %w", err)
 	}
 
 	// Return the generated token
 	return token, nil
+}
+
+func (u *useCases) AfipLogin(ctx context.Context) error {
+	return nil
 }

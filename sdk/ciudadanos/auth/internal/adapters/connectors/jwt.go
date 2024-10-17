@@ -6,9 +6,10 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 
-	ports "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/core/ports"
 	sdkjwt "github.com/devpablocristo/golang/sdk/pkg/jwt/v5"
 	sdkports "github.com/devpablocristo/golang/sdk/pkg/jwt/v5/ports"
+
+	ports "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/core/ports"
 )
 
 type jwtService struct {
