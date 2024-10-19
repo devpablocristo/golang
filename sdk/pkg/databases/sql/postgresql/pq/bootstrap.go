@@ -8,11 +8,11 @@ import (
 
 func Bootstrap() (ports.Repository, error) {
 	config := newConfig(
-		viper.GetString("POSTGRES_USER"),
+		viper.GetString("POSTGRES_USERNAME"),
 		viper.GetString("POSTGRES_PASSWORD"),
 		viper.GetString("POSTGRES_HOST"),
 		viper.GetString("POSTGRES_PORT"),
-		viper.GetString("POSTGRES_DB"),
+		viper.GetString("POSTGRES_DATABASE"),
 	)
 
 	if err := config.Validate(); err != nil {

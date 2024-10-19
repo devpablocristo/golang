@@ -3,11 +3,17 @@
 # shellcheck disable=SC2154  # Desactivar aviso de shellcheck para APP_NAME
 # shellcheck source=./config/.env disable=SC1091 # Desactivar aviso de shellcheck de archivo no especificado
 
-# Load environment variables from the ./config/.env file without overwriting existing ones
-loadEnv() {
-  if [ -f ./config/.env ]; then
-    log "Loading environment variables from ./config/.env"
-    # Read each line in .env file
+# Function to log messages
+log() {
+  echo "ENTRYPOINT: $1"
+}
+
+# Load environment variables from a file without overwriting existing ones
+loadEnvFile() {
+  ENV_FILE="$1"
+  if [ -f "$ENV_FILE" ]; then
+    log "Loading environment variables from $ENV_FILE"
+    # Read each line in the .env file
     while IFS= read -r line || [ -n "$line" ]; do
       # Ignore empty lines and comments
       if [ -n "$line" ] && [ "${line#\#}" = "$line" ]; then
@@ -20,28 +26,21 @@ loadEnv() {
           log "Variable $VAR_NAME is already set to $(printenv "$VAR_NAME"), not overwriting"
         fi
       fi
-    done < ./config/.env
+    done < "$ENV_FILE"
   else
-    echo "ERROR: ./config/.env file not found in the parent directory. Please create ./config/.env with the necessary environment variables"
-    exit 1
+    log "WARNING: $ENV_FILE file not found."
   fi
-}
-
-
-# Function to log messages
-log() {
-  echo "ENTRYPOINT: $1"
 }
 
 # Validate essential environment variables
 validateEnv() {
   if [ -z "${APP_NAME}" ]; then
-    log "ERROR: APP_NAME is not set. Please check ./config/.env file"
+    log "ERROR: APP_NAME is not set. Please check your .env files"
     exit 1
   fi
 
   if [ -z "${DEBUG}" ]; then
-    log "ERROR: DEBUG is not set. Please check ./config/.env file"
+    log "ERROR: DEBUG is not set. Please check your .env files"
     exit 1
   fi
 
@@ -56,6 +55,7 @@ initializeFileChangeLogger() {
   tail -f /tmp/filechanges.log &
 }
 
+# Function to run the server
 runServer() {
   log "Running service"
 
@@ -69,6 +69,8 @@ runServer() {
     air -c "$AIR_CONFIG"
   else
     log "Running in production mode"
+    # Aquí puedes agregar el comando para ejecutar tu aplicación en modo producción
+    # Por ejemplo: ./app
   fi
 }
 
@@ -76,10 +78,14 @@ runServer() {
 main() {
   log "Starting script"
   log "Current directory: $(pwd)"
-  loadEnv
+
+  # Load environment variables from .env and .env.local
+  loadEnvFile "./config/.env"
+  loadEnvFile "./config/.env.local"
+
   validateEnv
   initializeFileChangeLogger
-  
+
   # Start server with Air and possibly Delve
   runServer
 }

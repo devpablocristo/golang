@@ -5,9 +5,11 @@ import (
 	"log"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/spf13/viper"
 
 	sdkawslocal "github.com/devpablocristo/golang/sdk/pkg/aws/localstack"
-	sdkviper "github.com/devpablocristo/golang/sdk/pkg/configurators/viper"
+	sdkgodotenv "github.com/devpablocristo/golang/sdk/pkg/config/godotenv"
+	sdkviper "github.com/devpablocristo/golang/sdk/pkg/config/viper"
 
 	authconn "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/adapters/connectors"
 	authgtw "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/adapters/gateways"
@@ -15,9 +17,15 @@ import (
 )
 
 func init() {
-	if err := sdkviper.LoadConfig(); err != nil {
+	if err := sdkgodotenv.LoadConfig("config/.env", "config/.env.local"); err != nil {
+		log.Fatalf("GoDotEnv Service error: %v", err)
+	}
+
+	if err := sdkviper.LoadConfig("config/.env", "config/.env.local"); err != nil {
 		log.Fatalf("Viper Service error: %v", err)
 	}
+
+	fmt.Println("checking env 'AFIP_REALM':", viper.GetString("AFIP_REALM"))
 }
 
 func main() {

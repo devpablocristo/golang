@@ -1,17 +1,24 @@
 package sdkhclnt
 
 import (
+	"fmt"
+
 	"github.com/spf13/viper"
 
 	"github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/ports"
 )
 
-func Bootstrap() (ports.Client, ports.Config, error) {
+func Bootstrap(tokenEndPointEnvName, clientIDEnvName, clientSecretEnvName, addParamsEnvName string) (ports.Client, ports.Config, error) {
+	tokenEndPoint := viper.GetString(tokenEndPointEnvName)
+	if tokenEndPoint == "" {
+		return nil, nil, fmt.Errorf("token endpoint is empty. Check if %s environment variable is set", tokenEndPointEnvName)
+	}
+
 	config := newConfig(
-		viper.GetString("AUTH_SERVER_URL"),
-		viper.GetString("REALM"),
-		viper.GetString("CLIENT_ID"),
-		viper.GetString("CLIENT_SECRET"),
+		tokenEndPoint,
+		viper.GetString(clientIDEnvName),
+		viper.GetString(clientSecretEnvName),
+		viper.GetStringMapString(addParamsEnvName),
 	)
 
 	if err := config.Validate(); err != nil {
@@ -23,5 +30,5 @@ func Bootstrap() (ports.Client, ports.Config, error) {
 		return nil, nil, err
 	}
 
-	return client, config, err
+	return client, config, nil
 }

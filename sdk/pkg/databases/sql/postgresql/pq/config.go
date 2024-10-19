@@ -34,19 +34,19 @@ func (c *config) DNS() string {
 // Validate valida que los campos necesarios estén presentes
 func (c *config) Validate() error {
 	if c.User == "" {
-		return fmt.Errorf("POSTGRES_USER is required")
+		return fmt.Errorf("POSTGRES_USERNAME environmente variable is empty")
 	}
 	if c.Password == "" {
-		return fmt.Errorf("POSTGRES_PASSWORD is required")
+		return fmt.Errorf("POSTGRES_PASSWORD environmente variable is empty")
 	}
 	if c.Host == "" {
-		return fmt.Errorf("POSTGRES_HOST is required")
+		return fmt.Errorf("POSTGRES_HOST environmente variable is empty")
 	}
 	if c.Port == "" {
-		return fmt.Errorf("POSTGRES_PORT is required")
+		return fmt.Errorf("POSTGRES_PORT environmente variable is empty")
 	}
 	if c.DbName == "" {
-		return fmt.Errorf("POSTGRES_DB is required")
+		return fmt.Errorf("POSTGRES_DB environmente variable is empty")
 	}
 	return nil
 }

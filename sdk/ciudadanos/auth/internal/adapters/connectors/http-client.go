@@ -2,12 +2,9 @@ package authconn
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
-	"strings"
 	"sync"
 	"time"
 
@@ -26,8 +23,8 @@ type HttpClient struct {
 }
 
 // NewHttpClient crea una nueva instancia de HttpClient con la configuración proporcionada.
-func NewHttpClient() (ports.HttpClient, error) { //config AuthConfig) (ports.HttpClient, error) {
-	r, c, err := sdkhclnt.Bootstrap()
+func NewHttpClient() (ports.HttpClient, error) {
+	r, c, err := sdkhclnt.Bootstrap("AFIP_TOKEN_ENDPOINT", "x", "AFIP_CLIENT_SECRET", "y")
 	if err != nil {
 		return nil, fmt.Errorf("bootstrap error: %w", err)
 	}
@@ -38,7 +35,6 @@ func NewHttpClient() (ports.HttpClient, error) { //config AuthConfig) (ports.Htt
 	}, nil
 }
 
-// GetAccessToken obtiene un token de acceso válido desde el servidor de autenticación.
 func (c *HttpClient) GetAccessToken(ctx context.Context) (string, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -47,48 +43,21 @@ func (c *HttpClient) GetAccessToken(ctx context.Context) (string, error) {
 		return c.token, nil
 	}
 
-	endpoint := fmt.Sprintf("%s/realms/%s/protocol/openid-connect/token", c.config.GetAuthServerURL(), c.config.GetRealm())
+	params := url.Values{}
+	params.Set("grant_type", "client_credentials")
+	params.Set("client_id", c.config.GetClientID())
+	params.Set("client_secret", c.config.GetClientSecret())
+	params.Set("scope", c.config.GetAdditionalParams().Get("scope"))
 
-	data := url.Values{}
-	data.Set("grant_type", "client_credentials")
-	data.Set("client_id", c.config.GetClientID())
-	data.Set("client_secret", c.config.GetClientSecret())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, strings.NewReader(data.Encode()))
+	tokenResponse, err := c.httpClient.GetAccessToken(ctx, c.config.GetTokenEndpoint(), params)
 	if err != nil {
-		return "", fmt.Errorf("failed to create request: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return "", fmt.Errorf("non-200 response (%d): %s", resp.StatusCode, string(body))
+		return "", fmt.Errorf("error al obtener el token de acceso: %w", err)
 	}
 
-	var tokenResponse struct {
-		AccessToken string `json:"access_token"`
-		ExpiresIn   int    `json:"expires_in"`
-		TokenType   string `json:"token_type"`
-	}
+	c.token = tokenResponse.GetAccessToken()
 
-	if err := json.NewDecoder(resp.Body).Decode(&tokenResponse); err != nil {
-		return "", fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	if tokenResponse.AccessToken == "" {
-		return "", fmt.Errorf("access token is empty")
-	}
-
-	// Almacenar el token y su expiración
-	expiryBuffer := 60 // segundos para restar y asegurar que el token no expire durante una solicitud
-	c.token = tokenResponse.AccessToken
-	c.tokenExpiry = time.Now().Add(time.Duration(tokenResponse.ExpiresIn-expiryBuffer) * time.Second)
+	// Asumiendo que el token expira en 1 hora (ajusta según tu caso)
+	c.tokenExpiry = time.Now().Add(55 * time.Minute)
 
 	return c.token, nil
 }
@@ -96,34 +65,32 @@ func (c *HttpClient) GetAccessToken(ctx context.Context) (string, error) {
 // ValidateCUIT valida un CUIT con la AFIP utilizando el token de acceso.
 func (c *HttpClient) ValidateCUIT(ctx context.Context, cuit string) error {
 	if !isValidCUIT(cuit) {
-		return fmt.Errorf("invalid CUIT format")
+		return fmt.Errorf("formato de CUIT inválido")
 	}
 
 	token, err := c.GetAccessToken(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to get access token: %w", err)
+		return fmt.Errorf("error al obtener el token de acceso: %w", err)
 	}
 
-	endpoint := fmt.Sprintf("%s/api/validate-cuit?cuit=%s", c.config.GetAuthServerURL(), cuit)
-
+	// Aquí iría la lógica para validar el CUIT usando el token
+	// Por ejemplo:
+	endpoint := fmt.Sprintf("%s/api/validate-cuit?cuit=%s", c.config.GetTokenEndpoint(), cuit)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
+		return fmt.Errorf("error al crear la solicitud: %w", err)
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("request failed: %w", err)
+		return fmt.Errorf("error en la solicitud: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("validation failed (%d): %s", resp.StatusCode, string(body))
+		return fmt.Errorf("la validación falló: código de estado %d", resp.StatusCode)
 	}
-
-	// Procesar la respuesta si es necesario
 
 	return nil
 }
@@ -143,9 +110,10 @@ func isValidCUIT(cuit string) bool {
 	}
 	remainder := sum % 11
 	checkDigit := 11 - remainder
-	if checkDigit == 11 {
+	switch checkDigit {
+	case 11:
 		checkDigit = 0
-	} else if checkDigit == 10 {
+	case 10:
 		checkDigit = 9
 	}
 	return int(cuit[10]-'0') == checkDigit

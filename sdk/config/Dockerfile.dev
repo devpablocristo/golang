@@ -2,7 +2,7 @@ FROM golang:1.23
 
 # Instalar git, Go tools (Delve y Air), y tzdata para configurar la zona horaria
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends git tzdata && \
+    apt-get install -y --no-install-recommends docker.io git tzdata && \
     rm -rf /var/lib/apt/lists/* && \
     go install github.com/go-delve/delve/cmd/dlv@latest && \
     go install github.com/air-verse/air@latest

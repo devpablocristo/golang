@@ -3,83 +3,102 @@ package sdkhclnt
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
+	"time"
 
 	"github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/ports"
 )
 
-var (
-	instance  ports.Client
-	once      sync.Once
-	initError error
-)
-
 type client struct {
-	config     ports.Config
-	httpClient *http.Client
+	config       ports.Config
+	httpClient   *http.Client
+	interceptors []ports.Interceptor
 }
 
 func newClient(config ports.Config) (ports.Client, error) {
-	once.Do(func() {
-		err := config.Validate()
-		if err != nil {
-			initError = err
-			return
-		}
+	c := &client{
+		config: config,
+		httpClient: &http.Client{
+			Timeout: 30 * time.Second, // Timeout predeterminado
+		},
+	}
 
-		instance = &client{
-			config:     config,
-			httpClient: http.DefaultClient,
-		}
-	})
-	return instance, initError
+	return c, nil
 }
 
-func (c *client) GetAccessToken(ctx context.Context) (string, error) {
-	endpoint := c.config.GetAuthServerURL() + "/realms/" + c.config.GetRealm() + "/protocol/openid-connect/token"
-
-	data := url.Values{}
-	data.Set("grant_type", "client_credentials")
-	data.Set("client_id", c.config.GetClientID())
-	data.Set("client_secret", c.config.GetClientSecret())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, strings.NewReader(data.Encode()))
+func (c *client) GetAccessToken(ctx context.Context, endpoint string, params url.Values) (ports.TokenResponse, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, strings.NewReader(params.Encode()))
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := c.httpClient.Do(req)
+	var resp *http.Response
+	err = c.retryWithBackoff(func() error {
+		var err error
+		resp, err = c.do(req)
+		return err
+	})
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("error obteniendo el token de acceso: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", errors.New("failed to get access token")
+		return nil, fmt.Errorf("error obteniendo el token de acceso: código de estado %d", resp.StatusCode)
 	}
 
-	var tokenRes struct {
-		AccessToken string `json:"access_token"`
-		TokenType   string `json:"token_type"`
-		ExpiresIn   int    `json:"expires_in"`
-	}
-
+	var tokenRes map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&tokenRes); err != nil {
-		return "", err
+		return nil, fmt.Errorf("error decodificando la respuesta: %w", err)
 	}
 
-	if tokenRes.AccessToken == "" {
-		return "", errors.New("access token not found in response")
-	}
-
-	return tokenRes.AccessToken, nil
+	return &genericTokenResponse{tokenRes}, nil
 }
 
 func (c *client) Do(req *http.Request) (*http.Response, error) {
-	return c.httpClient.Do(req)
+	return c.do(req)
+}
+
+func (c *client) do(req *http.Request) (*http.Response, error) {
+	for _, interceptor := range c.interceptors {
+		var err error
+		req, err = interceptor.Before(req)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	resp, err := c.httpClient.Do(req)
+
+	if err == nil {
+		for i := len(c.interceptors) - 1; i >= 0; i-- {
+			resp, err = c.interceptors[i].After(resp, err)
+			if err != nil {
+				return resp, err
+			}
+		}
+	}
+
+	return resp, err
+}
+
+func (c *client) retryWithBackoff(operation func() error) error {
+	backoff := 100 * time.Millisecond
+	for i := 0; i < 3; i++ {
+		err := operation()
+		if err == nil {
+			return nil
+		}
+		time.Sleep(backoff)
+		backoff *= 2
+	}
+	return fmt.Errorf("operación fallida después de 3 intentos")
+}
+
+func (c *client) AddInterceptor(interceptor ports.Interceptor) {
+	c.interceptors = append(c.interceptors, interceptor)
 }

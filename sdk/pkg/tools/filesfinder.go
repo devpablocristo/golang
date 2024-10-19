@@ -10,6 +10,7 @@ import (
 
 // FilesFinder busca los archivos especificados en fileNames, interpretándolos como
 // rutas relativas al directorio raíz del proyecto que está utilizando el SDK.
+// O sea, tienes que decirle en qué subdirectorio buscar con respecto a la raíz del proyecto.
 // Retorna un slice con las rutas absolutas de los archivos encontrados.
 func FilesFinder(fileNames ...string) ([]string, error) {
 	// Obtener el directorio raíz del proyecto que está utilizando el SDK
