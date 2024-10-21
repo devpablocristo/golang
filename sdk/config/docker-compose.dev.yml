@@ -118,12 +118,12 @@ services:
     command: air -c ${AIR_CONFIG}
     # command: air -c ${AIR_CONFIG_CLIENT}
 
-  ciudadanos_auth:
-    container_name: "ciudadanos_auth"
+  sg_auth:
+    container_name: "sg_auth"
     build:
       context: ..
       dockerfile: config/Dockerfile.dev
-    image: "ciudadanos_auth:${APP_VERSION}"
+    image: "sg_auth:${APP_VERSION}"
     env_file:
       - .env
       - .env.local
@@ -141,7 +141,7 @@ services:
       #   target: /app/migrations
     environment:
       - MAIN_DIR=/app/ciudadanos/auth/cmd/main.go
-      - APP_NAME=ciudadanos_auth
+      - APP_NAME=sg_auth
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=${AWS_REGION}
@@ -152,7 +152,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - ciudadanos_auth
+      - sg_auth
     command: air -c ${AIR_CONFIG}
 
   postgres:
@@ -171,7 +171,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - ciudadanos_auth
+      - sg_auth
 
   pgadmin:
     image: dpage/pgadmin4:8.8
@@ -493,7 +493,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - ciudadanos_auth 
+      - sg_auth 
 
 networks:
   app-network:

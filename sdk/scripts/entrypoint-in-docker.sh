@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Nombre exacto del contenedor Docker
-CONTAINER_NAME="ciudadanos_auth"
+CONTAINER_NAME="sg_auth"
 
 # Comando a ejecutar dentro del contenedor (ejecutado en segundo plano)
 COMMAND="sh /app/scripts/entrypoint.sh &>/dev/null &"

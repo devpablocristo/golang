@@ -10,7 +10,7 @@ EXAMPLES_DIR := ${ROOT_DIR}/examples
 DOCKER_COMPOSE_FILE := ${CONFIG_DIR}/docker-compose.dev.yml
 
 # Phony targets
-.PHONY: all build run test docker-up docker-build docker-down docker-logs clean lint greeter-server-up greeter-server-build greeter-server-down greeter-server-logs greeter-client-up greeter-client-build greeter-client-down greeter-client-logs monitoring-up monitoring-build monitoring-down go-micro-up go-micro-build go-micro-down ciudadanos_auth-up ciudadanos_auth-build ciudadanos_auth-down ciudadanos_auth-logs
+.PHONY: all build run test docker-up docker-build docker-down docker-logs clean lint greeter-server-up greeter-server-build greeter-server-down greeter-server-logs greeter-client-up greeter-client-build greeter-client-down greeter-client-logs monitoring-up monitoring-build monitoring-down go-micro-up go-micro-build go-micro-down sg_auth-up sg_auth-build sg_auth-down sg_auth-logs
 
 # Default target
 all: build run
@@ -53,17 +53,17 @@ docker-logs:
 	@echo "Fetching logs for $(PROFILE) services..."
 	APP_NAME=$(APP_NAME) docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(APP_NAME)
 
-ciudadanos_auth-up:
-	@$(MAKE) docker-up PROFILE=ciudadanos_auth APP_NAME=ciudadanos_auth
+sg_auth-up:
+	@$(MAKE) docker-up PROFILE=sg_auth APP_NAME=sg_auth
 
-ciudadanos_auth-build:
-	@$(MAKE) docker-build PROFILE=ciudadanos_auth APP_NAME=ciudadanos_auth
+sg_auth-build:
+	@$(MAKE) docker-build PROFILE=sg_auth APP_NAME=sg_auth
 
-ciudadanos_auth-down:
-	@$(MAKE) docker-down PROFILE=ciudadanos_auth APP_NAME=ciudadanos_auth
+sg_auth-down:
+	@$(MAKE) docker-down PROFILE=sg_auth APP_NAME=sg_auth
 
-ciudadanos_auth-logs:
-	@$(MAKE) docker-logs PROFILE=ciudadanos_auth APP_NAME=ciudadanos_auth
+sg_auth-logs:
+	@$(MAKE) docker-logs PROFILE=sg_auth APP_NAME=sg_auth
 
 authentication-up:
 	@$(MAKE) docker-up PROFILE=authentication APP_NAME=authentication
