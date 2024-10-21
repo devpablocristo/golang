@@ -13,9 +13,9 @@ import (
 	//sdkgodotenv "github.com/devpablocristo/golang/sdk/pkg/config/godotenv"
 	//sdkviper "github.com/devpablocristo/golang/sdk/pkg/config/viper"
 
-	authconn "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/adapters/connectors"
-	authgtw "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/adapters/gateways"
-	auth "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/core"
+	authconn "github.com/devpablocristo/golang/sdk/sg/auth/internal/adapters/connectors"
+	authgtw "github.com/devpablocristo/golang/sdk/sg/auth/internal/adapters/gateways"
+	auth "github.com/devpablocristo/golang/sdk/sg/auth/internal/core"
 )
 
 func init() {

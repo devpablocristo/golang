@@ -11,7 +11,7 @@ import (
 	sdkhclnt "github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client"
 	sdkhclntports "github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/ports"
 
-	ports "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/core/ports"
+	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
 )
 
 type HttpClient struct {

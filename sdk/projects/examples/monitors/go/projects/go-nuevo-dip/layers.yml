@@ -1,9 +1,0 @@
-layers:
-  domain:
-    - "internal/core/domain"
-    - "internal/core/fakedomain"
-  application:
-    - "internal/core/services"
-  infrastructure: 
-    - "internal/adapters"
-    

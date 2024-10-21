@@ -140,7 +140,7 @@ services:
       #   source: ../migrations
       #   target: /app/migrations
     environment:
-      - MAIN_DIR=/app/ciudadanos/auth/cmd/main.go
+      - MAIN_DIR=/app/sg/auth/cmd/main.go
       - APP_NAME=sg_auth
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}

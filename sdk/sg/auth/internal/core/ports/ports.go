@@ -6,7 +6,7 @@ import (
 	sdkjwt "github.com/devpablocristo/golang/sdk/pkg/jwt/v5"
 	sdktypes "github.com/devpablocristo/golang/sdk/pkg/types"
 
-	entities "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/core/entities"
+	entities "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/entities"
 )
 
 // UseCases define las operaciones de casos de uso para autenticación

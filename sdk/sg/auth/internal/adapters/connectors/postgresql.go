@@ -7,8 +7,8 @@ import (
 	sdkpg "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool"
 	sdkpgports "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool/ports"
 
-	entities "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/core/entities"
-	ports "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/core/ports"
+	entities "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/entities"
+	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
 )
 
 type PostgreSQL struct {

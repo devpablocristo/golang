@@ -7,7 +7,7 @@ import (
 	sdkjwt "github.com/devpablocristo/golang/sdk/pkg/jwt/v5"
 	sdktypes "github.com/devpablocristo/golang/sdk/pkg/types"
 
-	ports "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/core/ports"
+	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
 )
 
 type useCases struct {

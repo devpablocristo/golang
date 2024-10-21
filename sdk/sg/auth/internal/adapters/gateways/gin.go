@@ -14,8 +14,8 @@ import (
 	sdktypes "github.com/devpablocristo/golang/sdk/pkg/types"
 	sdkjwt "github.com/golang-jwt/jwt/v5"
 
-	dto "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/adapters/gateways/dto"
-	ports "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/core/ports"
+	dto "github.com/devpablocristo/golang/sdk/sg/auth/internal/adapters/gateways/dto"
+	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
 )
 
 type GinHandler struct {

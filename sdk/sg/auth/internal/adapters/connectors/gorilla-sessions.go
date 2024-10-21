@@ -6,7 +6,7 @@ import (
 	sdksession "github.com/devpablocristo/golang/sdk/pkg/sessions/gorilla"
 	sdksessionports "github.com/devpablocristo/golang/sdk/pkg/sessions/gorilla/ports"
 
-	ports "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/core/ports"
+	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
 )
 
 type GorillaSessionManager struct {
@@ -23,5 +23,3 @@ func NewGorillaSessionManager() (ports.SessionManager, error) {
 		session: r,
 	}, nil
 }
-
-
