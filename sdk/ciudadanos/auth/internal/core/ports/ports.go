@@ -31,3 +31,5 @@ type HttpClient interface {
 	// RevokeToken(ctx context.Context, token string) error
 	// RefreshToken(ctx context.Context, refreshToken string) (*entities.Token, error)
 }
+
+type SessionManager interface{}

@@ -8,6 +8,42 @@ import (
 	"strings"
 )
 
+func FileNameAndExtension(filePath string) (string, string, error) {
+	fileName := filepath.Base(filePath)
+
+	// Verificar si el archivo comienza con un punto y no tiene una extensión real
+	if strings.HasPrefix(fileName, ".") && strings.Count(fileName, ".") == 1 {
+		// Caso donde el archivo es algo como ".env", ".gitignore", etc.
+		return fileName, "", nil
+	}
+
+	// Obtener la extensión del archivo
+	fileExtension := filepath.Ext(fileName)
+
+	// Si no tiene extensión (archivo sin punto o solo con nombre), devolvemos error
+	if fileExtension == "" {
+		return "", "", fmt.Errorf("file %s has no extension", fileName)
+	}
+
+	// Eliminar el punto de la extensión
+	fileExtension = strings.TrimPrefix(fileExtension, ".")
+
+	// Obtener el nombre del archivo sin la extensión
+	fileNameWithoutExt := strings.TrimSuffix(fileName, "."+fileExtension)
+
+	// Si el archivo no tiene un nombre válido, devolver error
+	if fileNameWithoutExt == "" {
+		return "", "", fmt.Errorf("invalid file name for file %s", fileName)
+	}
+
+	return fileNameWithoutExt, fileExtension, nil
+}
+
+// IsEnvFile verifica si un archivo es un .env
+func IsEnvFile(filePath string) bool {
+	return strings.HasSuffix(filePath, ".env")
+}
+
 // FilesFinder busca los archivos especificados en fileNames, interpretándolos como
 // rutas relativas al directorio raíz del proyecto que está utilizando el SDK.
 // O sea, tienes que decirle en qué subdirectorio buscar con respecto a la raíz del proyecto.
@@ -20,7 +56,6 @@ func FilesFinder(fileNames ...string) ([]string, error) {
 	}
 
 	var foundFiles []string
-
 	for _, relativePath := range fileNames {
 		// Construir la ruta absoluta del archivo
 		absPath := filepath.Join(rootDir, relativePath)

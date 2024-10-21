@@ -1,94 +1,71 @@
 package sdkviper
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
 
 	"github.com/spf13/viper"
 
-	sdkgodotenv "github.com/devpablocristo/golang/sdk/pkg/config/godotenv"
 	sdktools "github.com/devpablocristo/golang/sdk/pkg/tools"
 )
 
-// LoadConfig carga archivos de configuración compatibles con Viper y .env
-func LoadConfig(configPaths ...string) error {
+func LoadConfig(filePaths ...string) error {
+	if len(filePaths) == 0 {
+		return errors.New("no file paths provided")
+	}
+
 	configureViper()
 
-	if len(configPaths) == 0 {
-		configPaths = []string{"."}
+	loadedDirs := make(map[string]bool)
+	successfullyLoaded := false // Variable to track successful loads
+
+	for _, configFilePath := range filePaths {
+		// Try loading each file with Viper
+		if err := loadViperConfig(configFilePath, loadedDirs); err != nil {
+			fmt.Printf("%v\n", err) // Print error but continue
+		} else {
+			successfullyLoaded = true // At least one file loaded successfully
+		}
 	}
 
-	// Buscar los archivos en el proyecto utilizando FilesFinder
-	foundFiles, err := sdktools.FilesFinder(configPaths...)
-	if err != nil {
-		return fmt.Errorf("SDK Viper: FilesFinder failed to find files: %w", err)
-	}
-
-	configDirs := make(map[string]bool)
-	for _, configPath := range foundFiles {
-		// Cargar archivos .env con godotenv
-		if isEnvFile(configPath) {
-			if err := sdkgodotenv.LoadConfig(configPath); err != nil {
-				fmt.Printf("SDK Viper: Failed to load .env file '%s': %v\n", configPath, err)
-				continue
-			}
-			fmt.Printf("SDK Viper: Successfully loaded .env file from %s\n", configPath)
-			continue
-		}
-
-		// Cargar otros archivos con Viper
-		if err := loadViperConfig(configPath, configDirs); err != nil {
-			fmt.Printf("SDK Viper: %v\n", err)
-			continue
-		}
+	// If no file was successfully loaded, return an error
+	if !successfullyLoaded {
+		fmt.Println("sdkviper: WARNING: no configuration files were successfully loaded")
 	}
 
 	return nil
 }
 
-// isEnvFile verifica si el archivo es un .env
-func isEnvFile(filePath string) bool {
-	return strings.HasSuffix(filePath, ".env")
+// configureViper sets up Viper to load environment variables
+func configureViper() {
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	fmt.Println("sdkviper: Set to load environment variables (if any are present).")
 }
 
-// loadViperConfig carga un archivo de configuración con Viper
-func loadViperConfig(configPath string, configDirs map[string]bool) error {
-	fileNameWithoutExt, fileExtension, err := sdktools.FileNameAndExtension(configPath)
+// loadViperConfig loads a configuration file compatible with Viper
+func loadViperConfig(configFilePath string, loadedDirs map[string]bool) error {
+	fileNameWithoutExt, fileExtension, err := sdktools.FileNameAndExtension(configFilePath)
 	if err != nil {
-		return fmt.Errorf("SDK Viper: Skipping file '%s': %v", configPath, err)
+		return fmt.Errorf("sdkviper: Skipping file '%s': %v", configFilePath, err)
 	}
 
 	viper.SetConfigName(fileNameWithoutExt)
 	viper.SetConfigType(fileExtension)
 
-	dir := filepath.Dir(configPath)
-	if !configDirs[dir] {
+	dir := filepath.Dir(configFilePath)
+	if !loadedDirs[dir] {
 		viper.AddConfigPath(dir)
-		configDirs[dir] = true
+		loadedDirs[dir] = true
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			return fmt.Errorf("SDK Viper: No config files found at dir '%s'", dir)
-		}
-		return fmt.Errorf("SDK Viper: Skipping invalid config file '%s': %v", configPath, err)
+		return fmt.Errorf("sdkviper: WARNING: Failed to load configuration file: '%s'", configFilePath)
 	}
 
-	fmt.Printf("SDK Viper: Configuration successfully loaded from %s\n", viper.ConfigFileUsed())
-	return nil
-}
-
-// configureViper configura Viper para cargar variables de entorno
-func configureViper() {
-	viper.AutomaticEnv()
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-}
-
-// UnmarshalConfig decodifica la configuración en una estructura Go
-func UnmarshalConfig(cfg interface{}) error {
-	if err := viper.Unmarshal(cfg); err != nil {
-		return fmt.Errorf("unable to decode configuration into struct: %w", err)
-	}
+	fmt.Printf("sdkviper: Configuration file successfully loaded from: %s\n", viper.ConfigFileUsed())
 	return nil
 }

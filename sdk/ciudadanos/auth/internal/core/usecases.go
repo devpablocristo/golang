@@ -11,12 +11,13 @@ import (
 )
 
 type useCases struct {
-	jwtService ports.JwtService
-	repository ports.Repository
-	httpClient ports.HttpClient
+	jwtService     ports.JwtService
+	repository     ports.Repository
+	httpClient     ports.HttpClient
+	sessionManager ports.SessionManager
 }
 
-func NewUseCases(js ports.JwtService, rp ports.Repository, hc ports.HttpClient) ports.UseCases {
+func NewUseCases(js ports.JwtService, rp ports.Repository, hc ports.HttpClient, sm ports.SessionManager) ports.UseCases {
 	return &useCases{
 		jwtService: js,
 		repository: rp,

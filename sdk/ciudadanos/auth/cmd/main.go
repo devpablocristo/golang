@@ -8,8 +8,10 @@ import (
 	"github.com/spf13/viper"
 
 	sdkawslocal "github.com/devpablocristo/golang/sdk/pkg/aws/localstack"
-	sdkgodotenv "github.com/devpablocristo/golang/sdk/pkg/config/godotenv"
-	sdkviper "github.com/devpablocristo/golang/sdk/pkg/config/viper"
+	sdkcnfldr "github.com/devpablocristo/golang/sdk/pkg/config/configLoader"
+
+	//sdkgodotenv "github.com/devpablocristo/golang/sdk/pkg/config/godotenv"
+	//sdkviper "github.com/devpablocristo/golang/sdk/pkg/config/viper"
 
 	authconn "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/adapters/connectors"
 	authgtw "github.com/devpablocristo/golang/sdk/ciudadanos/auth/internal/adapters/gateways"
@@ -17,11 +19,7 @@ import (
 )
 
 func init() {
-	if err := sdkgodotenv.LoadConfig("config/.env", "config/.env.local"); err != nil {
-		log.Fatalf("GoDotEnv Service error: %v", err)
-	}
-
-	if err := sdkviper.LoadConfig("config/.env", "config/.env.local"); err != nil {
+	if err := sdkcnfldr.LoadConfig("config/.env", "config/.env.local"); err != nil {
 		log.Fatalf("Viper Service error: %v", err)
 	}
 
@@ -65,12 +63,17 @@ func main() {
 		log.Fatalf("Http Client error: %v", err)
 	}
 
+	sessionManager, err := authconn.NewGorillaSessionManager()
+	if err != nil {
+		log.Fatalf("Http Client error: %v", err)
+	}
+
 	repository, err := authconn.NewPostgreSQL()
 	if err != nil {
 		log.Fatalf("PostgreSQL error: %v", err)
 	}
 
-	authUsecases := auth.NewUseCases(jwtService, repository, httpClient)
+	authUsecases := auth.NewUseCases(jwtService, repository, httpClient, sessionManager)
 
 	authHandler, err := authgtw.NewGinHandler(authUsecases)
 	if err != nil {

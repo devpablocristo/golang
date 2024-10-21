@@ -1,37 +1,33 @@
 package sdkgodotenv
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/joho/godotenv"
-
-	sdktools "github.com/devpablocristo/golang/sdk/pkg/tools"
 )
 
-// LoadConfig carga múltiples archivos desde las rutas proporcionadas.
-// Cada string en configPaths debe representar el nombre del archivo o ruta relativa.
-// Retorna un error en caso de que no se pueda cargar algún archivo.
-func LoadConfig(configPaths ...string) error {
-	// Si no se proporcionan rutas, se debe intentar buscar un archivo por defecto.
-	if len(configPaths) == 0 {
-		configPaths = []string{".env"}
+// LoadConfig carga múltiples archivos .env usando godotenv
+func LoadConfig(filePaths ...string) error {
+	if len(filePaths) == 0 {
+		return errors.New("no env file paths provided")
 	}
 
-	// Buscar los archivos en el proyecto utilizando FilesFinder
-	foundFiles, err := sdktools.FilesFinder(configPaths...)
-	if err != nil {
-		return fmt.Errorf("FilesFinder failed to find files: %w", err)
-	}
+	successfullyLoaded := false // Variable para rastrear si algún archivo se cargó correctamente
 
-	// Cargar cada archivo desde las rutas encontradas
-	for _, filePath := range foundFiles {
-		fmt.Printf("SDK Envgodot: Attempting to load file from: %s\n", filePath) // Debugging
-		// Aquí no necesitas procesar de nuevo la ruta, simplemente la pasas a godotenv.Load
+	for _, filePath := range filePaths {
 		if err := godotenv.Load(filePath); err != nil {
-			return fmt.Errorf("failed to load file from path %s: %w", filePath, err)
+			fmt.Printf("sdkgodotenv: WARNING: Failed to load configuration file: '%s'\n", filePath)
+			continue
 		}
+		fmt.Printf("sdkgodotenv: Configuration file successfully loaded from: %s\n", filePath)
+		successfullyLoaded = true // Indica que al menos un archivo se cargó correctamente
 	}
 
-	fmt.Println("SDK Envgodot: Files loaded successfully.")
+	// Si no se pudo cargar ningún archivo, devolver un error
+	if !successfullyLoaded {
+		return errors.New("no .env files could be loaded")
+	}
+
 	return nil
 }

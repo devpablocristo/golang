@@ -82,7 +82,7 @@ temp/
 # Backup and Miscellaneous Files
 # Backup files and other miscellaneous files that are not part of the actual application.
 *.bak
-*.orig
+#*.orig
 *.old
 /workspace.xml
 /httpRequests/
