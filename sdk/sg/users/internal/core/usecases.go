@@ -1,4 +1,4 @@
-package auth
+package user
 
 import (
 	"context"
@@ -22,27 +22,21 @@ func NewUseCases(ur userports.Repository, pr personports.Repository, cr companyp
 	}
 }
 
-func (u *useCases) CheckCuit(ctx context.Context, cuit string) (bool, error) {
-	// First, check if the CUIT belongs to a person
-	person, err := u.personRepo.FindByCuit(ctx, cuit)
+func (u *useCases) CheckUserStatus(ctx context.Context, cuit string) (bool, error) {
+	userFound, err := u.findUserByCuit(ctx, cuit)
 	if err != nil {
 		return false, err
 	}
-	if person != nil {
-		// CUIT already exists for a person
+	if userFound {
 		return true, nil
 	}
-
-	// Next, check if the CUIT belongs to a company
-	company, err := u.companyRepo.FindByCuit(ctx, cuit)
+	adminRequestFound, err := u.findAdministrativeRequestByCuit(ctx, cuit)
 	if err != nil {
 		return false, err
 	}
-	if company != nil {
-		// CUIT already exists for a company
+	if adminRequestFound {
 		return true, nil
 	}
 
-	// If not found in both, the CUIT does not exist
 	return false, nil
 }

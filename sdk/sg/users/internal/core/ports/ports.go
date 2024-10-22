@@ -7,7 +7,7 @@ import (
 )
 
 type UseCases interface {
-	CheckCuit(context.Context, string) (bool, error)
+	CheckUserStatus(context.Context, string) (bool, error)
 }
 
 type Repository interface {

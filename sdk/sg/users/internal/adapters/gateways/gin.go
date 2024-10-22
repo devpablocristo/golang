@@ -84,7 +84,7 @@ func (h *GinHandler) AfipLogin(c *gin.Context) {
 	}
 
 	// Llamar a los use cases con el CUIT extraído del JWT
-	found, err := h.ucs.CheckCuit(c.Request.Context(), cuit)
+	found, err := h.ucs.CheckUserStatus(c.Request.Context(), cuit)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "error checking cuit: " + err.Error()})
 		return
