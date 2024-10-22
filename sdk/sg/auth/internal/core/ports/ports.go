@@ -1,11 +1,12 @@
-package authports
+package ports
 
 import (
 	"context"
 
+	"github.com/gin-gonic/gin"
+
 	sdkjwt "github.com/devpablocristo/golang/sdk/pkg/jwt/v5"
 	sdktypes "github.com/devpablocristo/golang/sdk/pkg/types"
-	"github.com/gin-gonic/gin"
 
 	entities "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/entities"
 )
