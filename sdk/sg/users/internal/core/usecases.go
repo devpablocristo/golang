@@ -3,10 +3,9 @@ package auth
 import (
 	"context"
 
+	companyports "github.com/devpablocristo/golang/sdk/sg/users/internal/company/core/ports"
 	userports "github.com/devpablocristo/golang/sdk/sg/users/internal/core/ports"
 	personports "github.com/devpablocristo/golang/sdk/sg/users/internal/person/core/ports"
-	companyports "github.com/devpablocristo/golang/sdk/sg/users/internal/company/core/ports"
-
 )
 
 type useCases struct {

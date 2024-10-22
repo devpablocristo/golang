@@ -45,14 +45,14 @@ func InitializeApplication() (*authgtw.GinHandler, error) {
 
 // ProvideAuthUsecases crea la capa de casos de uso de autenticación
 func ProvideAuthUsecases(
-	jwtService authports.JwtService,
-	repository authports.Repository,
-	httpClient authports.HttpClient,
-	sessionManager authports.SessionManager) authports.UseCases {
-	return authe.NewUseCases(jwtService, repository, httpClient, sessionManager)
+	jwtService ports.JwtService,
+	repository ports.Repository,
+	httpClient ports.HttpClient,
+	sessionManager ports.SessionManager) ports.UseCases {
+	return auth.NewUseCases(jwtService, repository, httpClient, sessionManager)
 }
 
 // ProvideGinHandler inicializa el manejador Gin con los casos de uso de autenticación
-func ProvideGinHandler(usecases authports.UseCases) (*authgtw.GinHandler, error) {
+func ProvideGinHandler(usecases ports.UseCases) (*authgtw.GinHandler, error) {
 	return authgtw.NewGinHandler(usecases)
 }

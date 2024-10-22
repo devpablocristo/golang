@@ -19,13 +19,13 @@ func init() {
 
 func main() {
 
-	authHandler, err := InitializeApplication()
+	userHandler, err := InitializeApplication()
 	if err != nil {
 		log.Fatalf("Failed to initialize application: %v", err)
 	}
 
 	// Iniciar el servidor de Gin
-	err = authHandler.Start()
+	err = userHandler.Start()
 	if err != nil {
 		log.Fatalf("Gin Server error at start: %v", err)
 	}
