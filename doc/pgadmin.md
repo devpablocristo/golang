@@ -25,9 +25,9 @@ pgAdmin no se conecta automáticamente a tu servidor PostgreSQL. Necesitas confi
    - En la pestaña "Connection":
      - **Host name/address**: `postgres` (nombre del servicio en `docker-compose.yml`).
      - **Port**: `5432`.
-     - **Maintenance database**: `dev_events_db`.
-     - **Username**: `postgres`.
-     - **Password**: `root`.
+     - **Maintenance database**: `my_db`.
+     - **Username**: `admin`.
+     - **Password**: `admin`.
 
 3. **Guardar la configuración**:
    - Haz clic en "Save".
@@ -47,9 +47,9 @@ pgAdmin no se conecta automáticamente a tu servidor PostgreSQL. Necesitas confi
 
 - **Host name/address**: `postgres`
 - **Port**: `5432`
-- **Maintenance database**: `dev_events_db`
-- **Username**: `postgres`
-- **Password**: `root`
+- **Maintenance database**: `my_db`
+- **Username**: `admin`
+- **Password**: `admin`
 
 ### Instrucciones para Crear la Base de Datos y la Tabla en pgAdmin
 
@@ -57,20 +57,20 @@ pgAdmin no se conecta automáticamente a tu servidor PostgreSQL. Necesitas confi
 
 1. En pgAdmin, abre el Query Tool y ejecuta:
    ```sql
-   CREATE DATABASE dev_events_db;
+   CREATE DATABASE my_db;
    ```
 
 #### Paso 2: Crear el Usuario y Otorgar Permisos
 
 1. En el Query Tool, ejecuta:
    ```sql
-   CREATE USER postgres WITH PASSWORD 'root';
-   GRANT ALL PRIVILEGES ON DATABASE dev_events_db TO postgres;
+   CREATE USER admin WITH PASSWORD 'admin';
+   GRANT ALL PRIVILEGES ON DATABASE my_db TO admin;
    ```
 
 #### Paso 3: Crear la Tabla
 
-1. Conéctate a `dev_events_db` en el Query Tool y ejecuta:
+1. Conéctate a `my_db` en el Query Tool y ejecuta:
    ```sql
    CREATE TABLE events (
        id UUID PRIMARY KEY,
@@ -97,7 +97,7 @@ pgAdmin no se conecta automáticamente a tu servidor PostgreSQL. Necesitas confi
 ### Pasos
 
 1. Abre pgAdmin y conéctate al servidor.
-2. Expande la base de datos `dev_events_db`.
+2. Expande la base de datos `my_db`.
 3. Expande `Schemas` -> `public` -> `Tables` para ver todas las tablas.
 
 Siguiendo estos pasos, podrás ver y gestionar las tablas en tu base de datos usando pgAdmin.

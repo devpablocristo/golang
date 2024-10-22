@@ -10,6 +10,8 @@ import (
 )
 
 const (
+	authHeaderName          = "Authorization"
+	bearerPrefix            = "Bearer "
 	errMissingAuthHeader    = "authorization header required"
 	errInvalidSigningMethod = "unexpected signing method"
 	errBearerPrefixRequired = "authorization header must start with Bearer"
@@ -20,22 +22,20 @@ const (
 func ValidateJwt(secretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Obtener el encabezado Authorization
-		authHeader := c.GetHeader("Authorization")
+		authHeader := c.GetHeader(authHeaderName)
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": errMissingAuthHeader})
-			c.Abort()
+			abortWithError(c, http.StatusUnauthorized, errMissingAuthHeader)
 			return
 		}
 
 		// Verificar que el encabezado empiece con "Bearer"
-		if !strings.HasPrefix(authHeader, "Bearer ") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": errBearerPrefixRequired})
-			c.Abort()
+		if !strings.HasPrefix(authHeader, bearerPrefix) {
+			abortWithError(c, http.StatusUnauthorized, errBearerPrefixRequired)
 			return
 		}
 
 		// Extraer el token
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+		tokenString := strings.TrimPrefix(authHeader, bearerPrefix)
 
 		// Validar el token
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
@@ -49,8 +49,7 @@ func ValidateJwt(secretKey string) gin.HandlerFunc {
 
 		// Si el token no es válido, devolver error
 		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": errInvalidToken})
-			c.Abort()
+			abortWithError(c, http.StatusUnauthorized, errInvalidToken)
 			return
 		}
 
@@ -60,4 +59,10 @@ func ValidateJwt(secretKey string) gin.HandlerFunc {
 		// Continuar con la siguiente función en la cadena de middlewares
 		c.Next()
 	}
+}
+
+// abortWithError centraliza la lógica para abortar con un error
+func abortWithError(c *gin.Context, statusCode int, message string) {
+	c.JSON(statusCode, gin.H{"error": message})
+	c.Abort()
 }

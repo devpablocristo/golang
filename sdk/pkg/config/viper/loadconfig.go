@@ -43,7 +43,7 @@ func configureViper() {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	fmt.Println("sdkviper: Set to load environment variables (if any are present).")
+	fmt.Println("sdkviper: Set to load environment variables (if any are present)")
 }
 
 // loadViperConfig loads a configuration file compatible with Viper

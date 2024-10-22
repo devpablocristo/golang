@@ -5,24 +5,19 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/spf13/viper"
 
 	sdkmwr "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
 	sdkginports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 	sdktypes "github.com/devpablocristo/golang/sdk/pkg/types"
-	sdkjwt "github.com/golang-jwt/jwt/v5"
 
 	dto "github.com/devpablocristo/golang/sdk/sg/auth/internal/adapters/gateways/dto"
 	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
 )
 
 type GinHandler struct {
-	ucs        ports.UseCases
-	ginServer  sdkginports.Server
-	apiVersion string
-	secret     string
+	ucs       ports.UseCases
+	ginServer sdkginports.Server
 }
 
 func NewGinHandler(u ports.UseCases) (*GinHandler, error) {
@@ -32,27 +27,35 @@ func NewGinHandler(u ports.UseCases) (*GinHandler, error) {
 	}
 
 	return &GinHandler{
-		ucs:        u,
-		ginServer:  ginServer,
-		apiVersion: ginServer.GetApiVersion(),
-		secret:     viper.GetString("JWT_SECRET_KEY"),
+		ucs:       u,
+		ginServer: ginServer,
 	}, nil
-}
-
-func (h *GinHandler) Start() error {
-	h.routes()
-	return h.ginServer.RunServer()
 }
 
 func (h *GinHandler) GetRouter() *gin.Engine {
 	return h.ginServer.GetRouter()
 }
 
-func (h *GinHandler) routes() {
+func (h *GinHandler) Start() error {
+	// Cargar el secret solo cuando sea necesario
+	secrets, err := getSecrets()
+	if err != nil {
+		return fmt.Errorf("failed to load secrets: %w", err)
+	}
+
+	// Configurar rutas
+	h.routes(secrets)
+
+	// Iniciar el servidor
+	return h.ginServer.RunServer()
+}
+
+func (h *GinHandler) routes(secrets map[string]string) {
 	router := h.ginServer.GetRouter()
 
 	// Definir prefijos de ruta
-	apiBase := "/api/" + h.apiVersion + "/auth"
+	apiVersion := h.ginServer.GetApiVersion()
+	apiBase := "/api/" + apiVersion + "/auth"
 	validatedPrefix := apiBase + "/validated"
 	protectedPrefix := apiBase + "/protected"
 
@@ -68,26 +71,29 @@ func (h *GinHandler) routes() {
 	}
 
 	// Rutas protegidas (requieren JWT válido)
-	authorized := router.Group(protectedPrefix)
+	afipAuthorized := router.Group(protectedPrefix)
 	{
 		// Aplicar middleware de validación JWT
-		authorized.Use(sdkmwr.ValidateJwt(h.secret))
-		authorized.GET("/protected-hi", h.ProtectedHi)
+		afipAuthorized.Use(sdkmwr.ValidateJwt(secrets["afip"]))
+		afipAuthorized.GET("/protected-hi", h.ProtectedHi)
 	}
 }
 
 func (h *GinHandler) AfipLogin(c *gin.Context) {
-	cuit := c.Query("cuit")
-	if cuit == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "CUIT is required"})
+	cuit, err := afipJwtData(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid jwt data: " + err.Error()})
 		return
 	}
 
-	err := h.ucs.AfipLogin(c.Request.Context())
-	if err != nil {
+	// Llamar a los use cases con el CUIT extraído del JWT
+	if err := h.ucs.AfipLogin(c.Request.Context(), cuit); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "afip start error"})
 		return
 	}
+
+	// Si todo es exitoso
+	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "cuit": cuit})
 }
 
 func (h *GinHandler) Login(c *gin.Context) {
@@ -115,26 +121,16 @@ func (h *GinHandler) Login(c *gin.Context) {
 }
 
 func (h *GinHandler) ProtectedHi(c *gin.Context) {
-	token, exists := c.Get("token")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "token not found"})
+	cuit, err := afipJwtData(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid jwt data: " + err.Error()})
 		return
 	}
-
-	// Realizar type assertion para extraer los claims
-	claims, ok := token.(*sdkjwt.Token).Claims.(jwt.MapClaims)
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token claims"})
-		return
-	}
-
-	//Extraer los claims que sean necesarios (por ejemplo, el 'sub')
-	sub := claims["sub"]
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": []string{
 			"hi! from protected.",
-			"Value of the 'sub' claim from the token: " + sub.(string),
+			"cuit: " + cuit,
 		},
 	})
 

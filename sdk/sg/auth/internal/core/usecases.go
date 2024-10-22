@@ -19,9 +19,10 @@ type useCases struct {
 
 func NewUseCases(js ports.JwtService, rp ports.Repository, hc ports.HttpClient, sm ports.SessionManager) ports.UseCases {
 	return &useCases{
-		jwtService: js,
-		repository: rp,
-		httpClient: hc,
+		jwtService:     js,
+		repository:     rp,
+		httpClient:     hc,
+		sessionManager: sm,
 	}
 }
 
@@ -41,6 +42,9 @@ func (u *useCases) Login(ctx context.Context, creds *sdktypes.LoginCredentials) 
 	return token, nil
 }
 
-func (u *useCases) AfipLogin(ctx context.Context) error {
+func (u *useCases) AfipLogin(ctx context.Context, jwtToken string) error {
+	// if err := u.sessionManager.JwtToSession(ctx, jwtToken, "afip-login"); err != nil {
+	// 	return fmt.Errorf("failed to save JWT to session: %w", err)
+	// }
 	return nil
 }
