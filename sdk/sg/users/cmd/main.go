@@ -7,6 +7,13 @@ import (
 	"github.com/spf13/viper"
 
 	sdkcnfldr "github.com/devpablocristo/golang/sdk/pkg/config/configLoader"
+
+	companyconn "github.com/devpablocristo/golang/sdk/sg/users/internal/company/adapters/connectors"
+	personconn "github.com/devpablocristo/golang/sdk/sg/users/internal/person/adapters/connectors"
+
+	userconn "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/connectors"
+	usergtw "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/gateways"
+	user "github.com/devpablocristo/golang/sdk/sg/users/internal/core"
 )
 
 func init() {
@@ -19,7 +26,24 @@ func init() {
 
 func main() {
 
-	userHandler, err := InitializeApplication()
+	usersRepo, err := userconn.NewPostgreSQL()
+	if err != nil {
+		log.Fatalf("Failed to initialize application: %v", err)
+	}
+
+	personRepo, err := personconn.NewPostgreSQL()
+	if err != nil {
+		log.Fatalf("Failed to initialize application: %v", err)
+	}
+
+	companyRepo, err := companyconn.NewPostgreSQL()
+	if err != nil {
+		log.Fatalf("Failed to initialize application: %v", err)
+	}
+
+	usersUseCases := user.NewUseCases(usersRepo, personRepo, companyRepo)
+
+	userHandler, err := usergtw.NewGinHandler(usersUseCases)
 	if err != nil {
 		log.Fatalf("Failed to initialize application: %v", err)
 	}

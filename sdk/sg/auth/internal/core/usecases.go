@@ -10,7 +10,7 @@ import (
 	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
 )
 
-type useCases struct {
+type UseCases struct {
 	jwtService     ports.JwtService
 	repository     ports.Repository
 	httpClient     ports.HttpClient
@@ -18,7 +18,7 @@ type useCases struct {
 }
 
 func NewUseCases(js ports.JwtService, rp ports.Repository, hc ports.HttpClient, sm ports.SessionManager) ports.UseCases {
-	return &useCases{
+	return &UseCases{
 		jwtService:     js,
 		repository:     rp,
 		httpClient:     hc,
@@ -27,7 +27,7 @@ func NewUseCases(js ports.JwtService, rp ports.Repository, hc ports.HttpClient, 
 }
 
 // Login maneja la lógica de autenticación de usuario
-func (u *useCases) Login(ctx context.Context, creds *sdktypes.LoginCredentials) (*sdkjwt.Token, error) {
+func (u *UseCases) Login(ctx context.Context, creds *sdktypes.LoginCredentials) (*sdkjwt.Token, error) {
 	// userUUID, err := s.grpcClient.GetUserUUID(ctx, creds)
 	// if err != nil {
 	// 	return nil, fmt.Errorf("failed to get user UUID: %w", err)
@@ -42,7 +42,7 @@ func (u *useCases) Login(ctx context.Context, creds *sdktypes.LoginCredentials) 
 	return token, nil
 }
 
-func (u *useCases) AfipLogin(ctx context.Context, jwtToken string) error {
+func (u *UseCases) AfipLogin(ctx context.Context, jwtToken string) error {
 	// if err := u.sessionManager.JwtToSession(ctx, jwtToken, "afip-login"); err != nil {
 	// 	return fmt.Errorf("failed to save JWT to session: %w", err)
 	// }

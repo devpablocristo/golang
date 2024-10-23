@@ -4,10 +4,14 @@ tmp_dir = "./tmp"
 
 [build]
   # Comando para compilar el binario con las opciones adecuadas
-  # FIXME: teoricamente deberia levantar las variables antes de contruir el binario, pero no lo hace
-  # cmd = "sh ./scripts/entrypoint-in-docker.sh && go build -gcflags='all=-N -l' -o ./tmp/${APP_NAME} ${MAIN_DIR}" 
-  cmd = "go build -gcflags='all=-N -l' -o ./tmp/${APP_NAME} ${MAIN_DIR}"
   
+  # FIXME: teoricamente deberia levantar las variables de entorno antes de contruir el binario, pero no lo hace
+  # cmd = "sh ./scripts/entrypoint-in-docker.sh && go build -gcflags='all=-N -l' -o ./tmp/${APP_NAME} ${BUILDING_FILES}" 
+  # NOTE: para wire
+  cmd = "go build -gcflags='all=-N -l' -o ./tmp/${APP_NAME}"
+
+  # cmd = "go build -gcflags='all=-N -l' -o ./tmp/${APP_NAME} ${BUILDING_FILES}"
+
   # Especifica el binario generado
   bin = "./tmp/${APP_NAME}"
 

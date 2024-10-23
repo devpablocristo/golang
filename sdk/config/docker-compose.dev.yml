@@ -16,7 +16,7 @@ services:
         source: ..
         target: /app
     environment:
-      - MAIN_DIR=/app/services/authentication/cmd/main.go
+      - BUILDING_FILES=/app/services/authentication/cmd/main.go
       - APP_NAME=authentication
     depends_on:
       # - postgres
@@ -51,7 +51,7 @@ services:
         source: ..
         target: /app
     environment:
-      - MAIN_DIR=/app/services/monitoring/main.go
+      - BUILDING_FILES=/app/services/monitoring/main.go
       - APP_NAME=monitoring-api
       - PROMETHEUS_URL=http://prometheus:9090
     depends_on:
@@ -77,7 +77,7 @@ services:
     environment:
       - DELVE_PORT=${DELVE_PORT_SERVER}  # Sobrescribir el valor de DELVE_PORT para el servidor
       - GRPC_SERVER_HOST=0.0.0.0  # Escuchar en todas las interfaces
-      - MAIN_DIR=/app/services/greeter-server/cmd/main.go
+      - BUILDING_FILES=/app/services/greeter-server/cmd/main.go
       - APP_NAME=greeter-server
       - APP_ROLE=server
     networks:
@@ -101,7 +101,7 @@ services:
     ports:
     - "${DELVE_PORT}:${DELVE_PORT}"
     environment:
-      - MAIN_DIR=/app/services/greeter-client/cmd/main.go
+      - BUILDING_FILES=/app/services/greeter-client/cmd/main.go
       - APP_NAME=greeter-client
       - APP_ROLE=client
     network_mode: "host"  # Usa la red del host
@@ -134,7 +134,8 @@ services:
         target: /app
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - MAIN_DIR=/app/sg/auth/cmd/main.go
+      - BUILDING_FILES=/app/sg/auth/cmd/main.go # /app/sg/auth/cmd/wire.go
+      #  Probar BUILDING_FILES=/app/sg/auth/cmd/... 
       - APP_NAME=sg_auth
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
@@ -168,7 +169,7 @@ services:
         target: /app
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - MAIN_DIR=/app/sg/auth/cmd/main.go
+      - BUILDING_FILES=/app/sg/users/cmd/main.go
       - APP_NAME=sg_users
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}

@@ -12,7 +12,7 @@ import (
 	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
 )
 
-type jwtService struct {
+type JwtService struct {
 	JwtService sdkports.Service
 }
 
@@ -22,12 +22,12 @@ func NewJwtService() (ports.JwtService, error) {
 		return nil, fmt.Errorf("bootstrap error: %w", err)
 	}
 
-	return &jwtService{
+	return &JwtService{
 		JwtService: js,
 	}, nil
 }
 
-func (j *jwtService) GenerateToken(userUUID string) (*sdkjwt.Token, error) {
+func (j *JwtService) GenerateToken(userUUID string) (*sdkjwt.Token, error) {
 	claims := map[string]interface{}{
 		"sub": userUUID,
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
@@ -49,7 +49,7 @@ func (j *jwtService) GenerateToken(userUUID string) (*sdkjwt.Token, error) {
 	return token, nil
 }
 
-func (j *jwtService) ValidateToken(tokenString string) (*sdkjwt.TokenClaims, error) {
+func (j *JwtService) ValidateToken(tokenString string) (*sdkjwt.TokenClaims, error) {
 	// Llama al SDK para validar el token
 	token, err := j.JwtService.ValidateToken(tokenString)
 	if err != nil {

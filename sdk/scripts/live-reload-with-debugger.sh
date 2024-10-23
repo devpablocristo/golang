@@ -6,7 +6,7 @@ log() {
 
 buildServer() {
   log "Building server binary"
-  go build -gcflags "all=-N -l" -buildvcs=false -o "/app/bin/${APP_NAME}" "${MAIN_DIR}"
+  go build -gcflags "all=-N -l" -buildvcs=false -o "/app/bin/${APP_NAME}" "${BUILDING_FILES}"
   if [ -f "/app/bin/${APP_NAME}" ]; then
     log "Binary file created successfully"
     chmod +x "/app/bin/${APP_NAME}"
