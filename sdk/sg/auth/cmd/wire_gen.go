@@ -10,13 +10,13 @@ import (
 	"github.com/devpablocristo/golang/sdk/sg/auth/internal/adapters/connectors"
 	"github.com/devpablocristo/golang/sdk/sg/auth/internal/adapters/gateways"
 	"github.com/devpablocristo/golang/sdk/sg/auth/internal/core"
-	"github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
+	"github.com/google/wire"
 )
 
 // Injectors from wire.go:
 
-// Injector es el que ensamblará todas las dependencias
-func InitializeApplication() (*authgtw.GinHandler, error) {
+// NewApplication creates a new application instance with all dependencies wired
+func NewApplication() (*Application, error) {
 	jwtService, err := authconn.NewJwtService()
 	if err != nil {
 		return nil, err
@@ -33,26 +33,23 @@ func InitializeApplication() (*authgtw.GinHandler, error) {
 	if err != nil {
 		return nil, err
 	}
-	useCases := ProvideAuthUsecases(jwtService, repository, httpClient, sessionManager)
-	ginHandler, err := ProvideGinHandler(useCases)
+	useCases := auth.NewUseCases(jwtService, repository, httpClient, sessionManager)
+	ginHandler, err := authgtw.NewGinHandler(useCases)
 	if err != nil {
 		return nil, err
 	}
-	return ginHandler, nil
+	application := &Application{
+		Handler: ginHandler,
+	}
+	return application, nil
 }
 
 // wire.go:
 
-// ProvideAuthUsecases crea la capa de casos de uso de autenticación
-func ProvideAuthUsecases(
-	jwtService ports.JwtService,
-	repository ports.Repository,
-	httpClient ports.HttpClient,
-	sessionManager ports.SessionManager) ports.UseCases {
-	return auth.NewUseCases(jwtService, repository, httpClient, sessionManager)
-}
+// ProviderSet contains all the providers needed for the application
+var ProviderSet = wire.NewSet(authconn.NewJwtService, authconn.NewHttpClient, authconn.NewGorillaSessionManager, authconn.NewPostgreSQL, auth.NewUseCases, authgtw.NewGinHandler)
 
-// ProvideGinHandler inicializa el manejador Gin con los casos de uso de autenticación
-func ProvideGinHandler(usecases ports.UseCases) (*authgtw.GinHandler, error) {
-	return authgtw.NewGinHandler(usecases)
+// Application represents the complete application with all its dependencies
+type Application struct {
+	Handler *authgtw.GinHandler
 }

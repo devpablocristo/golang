@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/spf13/viper"
+
 	sdkpg "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool"
 	sdkpgports "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool/ports"
 
@@ -11,12 +13,15 @@ import (
 	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
 )
 
+const dbNameKey = "AUTH_DB"
+
 type PostgreSQL struct {
 	repository sdkpgports.Repository
 }
 
 func NewPostgreSQL() (ports.Repository, error) {
-	r, err := sdkpg.Bootstrap()
+	fmt.Println(viper.GetString(dbNameKey))
+	r, err := sdkpg.Bootstrap(dbNameKey)
 	if err != nil {
 		return nil, fmt.Errorf("bootstrap error: %w", err)
 	}

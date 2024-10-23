@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/spf13/viper"
 
 	sdkaws "github.com/devpablocristo/golang/sdk/pkg/aws/localstack"
 	sdkcnfldr "github.com/devpablocristo/golang/sdk/pkg/config/configLoader"
@@ -15,8 +14,6 @@ func init() {
 	if err := sdkcnfldr.LoadConfig("config/.env", "config/.env.local"); err != nil {
 		log.Fatalf("Viper Service error: %v", err)
 	}
-
-	fmt.Println("checking env 'AFIP_REALM':", viper.GetString("AFIP_REALM"))
 }
 
 func awsInit() error {
@@ -39,20 +36,13 @@ func awsInit() error {
 }
 
 func main() {
-	if err := awsInit(); err != nil {
-		log.Fatalf("Failed to bootstrap AWS stack: %v", err)
-	}
-
-	// Usar Wire para inicializar el manejador de autenticación
-	authHandler, err := InitializeApplication()
+	app, err := NewApplication()
 	if err != nil {
 		log.Fatalf("Failed to initialize application: %v", err)
 	}
 
-	// Iniciar el servidor de Gin
-	err = authHandler.Start()
-	if err != nil {
-		log.Fatalf("Gin Server error at start: %v", err)
+	if err := app.Handler.Start(); err != nil {
+		log.Fatalf("Server failed to start: %v", err)
 	}
 }
 

@@ -5,11 +5,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Bootstrap(repoRemoteUrlEnvName, repoLocalPathEnvName, repoBranchEnvName string) (ports.Client, error) {
+func Bootstrap(repoRemoteUrlKey, repoLocalPathKey, repoBranchKey string) (ports.Client, error) {
 	config := newConfig(
-		viper.GetString(repoRemoteUrlEnvName),
-		viper.GetString(repoLocalPathEnvName),
-		viper.GetString(repoBranchEnvName),
+		viper.GetString(repoRemoteUrlKey),
+		viper.GetString(repoLocalPathKey),
+		viper.GetString(repoBranchKey),
 	)
 
 	if err := config.Validate(); err != nil {

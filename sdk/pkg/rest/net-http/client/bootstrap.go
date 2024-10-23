@@ -8,17 +8,17 @@ import (
 	"github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/ports"
 )
 
-func Bootstrap(tokenEndPointEnvName, clientIDEnvName, clientSecretEnvName, addParamsEnvName string) (ports.Client, ports.Config, error) {
-	tokenEndPoint := viper.GetString(tokenEndPointEnvName)
+func Bootstrap(tokenEndPointKey, clientIDKey, clientSecretKey, addParamsKey string) (ports.Client, ports.Config, error) {
+	tokenEndPoint := viper.GetString(tokenEndPointKey)
 	if tokenEndPoint == "" {
-		return nil, nil, fmt.Errorf("token endpoint is empty. Check if %s environment variable is set", tokenEndPointEnvName)
+		return nil, nil, fmt.Errorf("token endpoint is empty. Check if %s environment variable is set", tokenEndPointKey)
 	}
 
 	config := newConfig(
 		tokenEndPoint,
-		viper.GetString(clientIDEnvName),
-		viper.GetString(clientSecretEnvName),
-		viper.GetStringMapString(addParamsEnvName),
+		viper.GetString(clientIDKey),
+		viper.GetString(clientSecretKey),
+		viper.GetStringMapString(addParamsKey),
 	)
 
 	if err := config.Validate(); err != nil {

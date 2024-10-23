@@ -19,7 +19,7 @@ type PostgreSQL struct {
 }
 
 func NewPostgreSQL() (ports.Repository, error) {
-	r, err := sdkpg.Bootstrap()
+	r, err := sdkpg.Bootstrap("USERS_DB")
 	if err != nil {
 		return nil, fmt.Errorf("bootstrap error: %w", err)
 	}

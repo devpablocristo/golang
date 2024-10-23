@@ -53,6 +53,18 @@ docker-logs:
 	@echo "Fetching logs for $(PROFILE) services..."
 	APP_NAME=$(APP_NAME) docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(APP_NAME)
 
+sg_users-up:
+	@$(MAKE) docker-up PROFILE=sg_users APP_NAME=sg_users
+
+sg_users-build:
+	@$(MAKE) docker-build PROFILE=sg_users APP_NAME=sg_users
+
+sg_users-down:
+	@$(MAKE) docker-down PROFILE=sg_users APP_NAME=sg_users
+
+sg_users-logs:
+	@$(MAKE) docker-logs PROFILE=sg_users APP_NAME=sg_users
+
 sg_auth-up:
 	@$(MAKE) docker-up PROFILE=sg_auth APP_NAME=sg_auth
 
