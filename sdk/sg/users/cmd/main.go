@@ -24,6 +24,7 @@ func init() {
 	fmt.Println("checking env 'AFIP_REALM':", viper.GetString("AFIP_REALM"))
 }
 
+// NOTE: no pude implementar wire todavia, dan errores que no entiendo, mirar mas adelante
 func main() {
 
 	usersRepo, err := userconn.NewPostgreSQL()

@@ -5,11 +5,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 
 	sdkmwr "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
 	sdkginports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 
+	"github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/gateways/dto"
 	ports "github.com/devpablocristo/golang/sdk/sg/users/internal/core/ports"
 )
 
@@ -56,6 +58,9 @@ func (h *GinHandler) routes(secrets map[string]string) {
 	apiBase := "/api/" + apiVersion + "/users"
 	validatedPrefix := apiBase + "/validated"
 	protectedPrefix := apiBase + "/protected"
+
+	// NOTE: mover a protected
+	router.POST(apiBase+"/create-user", h.CreateUser)
 
 	// Rutas públicas
 	router.GET(apiBase+"/ping", h.Ping)
@@ -117,4 +122,42 @@ func (h *GinHandler) ProtectedHi(c *gin.Context) {
 
 func (h *GinHandler) Ping(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Pong!"})
+}
+
+func (h *GinHandler) CreateUser(c *gin.Context) {
+	// NOTE: cambiar a DTO
+	var req *dto.UserDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Validar que solo uno de los UUIDs esté presente
+	if (req.PersonUUID != nil && req.CompanyUUID != nil) || (req.PersonUUID == nil && req.CompanyUUID == nil) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Debe proporcionar solo uno de person_uuid o company_uuid"})
+		return
+	}
+
+	// Llamar al caso de uso para crear el usuario
+	if err := h.ucs.CreateUser(c.Request.Context(), dto.FromUserDTO(req)); err != nil {
+		if err.Error() == "el usuario ya existe" {
+			c.JSON(http.StatusConflict, gin.H{"error": "El usuario ya existe"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al crear el usuario: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "user created successfully"})
+}
+
+// hashPassword genera un hash seguro para la contraseña
+func hashPassword(password string) (string, error) {
+	// Implementa el hashing de la contraseña, por ejemplo usando bcrypt
+	// Este es un ejemplo utilizando bcrypt
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hashedBytes), nil
 }

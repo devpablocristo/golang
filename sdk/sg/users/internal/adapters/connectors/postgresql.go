@@ -31,7 +31,7 @@ func NewPostgreSQL() (ports.Repository, error) {
 }
 
 // Create inserts a new user into the database
-func (r *PostgreSQL) Create(ctx context.Context, user *entities.User) error {
+func (r *PostgreSQL) CreateUser(ctx context.Context, user *entities.User) error {
 	query := `
 		INSERT INTO users (
 			uuid, person_uuid, company_uuid, user_type, 
@@ -63,7 +63,7 @@ func (r *PostgreSQL) Create(ctx context.Context, user *entities.User) error {
 }
 
 // FindByID searches for a user by their UUID
-func (r *PostgreSQL) FindByUUID(ctx context.Context, id string) (*entities.User, error) {
+func (r *PostgreSQL) FindUserByUUID(ctx context.Context, id string) (*entities.User, error) {
 	user := &entities.User{}
 	query := `
 		SELECT uuid, person_uuid, company_uuid, user_type, 
@@ -95,7 +95,7 @@ func (r *PostgreSQL) FindByUUID(ctx context.Context, id string) (*entities.User,
 }
 
 // FindByCUIL searches for a user by their CUIL (for persons)
-func (r *PostgreSQL) FindByCuit(ctx context.Context, cuil string) (*entities.User, error) {
+func (r *PostgreSQL) FindUserByCuit(ctx context.Context, cuil string) (*entities.User, error) {
 	user := &entities.User{}
 	query := `
 		SELECT u.uuid, u.person_uuid, u.company_uuid, u.user_type, 
@@ -128,7 +128,7 @@ func (r *PostgreSQL) FindByCuit(ctx context.Context, cuil string) (*entities.Use
 }
 
 // FindByCUIT searches for a user by their CUIT (for companies)
-func (r *PostgreSQL) FindByCUIT(ctx context.Context, cuit string) (*entities.User, error) {
+func (r *PostgreSQL) FindUserByCUIT(ctx context.Context, cuit string) (*entities.User, error) {
 	user := &entities.User{}
 	query := `
 		SELECT u.uuid, u.person_uuid, u.company_uuid, u.user_type, 
@@ -161,7 +161,7 @@ func (r *PostgreSQL) FindByCUIT(ctx context.Context, cuit string) (*entities.Use
 }
 
 // Update updates an existing user
-func (r *PostgreSQL) Update(ctx context.Context, user *entities.User) error {
+func (r *PostgreSQL) UpdateUser(ctx context.Context, user *entities.User) error {
 	query := `
 		UPDATE users 
 		SET person_uuid = $2, company_uuid = $3, user_type = $4, 
@@ -190,7 +190,7 @@ func (r *PostgreSQL) Update(ctx context.Context, user *entities.User) error {
 }
 
 // SoftDelete marks a user as deleted
-func (r *PostgreSQL) SoftDelete(ctx context.Context, id string) error {
+func (r *PostgreSQL) SoftDeleteUser(ctx context.Context, id string) error {
 	query := `
 		UPDATE users 
 		SET deleted_at = CURRENT_TIMESTAMP

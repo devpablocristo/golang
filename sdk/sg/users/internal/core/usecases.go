@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	entities "github.com/devpablocristo/golang/sdk/sg/users/internal/core/entities"
 	companyports "github.com/devpablocristo/golang/sdk/sg/users/internal/company/core/ports"
 	userports "github.com/devpablocristo/golang/sdk/sg/users/internal/core/ports"
 	personports "github.com/devpablocristo/golang/sdk/sg/users/internal/person/core/ports"
@@ -20,6 +21,11 @@ func NewUseCases(ur userports.Repository, pr personports.Repository, cr companyp
 		personRepo:  pr,
 		companyRepo: cr,
 	}
+}
+
+// CreateUser crea un nuevo usuario
+func (u *useCases) CreateUser(ctx context.Context, user *entities.User) error {
+	return u.userRepo.CreateUser(ctx, user)
 }
 
 func (u *useCases) CheckUserStatus(ctx context.Context, cuit string) (bool, error) {

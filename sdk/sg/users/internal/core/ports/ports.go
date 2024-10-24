@@ -8,12 +8,13 @@ import (
 
 type UseCases interface {
 	CheckUserStatus(context.Context, string) (bool, error)
+	CreateUser(ctx context.Context, user *entities.User) error
 }
 
 type Repository interface {
-	Create(context.Context, *entities.User) error
-	FindByUUID(context.Context, string) (*entities.User, error)
-	FindByCuit(context.Context, string) (*entities.User, error)
-	Update(context.Context, *entities.User) error
-	SoftDelete(context.Context, string) error
+	CreateUser(context.Context, *entities.User) error
+	FindUserByUUID(context.Context, string) (*entities.User, error)
+	FindUserByCuit(context.Context, string) (*entities.User, error)
+	UpdateUser(context.Context, *entities.User) error
+	SoftDeleteUser(context.Context, string) error
 }
