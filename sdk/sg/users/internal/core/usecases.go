@@ -2,47 +2,60 @@ package user
 
 import (
 	"context"
+	"time"
 
-	entities "github.com/devpablocristo/golang/sdk/sg/users/internal/core/entities"
-	companyports "github.com/devpablocristo/golang/sdk/sg/users/internal/company/core/ports"
+	dto "github.com/devpablocristo/golang/sdk/sg/users/internal/core/dto"
 	userports "github.com/devpablocristo/golang/sdk/sg/users/internal/core/ports"
 	personports "github.com/devpablocristo/golang/sdk/sg/users/internal/person/core/ports"
+	"github.com/google/uuid"
 )
 
 type useCases struct {
-	userRepo    userports.Repository
-	personRepo  personports.Repository
-	companyRepo companyports.Repository
+	repository     userports.Repository
+	personUseCases personports.UseCases
 }
 
-func NewUseCases(ur userports.Repository, pr personports.Repository, cr companyports.Repository) userports.UseCases {
+func NewUseCases(r userports.Repository, pu personports.UseCases) userports.UseCases {
 	return &useCases{
-		userRepo:    ur,
-		personRepo:  pr,
-		companyRepo: cr,
+		repository:     r,
+		personUseCases: pu,
 	}
 }
 
-// CreateUser crea un nuevo usuario
-func (u *useCases) CreateUser(ctx context.Context, user *entities.User) error {
-	return u.userRepo.CreateUser(ctx, user)
-}
-
-func (u *useCases) CheckUserStatus(ctx context.Context, cuit string) (bool, error) {
-	userFound, err := u.findUserByCuit(ctx, cuit)
+func (u *useCases) CreateUser(ctx context.Context, userDto *dto.UserDto) (string, error) {
+	personUUID, err := u.personUseCases.CreatePerson(ctx, dto.ToPerson(userDto.Person))
 	if err != nil {
-		return false, err
-	}
-	if userFound {
-		return true, nil
-	}
-	adminRequestFound, err := u.findAdministrativeRequestByCuit(ctx, cuit)
-	if err != nil {
-		return false, err
-	}
-	if adminRequestFound {
-		return true, nil
+		return "", err
 	}
 
-	return false, nil
+	user := dto.ToUser(userDto)
+	user.UUID = uuid.New().String()
+	user.PersonUUID = &personUUID
+	now := time.Now().UTC()
+	user.CreatedAt = now
+	user.UpdatedAt = nil
+	if err := u.repository.CreateUser(ctx, user); err != nil {
+		return "", err
+	}
+
+	return user.UUID, nil
 }
+
+// func (u *useCases) CheckUserStatus(ctx context.Context, cuil string) (bool, error) {
+// 	userFound, err := u.FindUserByCuit(ctx, cuil)
+// 	if err != nil {
+// 		return false, err
+// 	}
+// 	if userFound {
+// 		return true, nil
+// 	}
+// 	adminRequestFound, err := u.findAdministrativeRequestByCuit(ctx, cuil)
+// 	if err != nil {
+// 		return false, err
+// 	}
+// 	if adminRequestFound {
+// 		return true, nil
+// 	}
+
+// 	return false, nil
+// }

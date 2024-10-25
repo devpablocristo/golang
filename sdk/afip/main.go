@@ -132,10 +132,10 @@ func (a *AFIPClient) GetAccessToken(ctx context.Context) (string, error) {
 	return a.token, nil
 }
 
-// ValidateCUIT validates a CUIT with AFIP using the access token
-func (a *AFIPClient) ValidateCUIT(ctx context.Context, cuit string) error {
-	if !isValidCUIT(cuit) {
-		return fmt.Errorf("invalid CUIT format")
+// ValidateCUIT validates a CUIL with AFIP using the access token
+func (a *AFIPClient) ValidateCUIT(ctx context.Context, cuil string) error {
+	if !isValidCUIT(cuil) {
+		return fmt.Errorf("invalid CUIL format")
 	}
 
 	// Obtain the access token
@@ -145,7 +145,7 @@ func (a *AFIPClient) ValidateCUIT(ctx context.Context, cuit string) error {
 	}
 
 	// Build the validation endpoint URL
-	endpoint := fmt.Sprintf("https://tst.autenticar.gob.ar/api/validate-cuit?cuit=%s", cuit)
+	endpoint := fmt.Sprintf("https://tst.autenticar.gob.ar/api/validate-cuil?cuil=%s", cuil)
 
 	// Create the GET request
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
@@ -179,12 +179,12 @@ func (a *AFIPClient) ValidateCUIT(ctx context.Context, cuit string) error {
 	return nil
 }
 
-// isValidCUIT verifies if the CUIT has the correct format and checksum
-func isValidCUIT(cuit string) bool {
-	if len(cuit) != 11 {
+// isValidCUIT verifies if the CUIL has the correct format and checksum
+func isValidCUIT(cuil string) bool {
+	if len(cuil) != 11 {
 		return false
 	}
-	for _, char := range cuit {
+	for _, char := range cuil {
 		if char < '0' || char > '9' {
 			return false
 		}
@@ -193,7 +193,7 @@ func isValidCUIT(cuit string) bool {
 	multipliers := []int{5, 4, 3, 2, 7, 6, 5, 4, 3, 2}
 	sum := 0
 	for i := 0; i < 10; i++ {
-		digit := int(cuit[i] - '0')
+		digit := int(cuil[i] - '0')
 		sum += digit * multipliers[i]
 	}
 	remainder := sum % 11
@@ -203,7 +203,7 @@ func isValidCUIT(cuit string) bool {
 	} else if checkDigit == 10 {
 		checkDigit = 9
 	}
-	return int(cuit[10]-'0') == checkDigit
+	return int(cuil[10]-'0') == checkDigit
 }
 
 // loadConfig reads configuration from environment variables or config files
@@ -258,10 +258,10 @@ func main() {
 
 	// Define the validation route
 	router.POST("/validate", func(c *gin.Context) {
-		// Extract the CUIT from the form
-		cuit := c.PostForm("cuit")
-		if cuit == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "CUIT is required"})
+		// Extract the CUIL from the form
+		cuil := c.PostForm("cuil")
+		if cuil == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "CUIL is required"})
 			return
 		}
 
@@ -269,8 +269,8 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		// Validate the CUIT with AFIP
-		err := afipClient.ValidateCUIT(ctx, cuit)
+		// Validate the CUIL with AFIP
+		err := afipClient.ValidateCUIT(ctx, cuil)
 		if err != nil {
 			log.Printf("Validation error: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Validation failed"})
@@ -278,7 +278,7 @@ func main() {
 		}
 
 		// Respond successfully
-		c.JSON(http.StatusOK, gin.H{"message": "CUIT validated successfully"})
+		c.JSON(http.StatusOK, gin.H{"message": "CUIL validated successfully"})
 	})
 
 	// Start the server on port 8080

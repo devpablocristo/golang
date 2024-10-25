@@ -8,12 +8,12 @@ import (
 
 	sdkcnfldr "github.com/devpablocristo/golang/sdk/pkg/config/configLoader"
 
-	companyconn "github.com/devpablocristo/golang/sdk/sg/users/internal/company/adapters/connectors"
-	personconn "github.com/devpablocristo/golang/sdk/sg/users/internal/person/adapters/connectors"
-
 	userconn "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/connectors"
 	usergtw "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/gateways"
+	personconn "github.com/devpablocristo/golang/sdk/sg/users/internal/person/adapters/connectors"
+
 	user "github.com/devpablocristo/golang/sdk/sg/users/internal/core"
+	person "github.com/devpablocristo/golang/sdk/sg/users/internal/person/core"
 )
 
 func init() {
@@ -27,22 +27,17 @@ func init() {
 // NOTE: no pude implementar wire todavia, dan errores que no entiendo, mirar mas adelante
 func main() {
 
-	usersRepo, err := userconn.NewPostgreSQL()
-	if err != nil {
-		log.Fatalf("Failed to initialize application: %v", err)
-	}
-
 	personRepo, err := personconn.NewPostgreSQL()
 	if err != nil {
 		log.Fatalf("Failed to initialize application: %v", err)
 	}
+	personUseCases := person.NewUseCases(personRepo)
 
-	companyRepo, err := companyconn.NewPostgreSQL()
+	userRepo, err := userconn.NewPostgreSQL()
 	if err != nil {
 		log.Fatalf("Failed to initialize application: %v", err)
 	}
-
-	usersUseCases := user.NewUseCases(usersRepo, personRepo, companyRepo)
+	usersUseCases := user.NewUseCases(userRepo, personUseCases)
 
 	userHandler, err := usergtw.NewGinHandler(usersUseCases)
 	if err != nil {

@@ -26,8 +26,7 @@ func NewPostgreSQL() (ports.Repository, error) {
 	return &PostgreSQL{repository: r}, nil
 }
 
-// Create inserts a new person into the database
-func (r *PostgreSQL) Create(ctx context.Context, person *entities.Person) error {
+func (r *PostgreSQL) CreatePerson(ctx context.Context, person *entities.Person) error {
 	query := `
         INSERT INTO persons (
             uuid, cuil, dni, first_name, last_name, nationality, email, phone, created_at, updated_at
@@ -48,46 +47,14 @@ func (r *PostgreSQL) Create(ctx context.Context, person *entities.Person) error 
 	return nil
 }
 
-// FindByID searches for a person by their UUID
-func (r *PostgreSQL) FindByID(ctx context.Context, UUID string) (*entities.Person, error) {
-	person := &entities.Person{}
-	query := `
-        SELECT uuid, cuil, dni, first_name, last_name, nationality, email, phone, created_at, updated_at, deleted_at
-        FROM persons 
-        WHERE uuid = $1 AND deleted_at IS NULL
-    `
-	err := r.repository.Pool().QueryRow(ctx, query, UUID).Scan(
-		&person.UUID,
-		&person.Cuil,
-		&person.Dni,
-		&person.FirstName,
-		&person.LastName,
-		&person.Nationality,
-		&person.Email,
-		&person.Phone,
-		&person.CreatedAt,
-		&person.UpdatedAt,
-		&person.DeletedAt,
-	)
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	return person, nil
-}
-
-// Update updates an existing person
-func (r *PostgreSQL) Update(ctx context.Context, person *entities.Person) error {
+func (r *PostgreSQL) UpdatePerson(ctx context.Context, person *entities.Person) error {
 	query := `
         UPDATE persons 
-        SET cuil = $2, dni = $3, first_name = $4, last_name = $5, nationality = $6, email = $7, phone = $8, updated_at = CURRENT_TIMESTAMP
-        WHERE uuid = $1 AND deleted_at IS NULL
+        SET dni = $2, first_name = $3, last_name = $4, nationality = $5, email = $6, phone = $7, updated_at = CURRENT_TIMESTAMP
+        WHERE cuil = $1 AND deleted_at IS NULL
     `
 	result, err := r.repository.Pool().Exec(ctx, query,
-		person.UUID, person.Cuil, person.Dni, person.FirstName, person.LastName, person.Nationality,
+		person.Cuil, person.Dni, person.FirstName, person.LastName, person.Nationality,
 		person.Email, person.Phone,
 	)
 	if err != nil {
@@ -102,35 +69,14 @@ func (r *PostgreSQL) Update(ctx context.Context, person *entities.Person) error 
 	return nil
 }
 
-// SoftDelete marks a person as deleted
-func (r *PostgreSQL) SoftDelete(ctx context.Context, UUID string) error {
-	query := `
-        UPDATE persons 
-        SET deleted_at = CURRENT_TIMESTAMP
-        WHERE uuid = $1 AND deleted_at IS NULL
-    `
-	result, err := r.repository.Pool().Exec(ctx, query, UUID)
-	if err != nil {
-		return err
-	}
-
-	rowsAffected := result.RowsAffected()
-	if rowsAffected == 0 {
-		return fmt.Errorf("person not found")
-	}
-
-	return nil
-}
-
-// FindByCuit searches for a person by their CUIL
-func (r *PostgreSQL) FindByCuit(ctx context.Context, cuit string) (*entities.Person, error) {
+func (r *PostgreSQL) FindPersonByCuil(ctx context.Context, cuil string) (*entities.Person, error) {
 	person := &entities.Person{}
 	query := `
         SELECT uuid, cuil, dni, first_name, last_name, nationality, email, phone, created_at, updated_at, deleted_at
         FROM persons 
         WHERE cuil = $1 AND deleted_at IS NULL
     `
-	err := r.repository.Pool().QueryRow(ctx, query, cuit).Scan(
+	err := r.repository.Pool().QueryRow(ctx, query, cuil).Scan(
 		&person.UUID,
 		&person.Cuil,
 		&person.Dni,
@@ -139,9 +85,6 @@ func (r *PostgreSQL) FindByCuit(ctx context.Context, cuit string) (*entities.Per
 		&person.Nationality,
 		&person.Email,
 		&person.Phone,
-		&person.CreatedAt,
-		&person.UpdatedAt,
-		&person.DeletedAt,
 	)
 	if err == sql.ErrNoRows {
 		return nil, nil

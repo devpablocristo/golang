@@ -62,10 +62,10 @@ func (c *HttpClient) GetAccessToken(ctx context.Context) (string, error) {
 	return c.token, nil
 }
 
-// ValidateCUIT valida un CUIT con la AFIP utilizando el token de acceso.
-func (c *HttpClient) ValidateCUIT(ctx context.Context, cuit string) error {
-	if !isValidCUIT(cuit) {
-		return fmt.Errorf("formato de CUIT inválido")
+// ValidateCUIT valida un CUIL con la AFIP utilizando el token de acceso.
+func (c *HttpClient) ValidateCUIT(ctx context.Context, cuil string) error {
+	if !isValidCUIT(cuil) {
+		return fmt.Errorf("formato de CUIL inválido")
 	}
 
 	token, err := c.GetAccessToken(ctx)
@@ -73,9 +73,9 @@ func (c *HttpClient) ValidateCUIT(ctx context.Context, cuit string) error {
 		return fmt.Errorf("error al obtener el token de acceso: %w", err)
 	}
 
-	// Aquí iría la lógica para validar el CUIT usando el token
+	// Aquí iría la lógica para validar el CUIL usando el token
 	// Por ejemplo:
-	endpoint := fmt.Sprintf("%s/api/validate-cuit?cuit=%s", c.config.GetTokenEndpoint(), cuit)
+	endpoint := fmt.Sprintf("%s/api/validate-cuil?cuil=%s", c.config.GetTokenEndpoint(), cuil)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return fmt.Errorf("error al crear la solicitud: %w", err)
@@ -95,9 +95,9 @@ func (c *HttpClient) ValidateCUIT(ctx context.Context, cuit string) error {
 	return nil
 }
 
-// isValidCUIT verifica si el CUIT tiene el formato correcto.
-func isValidCUIT(cuit string) bool {
-	if len(cuit) != 11 {
+// isValidCUIT verifica si el CUIL tiene el formato correcto.
+func isValidCUIT(cuil string) bool {
+	if len(cuil) != 11 {
 		return false
 	}
 	var (
@@ -105,7 +105,7 @@ func isValidCUIT(cuit string) bool {
 		sum         int
 	)
 	for i := 0; i < 10; i++ {
-		digit := int(cuit[i] - '0')
+		digit := int(cuil[i] - '0')
 		sum += digit * multipliers[i]
 	}
 	remainder := sum % 11
@@ -116,5 +116,5 @@ func isValidCUIT(cuit string) bool {
 	case 10:
 		checkDigit = 9
 	}
-	return int(cuit[10]-'0') == checkDigit
+	return int(cuil[10]-'0') == checkDigit
 }

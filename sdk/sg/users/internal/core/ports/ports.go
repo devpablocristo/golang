@@ -3,12 +3,13 @@ package ports
 import (
 	"context"
 
+	dto "github.com/devpablocristo/golang/sdk/sg/users/internal/core/dto"
 	entities "github.com/devpablocristo/golang/sdk/sg/users/internal/core/entities"
 )
 
 type UseCases interface {
-	CheckUserStatus(context.Context, string) (bool, error)
-	CreateUser(ctx context.Context, user *entities.User) error
+	// CheckUserStatus(context.Context, string) (bool, error)
+	CreateUser(context.Context, *dto.UserDto) (string, error)
 }
 
 type Repository interface {

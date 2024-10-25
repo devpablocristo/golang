@@ -14,13 +14,11 @@ const (
 type User struct {
 	UUID        string      // Unique identifier for the user
 	PersonUUID  *string     // Reference to the associated person (nullable)
-	CompanyUUID *string     // Reference to the associated company (nullable)
-	UserType    UserType    // Defines if the user is a person or a company
 	Credentials Credentials // Credentials information (username and password hash)
 	Roles       []Role      // List of roles associated with the user
 	CreatedAt   time.Time   // User creation date
 	LoggedAt    time.Time   // Last time the user logged in (optional)
-	UpdatedAt   time.Time   // Date when the user was last updated
+	UpdatedAt   *time.Time  // Date when the user was last updated
 	DeletedAt   *time.Time  // Date when the user was deleted (optional)
 }
 

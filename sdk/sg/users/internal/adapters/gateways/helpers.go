@@ -16,15 +16,15 @@ func afipJwtData(c *gin.Context) (string, error) {
 	// Extraer las claims del token
 	claims := jwtToken.Claims.(jwt.MapClaims) // Cast seguro porque ya fue validado
 
-	// Obtener el CUIT del token
-	cuit, _ := claims["cuit"].(string) // Asumimos que el claim está presente porque el middleware ya lo validó
+	// Obtener el CUIL del token
+	cuil, _ := claims["cuil"].(string) // Asumimos que el claim está presente porque el middleware ya lo validó
 
-	// Si el CUIT está vacío, retornamos error (por si acaso)
-	if cuit == "" {
-		return "", errors.New("CUIT is missing in the token")
+	// Si el CUIL está vacío, retornamos error (por si acaso)
+	if cuil == "" {
+		return "", errors.New("CUIL is missing in the token")
 	}
 
-	return cuit, nil
+	return cuil, nil
 }
 
 func getSecrets() (map[string]string, error) {

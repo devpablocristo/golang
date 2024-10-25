@@ -80,20 +80,20 @@ func (h *GinHandler) routes(secrets map[string]string) {
 }
 
 func (h *GinHandler) AfipLogin(c *gin.Context) {
-	cuit, err := afipJwtData(c)
+	cuil, err := afipJwtData(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid jwt data: " + err.Error()})
 		return
 	}
 
-	// Llamar a los use cases con el CUIT extraído del JWT
-	if err := h.ucs.AfipLogin(c.Request.Context(), cuit); err != nil {
+	// Llamar a los use cases con el CUIL extraído del JWT
+	if err := h.ucs.AfipLogin(c.Request.Context(), cuil); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "afip start error"})
 		return
 	}
 
 	// Si todo es exitoso
-	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "cuit": cuit})
+	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "cuil": cuil})
 }
 
 func (h *GinHandler) Login(c *gin.Context) {
@@ -121,7 +121,7 @@ func (h *GinHandler) Login(c *gin.Context) {
 }
 
 func (h *GinHandler) ProtectedHi(c *gin.Context) {
-	cuit, err := afipJwtData(c)
+	cuil, err := afipJwtData(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid jwt data: " + err.Error()})
 		return
@@ -130,7 +130,7 @@ func (h *GinHandler) ProtectedHi(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": []string{
 			"hi! from protected.",
-			"cuit: " + cuit,
+			"cuil: " + cuil,
 		},
 	})
 

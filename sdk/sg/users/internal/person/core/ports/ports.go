@@ -6,10 +6,13 @@ import (
 	entities "github.com/devpablocristo/golang/sdk/sg/users/internal/person/core/entities"
 )
 
+type UseCases interface {
+	CreatePerson(ctx context.Context, person *entities.Person) (string, error)
+	FindPersonByCuil(context.Context, string) (*entities.Person, error)
+}
+
 type Repository interface {
-	Create(context.Context, *entities.Person) error
-	FindByID(context.Context, string) (*entities.Person, error)
-	Update(context.Context, *entities.Person) error
-	SoftDelete(context.Context, string) error
-	FindByCuit(context.Context, string) (*entities.Person, error)
+	CreatePerson(context.Context, *entities.Person) error
+	UpdatePerson(context.Context, *entities.Person) error
+	FindPersonByCuil(context.Context, string) (*entities.Person, error)
 }

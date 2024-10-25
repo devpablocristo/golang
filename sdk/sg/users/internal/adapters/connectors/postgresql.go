@@ -45,9 +45,7 @@ func (r *PostgreSQL) CreateUser(ctx context.Context, user *entities.User) error 
 
 	_, err := r.repository.Pool().Exec(ctx, query,
 		user.UUID,
-		user.PersonUUID,  // Could be NULL if the user is a company
-		user.CompanyUUID, // Could be NULL if the user is a person
-		user.UserType,    // "person" or "company"
+		user.PersonUUID, // Could be NULL if the user is a company
 		user.Credentials.Username,
 		user.Credentials.PasswordHash,
 	)
@@ -75,8 +73,6 @@ func (r *PostgreSQL) FindUserByUUID(ctx context.Context, id string) (*entities.U
 	err := r.repository.Pool().QueryRow(ctx, query, id).Scan(
 		&user.UUID,
 		&user.PersonUUID,
-		&user.CompanyUUID,
-		&user.UserType,
 		&user.Credentials.Username,
 		&user.Credentials.PasswordHash,
 		&user.CreatedAt,
@@ -108,8 +104,6 @@ func (r *PostgreSQL) FindUserByCuit(ctx context.Context, cuil string) (*entities
 	err := r.repository.Pool().QueryRow(ctx, query, cuil).Scan(
 		&user.UUID,
 		&user.PersonUUID,
-		&user.CompanyUUID,
-		&user.UserType,
 		&user.Credentials.Username,
 		&user.Credentials.PasswordHash,
 		&user.CreatedAt,
@@ -127,22 +121,20 @@ func (r *PostgreSQL) FindUserByCuit(ctx context.Context, cuil string) (*entities
 	return user, nil
 }
 
-// FindByCUIT searches for a user by their CUIT (for companies)
-func (r *PostgreSQL) FindUserByCUIT(ctx context.Context, cuit string) (*entities.User, error) {
+// FindByCUIT searches for a user by their CUIL (for companies)
+func (r *PostgreSQL) FindUserByCUIT(ctx context.Context, cuil string) (*entities.User, error) {
 	user := &entities.User{}
 	query := `
 		SELECT u.uuid, u.person_uuid, u.company_uuid, u.user_type, 
 		       u.username, u.password_hash, u.created_at, u.updated_at, u.deleted_at
 		FROM users u
 		JOIN companies c ON u.company_uuid = c.uuid 
-		WHERE c.cuit = $1 AND u.deleted_at IS NULL
+		WHERE c.cuil = $1 AND u.deleted_at IS NULL
 	`
 
-	err := r.repository.Pool().QueryRow(ctx, query, cuit).Scan(
+	err := r.repository.Pool().QueryRow(ctx, query, cuil).Scan(
 		&user.UUID,
 		&user.PersonUUID,
-		&user.CompanyUUID,
-		&user.UserType,
 		&user.Credentials.Username,
 		&user.Credentials.PasswordHash,
 		&user.CreatedAt,
@@ -171,8 +163,6 @@ func (r *PostgreSQL) UpdateUser(ctx context.Context, user *entities.User) error 
 	result, err := r.repository.Pool().Exec(ctx, query,
 		user.UUID,
 		user.PersonUUID,
-		user.CompanyUUID,
-		user.UserType,
 		user.Credentials.Username,
 		user.Credentials.PasswordHash,
 	)
