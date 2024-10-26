@@ -29,9 +29,9 @@ func NewPostgreSQL() (ports.Repository, error) {
 func (r *PostgreSQL) CreatePerson(ctx context.Context, person *entities.Person) error {
 	query := `
         INSERT INTO persons (
-            uuid, cuil, dni, first_name, last_name, nationality, email, phone, created_at, updated_at
+            uuid, cuil, dni, first_name, last_name, nationality, email, phone
         ) VALUES (
-            $1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            $1, $2, $3, $4, $5, $6, $7, $8
         )
     `
 	_, err := r.repository.Pool().Exec(ctx, query,
@@ -50,8 +50,7 @@ func (r *PostgreSQL) CreatePerson(ctx context.Context, person *entities.Person) 
 func (r *PostgreSQL) UpdatePerson(ctx context.Context, person *entities.Person) error {
 	query := `
         UPDATE persons 
-        SET dni = $2, first_name = $3, last_name = $4, nationality = $5, email = $6, phone = $7, updated_at = CURRENT_TIMESTAMP
-        WHERE cuil = $1 AND deleted_at IS NULL
+        SET dni = $2, first_name = $3, last_name = $4, nationality = $5, email = $6, phone = $7
     `
 	result, err := r.repository.Pool().Exec(ctx, query,
 		person.Cuil, person.Dni, person.FirstName, person.LastName, person.Nationality,
@@ -72,7 +71,7 @@ func (r *PostgreSQL) UpdatePerson(ctx context.Context, person *entities.Person) 
 func (r *PostgreSQL) FindPersonByCuil(ctx context.Context, cuil string) (*entities.Person, error) {
 	person := &entities.Person{}
 	query := `
-        SELECT uuid, cuil, dni, first_name, last_name, nationality, email, phone, created_at, updated_at, deleted_at
+        SELECT uuid, cuil, dni, first_name, last_name, nationality, email, phone
         FROM persons 
         WHERE cuil = $1 AND deleted_at IS NULL
     `

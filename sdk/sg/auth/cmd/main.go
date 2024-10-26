@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 
 	sdkaws "github.com/devpablocristo/golang/sdk/pkg/aws/localstack"
-	sdkcnfldr "github.com/devpablocristo/golang/sdk/pkg/config/configLoader"
+	sdkcnfldr "github.com/devpablocristo/golang/sdk/pkg/config/config-loader"
 	authconn "github.com/devpablocristo/golang/sdk/sg/auth/internal/adapters/connectors"
 	authgtw "github.com/devpablocristo/golang/sdk/sg/auth/internal/adapters/gateways"
 	auth "github.com/devpablocristo/golang/sdk/sg/auth/internal/core"

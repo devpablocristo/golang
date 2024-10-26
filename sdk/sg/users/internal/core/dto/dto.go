@@ -1,20 +1,18 @@
 package dto
 
 import (
-	"time"
-
 	entities "github.com/devpablocristo/golang/sdk/sg/users/internal/core/entities"
 	personentities "github.com/devpablocristo/golang/sdk/sg/users/internal/person/core/entities"
 )
 
 // UserDto representa los datos para crear un usuario en la capa de aplicación
 type UserDto struct {
-	UUID        string
-	UserType    string
-	Person      *PersonDto
-	Credentials CredentialsDto
-	Roles       []RoleDto
-	LoggedAt    *time.Time
+	UUID           string
+	UserType       string
+	EmailValidated bool
+	Person         *PersonDto
+	Credentials    CredentialsDto
+	Roles          []RoleDto
 }
 
 // PersonDto representa los datos de una persona en la capa de aplicación
@@ -31,7 +29,7 @@ type PersonDto struct {
 // CredentialsDto representa las credenciales de un usuario en la capa de aplicación
 type CredentialsDto struct {
 	Username string
-	// Aquí podrías incluir PasswordHash u otro campo relacionado
+	Password string
 }
 
 // RoleDto representa los roles de un usuario en la capa de aplicación
@@ -63,22 +61,13 @@ func ToUser(dto *UserDto) *entities.User {
 	}
 
 	return &entities.User{
+		EmailValidated: dto.EmailValidated,
 		Credentials: entities.Credentials{
-			Username:     dto.Credentials.Username,
-			PasswordHash: "", // Asumimos que el password hash se manejará en otra parte del flujo
+			Username: dto.Credentials.Username,
+			Password: dto.Credentials.Username,
 		},
-		Roles:     roles,
-		CreatedAt: time.Now(),
-		LoggedAt:  dto.LoggedAtOrDefault(),
+		Roles: roles,
 	}
-}
-
-// LoggedAtOrDefault es un método auxiliar para usar un valor por defecto en caso de que LoggedAt sea nulo
-func (dto UserDto) LoggedAtOrDefault() time.Time {
-	if dto.LoggedAt != nil {
-		return *dto.LoggedAt
-	}
-	return time.Now()
 }
 
 func ToPerson(dto *PersonDto) *personentities.Person {

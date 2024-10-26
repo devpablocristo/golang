@@ -129,7 +129,7 @@ func (h *GinHandler) Ping(c *gin.Context) {
 
 // CreateUser maneja la creación de un nuevo usuario
 func (h *GinHandler) CreateUser(c *gin.Context) {
-	var req *transport.CreateUserUser
+	var req *transport.User
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

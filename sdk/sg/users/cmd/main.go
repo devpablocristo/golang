@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/viper"
 
-	sdkcnfldr "github.com/devpablocristo/golang/sdk/pkg/config/configLoader"
+	sdkcnfldr "github.com/devpablocristo/golang/sdk/pkg/config/config-loader"
 
 	userconn "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/connectors"
 	usergtw "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/gateways"

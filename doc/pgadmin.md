@@ -135,3 +135,363 @@ services:
 1. Configurar los niveles de logging si es posible desde pgAdmin.
 2. Configurar Nginx para desactivar los logs de acceso.
 3. Configurar el logging globalmente en Docker.
+
+### Configurar PgAdmin desde afuera de PdAdmin
+
+Par configurar **pgAdmin** utilizando **Docker Compose** de manera que, al iniciar los contenedores, **pgAdmin** ya esté automáticamente conectado a tu servidor de **PostgreSQL** sin necesidad de configurarlo manualmente cada vez. A continuación, te proporcionaré una guía detallada para lograr esto.
+
+## **1. Estructura del Proyecto**
+
+Organiza tu proyecto con la siguiente estructura de directorios:
+
+```
+my_project/
+├── docker-compose.yml
+├── pgadmin/
+│   └── servers.json
+└── data/
+    └── postgres/    # Volumen para datos persistentes de PostgreSQL
+```
+
+- **`docker-compose.yml`**: Define los servicios de PostgreSQL y pgAdmin.
+- **`pgadmin/servers.json`**: Configuración para que pgAdmin se conecte automáticamente al servidor de PostgreSQL.
+- **`data/postgres/`**: Volumen persistente para almacenar los datos de PostgreSQL.
+
+## **2. Crear el Archivo `docker-compose.yml`**
+
+Este archivo define los servicios de **PostgreSQL** y **pgAdmin**, junto con sus configuraciones respectivas.
+
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: your_user
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: users_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:6.21
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin_password
+      PGADMIN_LISTEN_PORT: 80
+      PGADMIN_CONFIG_SERVER_MODE: "False"  # Ejecutar en modo desktop para cargar servidores.json
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json  # Montar el archivo de configuración
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+```
+
+### **Explicación de la Configuración**
+
+- **Servicio `postgres`:**
+  - **`image`**: Utiliza la imagen oficial de PostgreSQL versión 15.
+  - **`container_name`**: Nombre del contenedor para fácil referencia.
+  - **`environment`**: Configuración de la base de datos (usuario, contraseña y nombre de la base de datos).
+  - **`ports`**: Mapea el puerto 5432 del contenedor al puerto 5432 de tu máquina local.
+  - **`volumes`**: Monta un volumen persistente para almacenar los datos de PostgreSQL.
+
+- **Servicio `pgadmin`:**
+  - **`image`**: Utiliza la imagen oficial de pgAdmin 4 versión 6.21.
+  - **`container_name`**: Nombre del contenedor para fácil referencia.
+  - **`environment`**:
+    - **`PGADMIN_DEFAULT_EMAIL`**: Correo electrónico para acceder a pgAdmin.
+    - **`PGADMIN_DEFAULT_PASSWORD`**: Contraseña para acceder a pgAdmin.
+    - **`PGADMIN_LISTEN_PORT`**: Puerto en el que pgAdmin escuchará dentro del contenedor (por defecto es 80).
+    - **`PGADMIN_CONFIG_SERVER_MODE: "False"`**: Ejecuta pgAdmin en modo desktop, permitiendo cargar la configuración de servidores desde un archivo.
+  - **`ports`**: Mapea el puerto 80 del contenedor al puerto 8080 de tu máquina local. Accede a pgAdmin en `http://localhost:8080`.
+  - **`volumes`**:
+    - **`pgadmin_data`**: Almacena la configuración y datos de pgAdmin.
+    - **`./pgadmin/servers.json:/pgadmin4/servers.json`**: Monta tu archivo de configuración `servers.json` en el contenedor.
+  - **`depends_on`**: Asegura que el servicio de PostgreSQL se inicie antes que pgAdmin.
+
+## **3. Crear el Archivo `servers.json`**
+
+Este archivo contiene la configuración del servidor de PostgreSQL que pgAdmin debe conectar automáticamente al iniciar.
+
+### **a. Crear el Directorio para pgAdmin**
+
+Dentro de tu directorio de proyecto, crea una carpeta llamada `pgadmin`:
+
+```bash
+mkdir pgadmin
+```
+
+### **b. Crear y Configurar `servers.json`**
+
+Crea un archivo llamado `servers.json` dentro de la carpeta `pgadmin` con el siguiente contenido:
+
+```json
+[
+  {
+    "Name": "PostgreSQL Server",
+    "Group": "Servers",
+    "Host": "postgres",
+    "Port": 5432,
+    "MaintenanceDB": "users_db",
+    "Username": "your_user",
+    "Password": "your_password",
+    "SSLMode": "prefer"
+  }
+]
+```
+
+### **Explicación de los Campos:**
+
+- **`Name`**: Nombre que aparecerá en pgAdmin para el servidor.
+- **`Group`**: Grupo al que pertenece el servidor en pgAdmin.
+- **`Host`**: Nombre del servicio de PostgreSQL definido en `docker-compose.yml` (`postgres`).
+- **`Port`**: Puerto en el que PostgreSQL está escuchando (5432).
+- **`MaintenanceDB`**: Base de datos de mantenimiento (`users_db`).
+- **`Username`**: Usuario de PostgreSQL (`your_user`).
+- **`Password`**: Contraseña de PostgreSQL (`your_password`).
+- **`SSLMode`**: Modo SSL para la conexión (`prefer`, `require`, etc.).
+
+**Nota Importante:** Asegúrate de que las credenciales en `servers.json` coincidan con las definidas en el archivo `docker-compose.yml`.
+
+## **4. Configurar Variables de Entorno de Forma Segura (Opcional pero Recomendado)**
+
+Para evitar exponer directamente las credenciales en `docker-compose.yml` y `servers.json`, puedes utilizar un archivo `.env`.
+
+### **a. Crear un Archivo `.env`**
+
+En el directorio raíz de tu proyecto, crea un archivo llamado `.env`:
+
+```bash
+touch .env
+```
+
+### **b. Definir las Variables de Entorno en `.env`**
+
+Añade las siguientes líneas al archivo `.env`:
+
+```env
+POSTGRES_USER=your_user
+POSTGRES_PASSWORD=your_password
+POSTGRES_DB=users_db
+PGADMIN_DEFAULT_EMAIL=admin@example.com
+PGADMIN_DEFAULT_PASSWORD=admin_password
+PGADMIN_SERVERS_JSON_PASSWORD=your_password
+```
+
+### **c. Actualizar `docker-compose.yml` para Usar Variables de Entorno**
+
+Modifica tu archivo `docker-compose.yml` para usar las variables definidas en `.env`:
+
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:6.21
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_LISTEN_PORT: 80
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+```
+
+### **d. Actualizar `servers.json` para Usar Variables de Entorno**
+
+Desafortunadamente, **pgAdmin** no soporta directamente la interpolación de variables de entorno en archivos JSON. Sin embargo, puedes utilizar herramientas como `envsubst` para reemplazar las variables antes de iniciar los contenedores. Alternativamente, puedes mantener las credenciales en el archivo `servers.json` pero asegurarte de que el archivo `.env` esté protegido (añadiéndolo a `.gitignore`).
+
+**Ejemplo de `servers.json` con Credenciales:**
+
+```json
+[
+  {
+    "Name": "PostgreSQL Server",
+    "Group": "Servers",
+    "Host": "postgres",
+    "Port": 5432,
+    "MaintenanceDB": "users_db",
+    "Username": "your_user",
+    "Password": "your_password",
+    "SSLMode": "prefer"
+  }
+]
+```
+
+**Recomendación:** Mantén el archivo `.env` y `servers.json` fuera de tu control de versiones añadiendo las siguientes líneas a tu archivo `.gitignore`:
+
+```gitignore
+.env
+pgadmin/servers.json
+```
+
+## **5. Iniciar los Servicios con Docker Compose**
+
+Desde el directorio raíz de tu proyecto, ejecuta el siguiente comando para iniciar los servicios:
+
+```bash
+docker-compose up -d
+```
+
+### **Explicación del Comando:**
+
+- **`docker-compose up`**: Crea e inicia los contenedores definidos en `docker-compose.yml`.
+- **`-d`**: Ejecuta los contenedores en segundo plano (modo "detached").
+
+## **6. Verificar la Conexión Automática en pgAdmin**
+
+1. **Abrir pgAdmin en el Navegador:**
+
+   Navega a [http://localhost:8080](http://localhost:8080) en tu navegador web.
+
+2. **Iniciar Sesión:**
+
+   Utiliza las credenciales definidas en `.env` o directamente en `docker-compose.yml`:
+
+   - **Email**: `admin@example.com`
+   - **Contraseña**: `admin_password`
+
+3. **Verificar la Conexión al Servidor de PostgreSQL:**
+
+   Deberías ver automáticamente el servidor de PostgreSQL ("PostgreSQL Server") en la interfaz de pgAdmin bajo el grupo "Servers".
+
+   ![pgAdmin Server](https://www.pgadmin.org/static/img/screenshots/pgadmin4_dashboard.png)
+
+   *Nota: La apariencia puede variar según la versión de pgAdmin.*
+
+## **7. Consideraciones Adicionales**
+
+### **a. Persistencia de Datos**
+
+- **PostgreSQL**: Los datos de la base de datos se almacenan en el volumen `postgres_data`. Esto asegura que tus datos no se pierdan al reiniciar o eliminar los contenedores.
+- **pgAdmin**: La configuración y los datos de pgAdmin se almacenan en el volumen `pgadmin_data`.
+
+### **b. Seguridad**
+
+- **Credenciales Seguras**: Asegúrate de utilizar contraseñas seguras para `POSTGRES_PASSWORD` y `PGADMIN_DEFAULT_PASSWORD`.
+- **Acceso Limitado**: Considera limitar el acceso a pgAdmin únicamente a redes confiables o implementa un proxy inverso con autenticación adicional y HTTPS.
+
+### **c. Uso de Variables de Entorno para `servers.json` (Opcional)**
+
+Si deseas automatizar la inyección de variables de entorno en `servers.json`, puedes utilizar scripts de inicio o herramientas como `envsubst`. Sin embargo, esto añade complejidad adicional y requiere configurar scripts personalizados.
+
+### **d. Actualización de Servicios**
+
+Para actualizar los servicios (por ejemplo, después de modificar `servers.json`), ejecuta:
+
+```bash
+docker-compose down
+docker-compose up -d
+```
+
+### **e. Solución de Problemas**
+
+- **Logs de Contenedores**: Si encuentras problemas, revisa los logs de los contenedores para identificar errores.
+
+  ```bash
+  docker-compose logs pgadmin
+  docker-compose logs postgres
+  ```
+
+- **Verificar Conexión**: Asegúrate de que el servicio de PostgreSQL esté funcionando y escuchando en el puerto correcto.
+
+## **8. Ejemplo Completo del Archivo `docker-compose.yml`**
+
+Aquí tienes un resumen completo del archivo `docker-compose.yml`:
+
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:6.21
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_LISTEN_PORT: 80
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+```
+
+## **9. Resumen**
+
+Siguiendo los pasos anteriores, podrás configurar **pgAdmin** para que se conecte automáticamente a tu servidor de **PostgreSQL** al iniciar los contenedores con **Docker Compose**. Esto facilita la administración de tu base de datos sin necesidad de configuraciones manuales cada vez que inicies pgAdmin.
+
+### **Pasos Clave:**
+
+1. **Configurar `docker-compose.yml`**: Define los servicios de PostgreSQL y pgAdmin con sus configuraciones respectivas.
+2. **Crear `servers.json`**: Define la conexión al servidor de PostgreSQL para que pgAdmin lo cargue automáticamente.
+3. **Montar `servers.json` en pgAdmin**: Asegura que pgAdmin cargue la configuración al iniciar.
+4. **Iniciar los Servicios**: Utiliza `docker-compose up -d` para levantar los contenedores.
+5. **Verificar la Conexión**: Accede a pgAdmin en `http://localhost:8080` y confirma que el servidor de PostgreSQL está conectado.
+
+### **Consejos Finales:**
+
+- **Mantén tus credenciales seguras**: Utiliza archivos `.env` y evita exponer contraseñas en archivos de configuración versionados.
+- **Monitorea los Logs**: Siempre revisa los logs de los contenedores si encuentras problemas.
+- **Actualiza Regularmente**: Mantén las imágenes de Docker actualizadas para aprovechar las últimas mejoras y parches de seguridad.
+
+Si tienes alguna otra pregunta o necesitas más ayuda, ¡no dudes en preguntar!

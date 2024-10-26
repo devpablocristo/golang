@@ -1,21 +1,17 @@
 package tranport
 
 import (
-	"time"
-
 	dto "github.com/devpablocristo/golang/sdk/sg/users/internal/core/dto"
 )
 
-type CreateUserUser struct {
-	UserType         string            `json:"user_type" binding:"required,oneof=person company"`
-	CreateUserPerson *CreateUserPerson `json:"person,omitempty"`
-	Credentials      CreateUserCreds   `json:"credentials" binding:"required"`
-	Roles            []CreateUserRole  `json:"roles,omitempty"`
-	LoggedAt         *time.Time        `json:"logged_at,omitempty"`
+type User struct {
+	Person      *Person     `json:"person"`
+	Credentials Credentials `json:"credentials"`
+	Roles       []Role      `json:"roles,omitempty"`
 }
 
-// CreateUserPerson representa la estructura de datos para una persona
-type CreateUserPerson struct {
+// Person representa la estructura de datos para una persona
+type Person struct {
 	Cuil        string  `json:"cuil" binding:"required"`
 	Dni         *string `json:"dni,omitempty"`
 	FirstName   *string `json:"first_name,omitempty"`
@@ -25,35 +21,35 @@ type CreateUserPerson struct {
 	Phone       string  `json:"phone" binding:"required"`
 }
 
-// CreateUserCreds representa la estructura de datos de las credenciales para la API
-type CreateUserCreds struct {
-	Username string `json:"username" binding:"required"`
-	// PasswordHash se excluye deliberadamente por razones de seguridad
+// Creds representa la estructura de datos de las credenciales para la API
+type Credentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
-// CreateUserRole representa la estructura de datos del rol para la API
-type CreateUserRole struct {
-	Name        string           `json:"name" binding:"required"`
-	Permissions []CreateUserPerm `json:"permissions" binding:"required,dive,required"`
+// Role representa la estructura de datos del rol para la API
+type Role struct {
+	Name        string       `json:"name"`
+	Permissions []Permission `json:"permissions"`
 }
 
-// CreateUserPerm representa la estructura de datos del permiso para la API
-type CreateUserPerm struct {
-	Name        string `json:"name" binding:"required"`
-	Description string `json:"description" binding:"required"`
+// Perm representa la estructura de datos del permiso para la API
+type Permission struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
-func ToUserDto(req *CreateUserUser) *dto.UserDto {
+func ToUserDto(req *User) *dto.UserDto {
 	var personDto *dto.PersonDto
-	if req.CreateUserPerson != nil {
+	if req.Person != nil {
 		personDto = &dto.PersonDto{
-			Cuil:        req.CreateUserPerson.Cuil,
-			Dni:         req.CreateUserPerson.Dni,
-			FirstName:   req.CreateUserPerson.FirstName,
-			LastName:    req.CreateUserPerson.LastName,
-			Nationality: req.CreateUserPerson.Nationality,
-			Email:       req.CreateUserPerson.Email,
-			Phone:       req.CreateUserPerson.Phone,
+			Cuil:        req.Person.Cuil,
+			Dni:         req.Person.Dni,
+			FirstName:   req.Person.FirstName,
+			LastName:    req.Person.LastName,
+			Nationality: req.Person.Nationality,
+			Email:       req.Person.Email,
+			Phone:       req.Person.Phone,
 		}
 	}
 
@@ -75,12 +71,11 @@ func ToUserDto(req *CreateUserUser) *dto.UserDto {
 	}
 
 	return &dto.UserDto{
-		UserType: req.UserType,
-		Person:   personDto,
+		Person: personDto,
 		Credentials: dto.CredentialsDto{
 			Username: req.Credentials.Username,
+			Password: req.Credentials.Password,
 		},
-		Roles:    rolesDto,
-		LoggedAt: req.LoggedAt,
+		Roles: rolesDto,
 	}
 }
