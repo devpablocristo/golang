@@ -2,6 +2,7 @@ package authconn
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -12,6 +13,7 @@ import (
 	sdktools "github.com/devpablocristo/golang/sdk/pkg/tools"
 
 	datmod "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/connectors/data-model"
+	entities "github.com/devpablocristo/golang/sdk/sg/users/internal/core/entities"
 	ports "github.com/devpablocristo/golang/sdk/sg/users/internal/core/ports"
 )
 
@@ -30,35 +32,32 @@ func NewPostgreSQL() (ports.Repository, error) {
 	}, nil
 }
 
-// Función para hashear la contraseña antes de almacenar en la base de datos
+
+
+// Crear usuario en la base de datos con hash de contraseña
 func (r *PostgreSQL) CreateUser(ctx context.Context, user *datmod.User) error {
 	passwordHash, err := sdktools.HashPassword(user.Password, 12)
 	if err != nil {
 		return err
 	}
-
 	user.Password = passwordHash
 
-	// Consulta SQL para insertar el usuario
 	query := `
 		INSERT INTO users (
 			uuid, person_uuid, email_validated, username, password_hash, created_at
-		) VALUES (
-			$1, $2, $3, $4, $5, CURRENT_TIMESTAMP
-		)
+		) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
 	`
 
-	// Ejecutar la consulta con el hash generado
 	_, err = r.repository.Pool().Exec(ctx, query,
 		user.UUID,
 		user.PersonUUID,
 		user.EmailValidated,
 		user.Username,
-		user.Password, // Aquí se usa el hash de la contraseña
+		user.Password, // Hash de la contraseña
 	)
 
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" { // unique_violation
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" { // Código para unique_violation
 			return errors.New("user already exists")
 		}
 		return err
@@ -67,58 +66,60 @@ func (r *PostgreSQL) CreateUser(ctx context.Context, user *datmod.User) error {
 	return nil
 }
 
-// // FindByCUIL searches for a user by their CUIL (for persons)
-// func (r *PostgreSQL) FindUserByCuil(ctx context.Context, cuil string) (*entities.User, error) {
-// 	user := &entities.User{}
-// 	query := `
-// 		SELECT u.uuid, u.person_uuid, u.username, u.password_hash, u.created_at, u.updated_at, u.deleted_at
-// 		FROM users u
-// 		JOIN persons p ON u.person_uuid = p.uuid
-// 		WHERE p.cuil = $1 AND u.deleted_at IS NULL
-// 	`
+// Buscar usuario por UUID
+func (r *PostgreSQL) FindUserByUserUUID(ctx context.Context, userUUID string) (*entities.User, error) {
+	query := `SELECT uuid, person_uuid, username, password_hash, email_validated, created_at, updated_at, deleted_at FROM users WHERE uuid = $1`
 
-// 	err := r.repository.Pool().QueryRow(ctx, query, cuil).Scan(
-// 		&user.UUID,
-// 		&user.PersonUUID,
-// 		&user.Credentials.Username,
-// 		&user.Credentials.PasswordHash,
-// 		&user.CreatedAt,
-// 		&user.UpdatedAt,
-// 		&user.DeletedAt,
-// 	)
+	return r.findUserByQuery(ctx, query, userUUID)
+}
 
-// 	if err == sql.ErrNoRows {
-// 		return nil, nil
-// 	}
-// 	if err != nil {
-// 		return nil, err
-// 	}
+// Actualizar usuario por UUID
+func (r *PostgreSQL) UpdateUser(ctx context.Context, user *datmod.User) error {
+	query := `
+		UPDATE users
+		SET email_validated = $1, username = $2, password_hash = $3, updated_at = CURRENT_TIMESTAMP
+		WHERE uuid = $4
+	`
 
-// 	return user, nil
-// }
+	_, err := r.repository.Pool().Exec(ctx, query,
+		user.EmailValidated,
+		user.Username,
+		user.Password,
+		user.UUID,
+	)
 
-// // Update updates an existing user
-// func (r *PostgreSQL) UpdateUser(ctx context.Context, user *datmod.User) error {
-// 	query := `
-// 		UPDATE users
-// 		SET person_uuid = $2, user_type = $3, username = $4, password_hash = $5, updated_at = CURRENT_TIMESTAMP
-// 		WHERE uuid = $1 AND deleted_at IS NULL
-// 	`
-// 	result, err := r.repository.Pool().Exec(ctx, query,
-// 		user.UUID,
-// 		user.PersonUUID,
-// 		user.Credentials.Username,
-// 		user.Credentials.PasswordHash,
-// 	)
+	if err != nil {
+		return fmt.Errorf("error updating user: %w", err)
+	}
 
-// 	if err != nil {
-// 		return err
-// 	}
+	return nil
+}
 
-// 	rowsAffected := result.RowsAffected()
-// 	if rowsAffected == 0 {
-// 		return errors.New("user not found")
-// 	}
+// Buscar usuario por PersonUUID
+func (r *PostgreSQL) FindUserByPersonUUID(ctx context.Context, personUUID string) (*entities.User, error) {
+	query := `SELECT uuid, person_uuid, username, password_hash, email_validated, created_at, updated_at, deleted_at FROM users WHERE person_uuid = $1`
 
-// 	return nil
-// }
+	return r.findUserByQuery(ctx, query, personUUID)
+}
+
+// Función auxiliar para encontrar un usuario usando una consulta SQL
+func (r *PostgreSQL) findUserByQuery(ctx context.Context, query string, identifier string) (*entities.User, error) {
+	// Ejecutar la consulta
+	row := r.repository.Pool().QueryRow(ctx, query, identifier)
+
+	// Mapear el resultado a una entidad User
+	var user entities.User
+	var personUUID sql.NullString
+
+	err := row.Scan(&user.UUID, &personUUID, &user.Credentials.Username, &user.Credentials.Password, &user.EmailValidated, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("no user found for identifier: %s", identifier)
+		}
+		return nil, fmt.Errorf("error finding user: %w", err)
+	}
+
+	user.PersonUUID = getStringFromNullString(personUUID)
+
+	return &user, nil
+}

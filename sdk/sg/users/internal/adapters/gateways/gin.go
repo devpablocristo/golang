@@ -10,7 +10,8 @@ import (
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
 	sdkginports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
 
-	transport "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/gateways/transport"
+	trncreate "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/gateways/transport/create-user"
+	trnupdate "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/gateways/transport/update-user"
 	ports "github.com/devpablocristo/golang/sdk/sg/users/internal/core/ports"
 )
 
@@ -129,19 +130,37 @@ func (h *GinHandler) Ping(c *gin.Context) {
 
 // CreateUser maneja la creación de un nuevo usuario
 func (h *GinHandler) CreateUser(c *gin.Context) {
-	var req *transport.User
+	var req *trncreate.User
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	userUUID, err := h.ucs.CreateUser(c.Request.Context(), transport.ToUserDto(req))
+	userUUID, err := h.ucs.CreateUser(c.Request.Context(), trncreate.ToUserDto(req))
 	if err != nil {
-		if err.Error() == "user already exists" {
-			c.JSON(http.StatusConflict, gin.H{"error": "User already exists"})
-			return
-		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating user: " + err.Error()})
+		return
+	}
+
+	// Traducir la entidad de dominio a transport para la respuesta
+	//usertransport := transport.ToUsertransport(user)
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "user created",
+		"uuid":    userUUID,
+	})
+}
+
+func (h *GinHandler) UpdateUserByCuil(c *gin.Context) {
+	var req *trnupdate.User
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userUUID, err := h.ucs.UpdateUserByPersonCuil(c.Request.Context(), trnupdate.ToUserDto(req))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating user: " + err.Error()})
 		return
 	}
 
