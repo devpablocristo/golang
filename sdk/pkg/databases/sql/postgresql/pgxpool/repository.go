@@ -25,10 +25,10 @@ type repository struct {
 	pool *pgxpool.Pool
 }
 
-func newRepository(c defs.Config) (defs.Repository, error) {
+func newRepository(config defs.Config) (defs.Repository, error) {
 	once.Do(func() {
 		instance = &repository{}
-		initError = instance.Connect(c)
+		initError = instance.Connect(config)
 		if initError != nil {
 			instance = nil
 		}

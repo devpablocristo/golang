@@ -53,6 +53,18 @@ docker-logs:
 	@echo "Fetching logs for $(PROFILE) services..."
 	APP_NAME=$(APP_NAME) docker compose -f ${DOCKER_COMPOSE_FILE} logs -f $(APP_NAME)
 
+sg_mailing-up:
+	@$(MAKE) docker-up PROFILE=sg_mailing APP_NAME=sg_mailing
+
+sg_mailing-build:
+	@$(MAKE) docker-build PROFILE=sg_mailing APP_NAME=sg_mailing
+
+sg_mailing-down:
+	@$(MAKE) docker-down PROFILE=sg_mailing APP_NAME=sg_mailing
+
+sg_mailing-logs:
+	@$(MAKE) docker-logs PROFILE=sg_mailing APP_NAME=sg_mailing
+
 sg_users-up:
 	@$(MAKE) docker-up PROFILE=sg_users APP_NAME=sg_users
 

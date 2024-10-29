@@ -17,7 +17,7 @@ type JwtService struct {
 func NewJwtService() (ports.JwtService, error) {
 	js, err := sdkjwt.Bootstrap()
 	if err != nil {
-		return nil, fmt.Errorf("bootstrap error: %w", err)
+		return nil, fmt.Errorf("jwt bootstrap error: %w", err)
 	}
 
 	return &JwtService{

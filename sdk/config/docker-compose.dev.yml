@@ -177,12 +177,48 @@ services:
       - AWS_ENDPOINT=http://localstack:${AWS_EDGE_PORT}
     depends_on:
       - localstack
+      - postgres
     networks:
       - app-network
     restart: on-failure
     profiles:
       - sg_users
     command: air -c ${AIR_CONFIG}    
+
+  sg_mailing:
+    container_name: "sg_mailing"
+    build:
+      context: ..
+      dockerfile: config/Dockerfile.dev
+    image: "sg_mailing:${APP_VERSION}"
+    env_file:
+      - .env
+      - .env.local
+    ports:
+      - "${WEB_SERVER_PORT}:${WEB_SERVER_PORT}"
+      - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}"
+      - "${DELVE_PORT}:${DELVE_PORT}"
+    volumes:
+      - type: bind
+        source: ..
+        target: /app
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - BUILDING_FILES=/app/sg/mailing/cmd/main.go
+      - APP_NAME=sg_mailing
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ENDPOINT=http://localstack:${AWS_EDGE_PORT}
+    depends_on:
+      - localstack
+      - mailhog
+    networks:
+      - app-network
+    restart: on-failure
+    profiles:
+      - sg_mailing
+    command: air -c ${AIR_CONFIG}   
 
   postgres:
     image: postgres:16.3
@@ -200,8 +236,7 @@ services:
       - app-network
     restart: on-failure
     profiles:
-      - sg_auth
-      - sg_users
+      - sg_mailing
 
   pgadmin:
     image: dpage/pgadmin4:8.12
@@ -527,6 +562,18 @@ services:
     profiles:
       - sg_auth 
       - sg_users
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: mailhog
+    ports:
+      - "${MH_SMTP_PORT}:${MH_SMTP_PORT}"   # Puerto SMTP que tu aplicación usará para enviar correos
+      - "${MH_WEB_UI_PORT:${MH_WEB_UI_PORT}"   # Puerto de la interfaz web para visualizar los correos
+    networks:
+      - app-network
+    restart: on-failure  # Asegura que MailHog se reinicie en caso de fallo
+    profiles:
+      - sg_mailing
 
 networks:
   app-network:

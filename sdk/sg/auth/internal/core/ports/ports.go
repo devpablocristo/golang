@@ -29,10 +29,6 @@ type Repository interface {
 
 type HttpClient interface {
 	GetAccessToken(ctx context.Context) (string, error)
-	// AuthenticateUser(ctx context.Context, credentials entities.Credentials) (*entities.User, error)
-	// GetUserInfo(ctx context.Context, token string) (*entities.User, error)
-	// RevokeToken(ctx context.Context, token string) error
-	// RefreshToken(ctx context.Context, refreshToken string) (*entities.Token, error)
 }
 
 type SessionManager interface {
