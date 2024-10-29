@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	defs "github.com/devpablocristo/golang/sdk/pkg/repo-tools/ast/defs"
 	"golang.org/x/tools/go/ast/astutil"
 	"golang.org/x/tools/go/packages"
 )
@@ -42,9 +43,9 @@ func collectNodes[T any](node ast.Node, filter func(ast.Node) (T, bool)) ([]T, e
 	return results, nil
 }
 
-// getParameterInfo es una función auxiliar para obtener información de parámetros.
-func getParameterInfo(fl *ast.FieldList) []ParameterInfo {
-	var params []ParameterInfo
+// getdefs.ParameterInfo es una función auxiliar para obtener información de parámetros.
+func getParameterInfo(fl *ast.FieldList) []defs.ParameterInfo {
+	var params []defs.ParameterInfo
 	if fl == nil {
 		return params
 	}
@@ -52,13 +53,13 @@ func getParameterInfo(fl *ast.FieldList) []ParameterInfo {
 		typeStr := exprToString(field.Type)
 		if len(field.Names) == 0 {
 			// Parámetro anónimo
-			params = append(params, ParameterInfo{
+			params = append(params, defs.ParameterInfo{
 				Name: "",
 				Type: typeStr,
 			})
 		} else {
 			for _, name := range field.Names {
-				params = append(params, ParameterInfo{
+				params = append(params, defs.ParameterInfo{
 					Name: name.Name,
 					Type: typeStr,
 				})
@@ -93,9 +94,9 @@ func exprToString(expr ast.Expr) string {
 }
 
 // getVariableType obtiene el tipo de una variable.
-func (s *service) getVariableType(expr ast.Expr, name *ast.Ident, pkg *packages.Package, imports map[string]string) string {
+func (s *service) getVariableType(expr ast.Expr, name *ast.Ident, pkg *packages.Package, imdefs map[string]string) string {
 	if expr != nil {
-		return s.getTypeFromAST(expr, imports)
+		return s.getTypeFromAST(expr, imdefs)
 	}
 	return pkg.TypesInfo.ObjectOf(name).Type().String()
 }
@@ -115,28 +116,28 @@ func (s *service) getKindFromObj(obj types.Object) string {
 }
 
 // getTypeFromAST obtiene el tipo desde una expresión AST.
-func (s *service) getTypeFromAST(expr ast.Expr, imports map[string]string) string {
+func (s *service) getTypeFromAST(expr ast.Expr, imdefs map[string]string) string {
 	switch t := expr.(type) {
 	case *ast.Ident:
 		return t.Name
 	case *ast.SelectorExpr:
 		if pkgIdent, ok := t.X.(*ast.Ident); ok {
-			if pkgPath, exists := imports[pkgIdent.Name]; exists {
+			if pkgPath, exists := imdefs[pkgIdent.Name]; exists {
 				return fmt.Sprintf("%s.%s", pkgPath, t.Sel.Name)
 			}
 			return fmt.Sprintf("%s.%s", pkgIdent.Name, t.Sel.Name)
 		}
 	case *ast.StarExpr:
-		return "*" + s.getTypeFromAST(t.X, imports)
+		return "*" + s.getTypeFromAST(t.X, imdefs)
 	case *ast.ArrayType:
-		return "[]" + s.getTypeFromAST(t.Elt, imports)
+		return "[]" + s.getTypeFromAST(t.Elt, imdefs)
 	}
 	return "unknown"
 }
 
-// extractImports extrae las importaciones del archivo.
-func (s *service) extractImports(file *ast.File) map[string]string {
-	imports := make(map[string]string)
+// extractImdefs extrae las importaciones del archivo.
+func (s *service) extractImdefs(file *ast.File) map[string]string {
+	imdefs := make(map[string]string)
 	for _, i := range file.Imports {
 		alias := ""
 		if i.Name != nil {
@@ -146,9 +147,9 @@ func (s *service) extractImports(file *ast.File) map[string]string {
 			parts := strings.Split(path, "/")
 			alias = parts[len(parts)-1]
 		}
-		imports[alias] = strings.Trim(i.Path.Value, "\"")
+		imdefs[alias] = strings.Trim(i.Path.Value, "\"")
 	}
-	return imports
+	return imdefs
 }
 
 // getFileFromPackage obtiene el archivo AST desde el paquete.

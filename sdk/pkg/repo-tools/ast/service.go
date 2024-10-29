@@ -13,26 +13,27 @@ import (
 	"strings"
 	"sync"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/repo-tools/ast/ports"
 	"golang.org/x/tools/go/callgraph"
 	"golang.org/x/tools/go/callgraph/static"
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/tools/go/ssa"
 	"golang.org/x/tools/go/ssa/ssautil"
+
+	defs "github.com/devpablocristo/golang/sdk/pkg/repo-tools/ast/defs"
 )
 
 var (
-	instance  ports.Service
+	instance  defs.Service
 	once      sync.Once
 	initError error
 )
 
 type service struct {
-	config ports.Config
+	config defs.Config
 }
 
 // newService crea una nueva instancia del servicio AST.
-func newService(config ports.Config) (ports.Service, error) {
+func newService(config defs.Config) (defs.Service, error) {
 	once.Do(func() {
 		err := config.Validate()
 		if err != nil {
@@ -47,20 +48,20 @@ func newService(config ports.Config) (ports.Service, error) {
 	return instance, initError
 }
 
-// ReadImports analiza un archivo Go y devuelve los imports encontrados.
+// ReadImdefs analiza un archivo Go y devuelve los imdefs encontrados.
 func (s *service) ReadImports(filePath string) ([]string, error) {
 	node, _, err := s.parseFile(filePath, parser.AllErrors)
 	if err != nil {
 		return nil, err
 	}
 
-	var imports []string
+	var imdefs []string
 	for _, imp := range node.Imports {
 		importPath := strings.Trim(imp.Path.Value, "\"")
-		imports = append(imports, importPath)
+		imdefs = append(imdefs, importPath)
 	}
 
-	return imports, nil
+	return imdefs, nil
 }
 
 // ReadFunctions analiza un archivo Go y devuelve las funciones encontradas.
@@ -268,15 +269,15 @@ func (s *service) ReadComments(filePath string) ([]string, error) {
 }
 
 // ReadMethodsInfo analiza un archivo Go y devuelve información detallada de los métodos encontrados.
-func (s *service) ReadMethodsInfo(filePath string) ([]MethodInfo, error) {
+func (s *service) ReadMethodsInfo(filePath string) ([]defs.MethodInfo, error) {
 	node, _, err := s.parseFile(filePath, parser.AllErrors)
 	if err != nil {
 		return nil, err
 	}
 
-	filter := func(n ast.Node) (MethodInfo, bool) {
+	filter := func(n ast.Node) (defs.MethodInfo, bool) {
 		if fn, ok := n.(*ast.FuncDecl); ok && fn.Recv != nil {
-			methodInfo := MethodInfo{
+			methodInfo := defs.MethodInfo{
 				Name: fn.Name.Name,
 			}
 			if len(fn.Recv.List) > 0 {
@@ -286,55 +287,55 @@ func (s *service) ReadMethodsInfo(filePath string) ([]MethodInfo, error) {
 			methodInfo.OutputParams = getParameterInfo(fn.Type.Results)
 			return methodInfo, true
 		}
-		return MethodInfo{}, false
+		return defs.MethodInfo{}, false
 	}
 
 	return collectNodes(node, filter)
 }
 
 // ReadFunctionsInfo analiza un archivo Go y devuelve información detallada de las funciones encontradas.
-func (s *service) ReadFunctionsInfo(filePath string) ([]FunctionInfo, error) {
+func (s *service) ReadFunctionsInfo(filePath string) ([]defs.FunctionInfo, error) {
 	node, _, err := s.parseFile(filePath, parser.AllErrors)
 	if err != nil {
 		return nil, err
 	}
 
-	filter := func(n ast.Node) (FunctionInfo, bool) {
+	filter := func(n ast.Node) (defs.FunctionInfo, bool) {
 		if fn, ok := n.(*ast.FuncDecl); ok && fn.Recv == nil {
-			funcInfo := FunctionInfo{
+			funcInfo := defs.FunctionInfo{
 				Name:         fn.Name.Name,
 				InputParams:  getParameterInfo(fn.Type.Params),
 				OutputParams: getParameterInfo(fn.Type.Results),
 			}
 			return funcInfo, true
 		}
-		return FunctionInfo{}, false
+		return defs.FunctionInfo{}, false
 	}
 
 	return collectNodes(node, filter)
 }
 
 // ReadVariablesDetailed analiza un archivo Go y devuelve información detallada de las variables.
-func (s *service) ReadVariablesDetailed(filePath string) ([]VariableInfo, error) {
+func (s *service) ReadVariablesDetailed(filePath string) ([]defs.VariableInfo, error) {
 	cfg := &packages.Config{Mode: packages.NeedSyntax | packages.NeedTypes | packages.NeedTypesInfo, Dir: ""}
 	pkgs, err := packages.Load(cfg, fmt.Sprintf("file=%s", filePath))
 	if err != nil || len(pkgs) == 0 {
 		return nil, fmt.Errorf("error loading package: %w", err)
 	}
 
-	var results []VariableInfo
+	var results []defs.VariableInfo
 	pkg := pkgs[0]
 	file, err := s.getFileFromPackage(pkg, filePath)
 	if err != nil {
 		return nil, err
 	}
 
-	imports := s.extractImports(file)
+	imdefs := s.extractImdefs(file)
 
 	ast.Inspect(file, func(n ast.Node) bool {
 		switch decl := n.(type) {
 		case *ast.GenDecl:
-			s.processVariables(decl, pkg, imports, &results)
+			s.processVariables(decl, pkg, imdefs, &results)
 		case *ast.FuncDecl:
 			s.processFunctionAssignments(decl, pkg, &results)
 		}
@@ -345,16 +346,16 @@ func (s *service) ReadVariablesDetailed(filePath string) ([]VariableInfo, error)
 }
 
 // processVariables procesa las variables globales en el archivo.
-func (s *service) processVariables(decl *ast.GenDecl, pkg *packages.Package, imports map[string]string, results *[]VariableInfo) {
+func (s *service) processVariables(decl *ast.GenDecl, pkg *packages.Package, imdefs map[string]string, results *[]defs.VariableInfo) {
 	for _, spec := range decl.Specs {
 		if vspec, ok := spec.(*ast.ValueSpec); ok {
 			for _, name := range vspec.Names {
-				varType := s.getVariableType(vspec.Type, name, pkg, imports)
+				varType := s.getVariableType(vspec.Type, name, pkg, imdefs)
 				isGlobal := true
 				kind := s.getKindFromObj(pkg.TypesInfo.ObjectOf(name))
 
 				pos := pkg.Fset.Position(name.Pos())
-				*results = append(*results, VariableInfo{
+				*results = append(*results, defs.VariableInfo{
 					Name:     name.Name,
 					Type:     varType,
 					Position: pos,
@@ -370,7 +371,7 @@ func (s *service) processVariables(decl *ast.GenDecl, pkg *packages.Package, imp
 func (s *service) processFunctionAssignments(
 	funcDecl *ast.FuncDecl,
 	pkg *packages.Package,
-	results *[]VariableInfo,
+	results *[]defs.VariableInfo,
 ) {
 	fset := pkg.Fset
 	if fset == nil {
@@ -387,7 +388,7 @@ func (s *service) processFunctionAssignments(
 						varType := obj.Type().String()
 						isGlobal := false
 						pos := fset.Position(ident.Pos())
-						*results = append(*results, VariableInfo{
+						*results = append(*results, defs.VariableInfo{
 							Name:     ident.Name,
 							Type:     varType,
 							Position: pos,
@@ -925,14 +926,14 @@ func (s *service) AnalyzeThirdPartyPackages(filePath string) ([]string, error) {
 		return nil, err
 	}
 
-	var thirdPartyImports []string
+	var thirdPartyImdefs []string
 	for _, imp := range node.Imports {
 		importPath := strings.Trim(imp.Path.Value, "\"")
 		if !s.isStandardLibrary(importPath) {
-			thirdPartyImports = append(thirdPartyImports, importPath)
+			thirdPartyImdefs = append(thirdPartyImdefs, importPath)
 		}
 	}
-	return thirdPartyImports, nil
+	return thirdPartyImdefs, nil
 }
 
 // isStandardLibrary verifica si una importación es de la biblioteca estándar.

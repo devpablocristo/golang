@@ -1,4 +1,4 @@
-package sdkast
+package defs
 
 import (
 	"go/token"

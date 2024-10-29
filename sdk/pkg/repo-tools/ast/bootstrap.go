@@ -3,11 +3,11 @@ package sdkast
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/repo-tools/ast/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/repo-tools/ast/defs"
 )
 
 // Bootstrap inicializa y valida la configuración del AST parser.
-func Bootstrap() (ports.Service, error) {
+func Bootstrap() (defs.Service, error) {
 	config := newConfig(
 		viper.GetString("AST_ANALYZE_PATH"),
 	)

@@ -5,10 +5,10 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/defs"
 )
 
-func Bootstrap(tokenEndPointKey, clientIDKey, clientSecretKey, addParamsKey string) (ports.Client, ports.Config, error) {
+func Bootstrap(tokenEndPointKey, clientIDKey, clientSecretKey, addParamsKey string) (defs.Client, defs.Config, error) {
 	tokenEndPoint := viper.GetString(tokenEndPointKey)
 	if tokenEndPoint == "" {
 		return nil, nil, fmt.Errorf("token endpoint is empty. Check if %s environment variable is set", tokenEndPointKey)

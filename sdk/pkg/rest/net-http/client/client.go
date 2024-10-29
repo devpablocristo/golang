@@ -9,16 +9,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/defs"
 )
 
 type client struct {
-	config       ports.Config
+	config       defs.Config
 	httpClient   *http.Client
-	interceptors []ports.Interceptor
+	interceptors []defs.Interceptor
 }
 
-func newClient(config ports.Config) (ports.Client, error) {
+func newClient(config defs.Config) (defs.Client, error) {
 	c := &client{
 		config: config,
 		httpClient: &http.Client{
@@ -29,7 +29,7 @@ func newClient(config ports.Config) (ports.Client, error) {
 	return c, nil
 }
 
-func (c *client) GetAccessToken(ctx context.Context, endpoint string, params url.Values) (ports.TokenResponse, error) {
+func (c *client) GetAccessToken(ctx context.Context, endpoint string, params url.Values) (defs.TokenResponse, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, strings.NewReader(params.Encode()))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
@@ -56,7 +56,7 @@ func (c *client) GetAccessToken(ctx context.Context, endpoint string, params url
 		return nil, fmt.Errorf("error decodificando la respuesta: %w", err)
 	}
 
-	return &genericTokenResponse{tokenRes}, nil
+	return &defs.GenericTokenResponse{tokenRes}, nil
 }
 
 func (c *client) Do(req *http.Request) (*http.Response, error) {
@@ -99,6 +99,6 @@ func (c *client) retryWithBackoff(operation func() error) error {
 	return fmt.Errorf("operación fallida después de 3 intentos")
 }
 
-func (c *client) AddInterceptor(interceptor ports.Interceptor) {
+func (c *client) AddInterceptor(interceptor defs.Interceptor) {
 	c.interceptors = append(c.interceptors, interceptor)
 }

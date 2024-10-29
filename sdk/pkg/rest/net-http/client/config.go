@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/defs"
 )
 
 type config struct {
@@ -14,7 +14,7 @@ type config struct {
 	additionalParams url.Values
 }
 
-func newConfig(tokenEndPoint, clientID, clientSecret string, additionalParams map[string]string) ports.Config {
+func newConfig(tokenEndPoint, clientID, clientSecret string, additionalParams map[string]string) defs.Config {
 	c := &config{
 		tokenEndPoint:    tokenEndPoint,
 		clientID:         clientID,

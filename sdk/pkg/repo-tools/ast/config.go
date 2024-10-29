@@ -3,14 +3,14 @@ package sdkast
 import (
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/repo-tools/ast/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/repo-tools/ast/defs"
 )
 
 type config struct {
 	AnalyzePath string
 }
 
-func newConfig(analyzePath string) ports.Config {
+func newConfig(analyzePath string) defs.Config {
 	return &config{
 		AnalyzePath: analyzePath,
 	}

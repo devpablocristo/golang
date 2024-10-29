@@ -1,4 +1,4 @@
-package ports
+package defs
 
 type Service interface {
 	ReadImports(filePath string) ([]string, error)

@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/spf13/viper"
 
 	sdkaws "github.com/devpablocristo/golang/sdk/pkg/aws/localstack"
 	sdkcnfldr "github.com/devpablocristo/golang/sdk/pkg/config/config-loader"
@@ -18,8 +17,6 @@ func init() {
 	if err := sdkcnfldr.LoadConfig("config/.env", "config/.env.local"); err != nil {
 		log.Fatalf("Viper Service error: %v", err)
 	}
-
-	fmt.Println("checking env 'AFIP_REALM':", viper.GetString("AFIP_REALM"))
 }
 
 func awsInit() error {

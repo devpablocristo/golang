@@ -2,57 +2,78 @@ package sdkjwt
 
 import (
 	"fmt"
-	"sync"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/devpablocristo/golang/sdk/pkg/jwt/v5/ports"
-)
-
-var (
-	instance  ports.Service
-	once      sync.Once
-	initError error
+	"github.com/devpablocristo/golang/sdk/pkg/jwt/v5/defs"
 )
 
 type service struct {
-	secretKey string
+	secretKey []byte
 }
 
-// newService inicializa el servicio JWT con la configuración proporcionada
-func newService(cfg ports.Config) (ports.Service, error) {
-	once.Do(func() {
-		if err := cfg.Validate(); err != nil {
-			initError = err
-			return
-		}
-		instance = &service{
-			secretKey: cfg.GetSecretKey(),
-		}
-	})
-	if initError != nil {
-		return nil, initError
+// NewService inicializa el servicio JWT con la configuración proporcionada.
+func newService(c defs.Config) (defs.Service, error) {
+	if err := c.Validate(); err != nil {
+		return nil, err
 	}
-
-	return instance, nil
+	return &service{
+		secretKey: []byte(c.GetSecretKey()),
+	}, nil
 }
 
-// GenerateToken genera un token JWT con las reclamaciones proporcionadas
-func (j *service) GenerateToken(claims jwt.MapClaims) (string, error) {
+func (s *service) GenerateToken(claims defs.Claims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString([]byte(j.secretKey))
+	signedToken, err := token.SignedString(s.secretKey)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to sign token: %w", err)
 	}
 	return signedToken, nil
 }
 
-// ValidateToken valida un token JWT proporcionado
-func (j *service) ValidateToken(token string) (*jwt.Token, error) {
-	return jwt.Parse(token, func(token *jwt.Token) (any, error) {
+func (j *service) ValidateToken(tokenString string) (*defs.TokenClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("método de firma inesperado: %v", token.Header["alg"])
 		}
 		return []byte(j.secretKey), nil
 	})
+
+	if err != nil {
+		return nil, fmt.Errorf("error al validar el token: %w", err)
+	}
+
+	// Verifica que el token sea válido y extrae las claims
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return nil, fmt.Errorf("token inválido")
+	}
+
+	// Extrae las claims necesarias
+	subject, ok := claims["sub"].(string)
+	if !ok {
+		return nil, fmt.Errorf("el token no contiene 'sub'")
+	}
+
+	expFloat, ok := claims["exp"].(float64)
+	if !ok {
+		return nil, fmt.Errorf("el token no contiene 'exp'")
+	}
+	expiresAt := time.Unix(int64(expFloat), 0)
+
+	iatFloat, ok := claims["iat"].(float64)
+	if !ok {
+		return nil, fmt.Errorf("el token no contiene 'iat'")
+	}
+	issuedAt := time.Unix(int64(iatFloat), 0)
+
+	// Crea una estructura TokenClaims con la información extraída
+	tokenClaims := &defs.TokenClaims{
+		Subject:   subject,
+		ExpiresAt: expiresAt,
+		IssuedAt:  issuedAt,
+	}
+
+	return tokenClaims, nil
 }
