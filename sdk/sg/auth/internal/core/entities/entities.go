@@ -2,13 +2,11 @@ package authent
 
 import (
 	"time"
-
-	sdkjwt "github.com/devpablocristo/golang/sdk/pkg/jwt/v5"
 )
 
 type Session struct {
 	UserUUID  string
-	Token     sdkjwt.Token
+	Token     string
 	LoggedAt  time.Time
 	ExpiresAt time.Time
 }

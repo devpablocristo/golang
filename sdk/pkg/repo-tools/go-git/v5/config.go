@@ -3,7 +3,7 @@ package sdkgogit
 import (
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/repo-tools/go-git/v5/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/repo-tools/go-git/v5/defs"
 )
 
 type config struct {
@@ -12,7 +12,7 @@ type config struct {
 	RepoBranch string
 }
 
-func newConfig(repoURL, repoPath, repoBranch string) ports.Config {
+func newConfig(repoURL, repoPath, repoBranch string) defs.Config {
 	return &config{
 		RepoURL:    repoURL,
 		RepoPath:   repoPath,

@@ -6,13 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 
 	sdksession "github.com/devpablocristo/golang/sdk/pkg/sessions/gorilla"
-	sdksessionports "github.com/devpablocristo/golang/sdk/pkg/sessions/gorilla/ports"
+	sdksessiondefs "github.com/devpablocristo/golang/sdk/pkg/sessions/gorilla/defs"
 
 	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
 )
 
 type GorillaSessionManager struct {
-	session sdksessionports.SessionManager
+	session sdksessiondefs.SessionManager
 }
 
 // NewGorillaSessionManager inicializa el manejador de sesiones Gorilla

@@ -9,11 +9,11 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/grpc/server/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/grpc/server/defs"
 )
 
 var (
-	instance ports.Server
+	instance defs.Server
 	once     sync.Once
 	initErr  error
 )
@@ -23,7 +23,7 @@ type Server struct {
 	listener net.Listener
 }
 
-func newServer(config ports.Config) (ports.Server, error) {
+func newServer(config defs.Config) (defs.Server, error) {
 	once.Do(func() {
 		var opts []grpc.ServerOption
 		if config.GetTLSConfig() != nil {

@@ -9,23 +9,23 @@ import (
 	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/logger"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/rabbitmq-broker/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/rabbitmq-broker/defs"
 )
 
 var (
-	instance  ports.Broker
+	instance  defs.Broker
 	once      sync.Once
 	initError error
 )
 
-// service estructura que implementa la interfaz ports.Broker
+// service estructura que implementa la interfaz defs.Broker
 type service struct {
 	b  broker.Broker
 	mu sync.Mutex
 }
 
-// newBroker crea una nueva instancia del servicio que implementa ports.Broker
-func newService(config ports.Config) (ports.Broker, error) {
+// newBroker crea una nueva instancia del servicio que implementa defs.Broker
+func newService(config defs.Config) (defs.Broker, error) {
 	once.Do(func() {
 		// Configurar el broker para usar RabbitMQ
 		rabbit := broker.NewBroker(

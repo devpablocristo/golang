@@ -5,11 +5,11 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/producer/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/producer/defs"
 )
 
 // Bootstrap inicializa una nueva instancia de Producer con configuración de Viper.
-func Bootstrap() (ports.Producer, error) {
+func Bootstrap() (defs.Producer, error) {
 	config := newConfig(
 		viper.GetString("RABBITMQ_HOST"),
 		viper.GetInt("RABBITMQ_PORT"),

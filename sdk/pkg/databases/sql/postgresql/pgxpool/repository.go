@@ -12,11 +12,11 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool/defs"
 )
 
 var (
-	instance  ports.Repository
+	instance  defs.Repository
 	once      sync.Once
 	initError error
 )
@@ -25,7 +25,7 @@ type repository struct {
 	pool *pgxpool.Pool
 }
 
-func newRepository(c ports.Config) (ports.Repository, error) {
+func newRepository(c defs.Config) (defs.Repository, error) {
 	once.Do(func() {
 		instance = &repository{}
 		initError = instance.Connect(c)
@@ -36,7 +36,7 @@ func newRepository(c ports.Config) (ports.Repository, error) {
 	return instance, initError
 }
 
-func (r *repository) Connect(c ports.Config) error {
+func (r *repository) Connect(c defs.Config) error {
 	// Construcción de la cadena de conexión
 	connString := c.DNS()
 

@@ -3,10 +3,10 @@ package sdkcgrpcclient
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/grpc/client/defs"
 )
 
-func Bootstrap() (ports.Client, error) {
+func Bootstrap() (defs.Client, error) {
 	config := newConfig(
 		viper.GetString("GRPC_SERVER_HOST"),
 		viper.GetInt("GRPC_SERVER_PORT"),

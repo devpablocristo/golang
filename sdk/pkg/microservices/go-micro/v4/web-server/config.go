@@ -3,8 +3,9 @@ package sdkgomicro
 import (
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/web-server/ports"
 	"github.com/google/uuid"
+
+	defs "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/web-server/defs"
 )
 
 type config struct {
@@ -22,7 +23,7 @@ func newConfig(
 	consulAddress string,
 	ServerHost string,
 	ServerPort int,
-) ports.Config {
+) defs.Config {
 	return &config{
 		Router:        Router,
 		ServerName:    ServerName,

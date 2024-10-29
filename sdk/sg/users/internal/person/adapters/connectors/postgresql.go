@@ -9,7 +9,7 @@ import (
 	"github.com/lib/pq"
 
 	sdkpg "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool"
-	sdkpgports "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool/ports"
+	sdkpgports "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool/defs"
 
 	"github.com/devpablocristo/golang/sdk/sg/users/internal/person/core/entities"
 	"github.com/devpablocristo/golang/sdk/sg/users/internal/person/core/ports"

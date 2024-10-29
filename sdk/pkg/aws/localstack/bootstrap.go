@@ -3,10 +3,10 @@ package sdkaws
 import (
 	"github.com/spf13/viper"
 
-	"github.com/devpablocristo/golang/sdk/pkg/aws/localstack/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/aws/localstack/defs"
 )
 
-func Bootstrap() (ports.Stack, error) {
+func Bootstrap() (defs.Stack, error) {
 	config := newConfig(
 		viper.GetString("AWS_ACCESS_KEY_ID"),
 		viper.GetString("AWS_SECRET_ACCESS_KEY"),

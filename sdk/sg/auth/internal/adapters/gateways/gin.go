@@ -8,7 +8,7 @@ import (
 
 	sdkmwr "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
-	sdkginports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
+	sdkgindefs "github.com/devpablocristo/golang/sdk/pkg/rest/gin/defs"
 	sdktypes "github.com/devpablocristo/golang/sdk/pkg/types"
 
 	dto "github.com/devpablocristo/golang/sdk/sg/auth/internal/adapters/gateways/dto"
@@ -17,7 +17,7 @@ import (
 
 type GinHandler struct {
 	ucs       ports.UseCases
-	ginServer sdkginports.Server
+	ginServer sdkgindefs.Server
 }
 
 func NewGinHandler(u ports.UseCases) (*GinHandler, error) {
@@ -117,7 +117,7 @@ func (h *GinHandler) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.LoginResponse{Token: token.AccessToken})
+	c.JSON(http.StatusOK, dto.LoginResponse{Token: token})
 }
 
 func (h *GinHandler) ProtectedHi(c *gin.Context) {

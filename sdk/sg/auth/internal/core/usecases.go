@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	sdkjwt "github.com/devpablocristo/golang/sdk/pkg/jwt/v5"
 	sdktypes "github.com/devpablocristo/golang/sdk/pkg/types"
 
 	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
@@ -27,7 +26,7 @@ func NewUseCases(js ports.JwtService, rp ports.Repository, hc ports.HttpClient, 
 }
 
 // Login maneja la lógica de autenticación de usuario
-func (u *UseCases) Login(ctx context.Context, creds *sdktypes.LoginCredentials) (*sdkjwt.Token, error) {
+func (u *UseCases) Login(ctx context.Context, creds *sdktypes.LoginCredentials) (string, error) {
 	// userUUID, err := s.grpcClient.GetUserUUID(ctx, creds)
 	// if err != nil {
 	// 	return nil, fmt.Errorf("failed to get user UUID: %w", err)
@@ -35,7 +34,7 @@ func (u *UseCases) Login(ctx context.Context, creds *sdktypes.LoginCredentials) 
 
 	token, err := u.jwtService.GenerateToken("userUUID")
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate token: %w", err)
+		return "", fmt.Errorf("failed to generate token: %w", err)
 	}
 
 	// Return the generated token

@@ -3,7 +3,7 @@ package sdkgin
 import (
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/rest/gin/defs"
 )
 
 type config struct {
@@ -11,7 +11,7 @@ type config struct {
 	ApiVersion string
 }
 
-func newConfig(routerPort, ApiVersion string) ports.Config {
+func newConfig(routerPort, ApiVersion string) defs.Config {
 	return &config{
 		routerPort: routerPort,
 		ApiVersion: ApiVersion,

@@ -3,10 +3,10 @@ package sdkgomicro
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/web-server/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/web-server/defs"
 )
 
-func Bootstrap(webRouter interface{}) (ports.Server, error) {
+func Bootstrap(webRouter interface{}) (defs.Server, error) {
 	config := newConfig(
 		webRouter,
 		viper.GetString("WEB_SERVER_NAME"),

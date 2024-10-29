@@ -6,12 +6,13 @@ import (
 	"sync"
 	"time"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/cache/redis/v8/ports"
 	"github.com/go-redis/redis/v8"
+
+	defs "github.com/devpablocristo/golang/sdk/pkg/cache/redis/v8/defs"
 )
 
 var (
-	instance  ports.Cache
+	instance  defs.Cache
 	once      sync.Once
 	initError error
 )
@@ -21,7 +22,7 @@ type Cache struct {
 }
 
 // newCache inicializa la instancia del cache Redis utilizando el patrón singleton
-func newCache(c ports.Config) (ports.Cache, error) {
+func newCache(c defs.Config) (defs.Cache, error) {
 	once.Do(func() {
 		client := &Cache{}
 		initError = client.connect(c)
@@ -35,7 +36,7 @@ func newCache(c ports.Config) (ports.Cache, error) {
 }
 
 // connect conecta al servidor Redis utilizando los getters de la configuración
-func (ch *Cache) connect(c ports.Config) error {
+func (ch *Cache) connect(c defs.Config) error {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     c.GetAddress(),
 		Password: c.GetPassword(),

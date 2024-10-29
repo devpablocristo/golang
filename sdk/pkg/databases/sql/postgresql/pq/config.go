@@ -3,7 +3,7 @@ package sdkpg
 import (
 	"fmt"
 
-	"github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pq/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pq/defs"
 )
 
 type config struct {
@@ -15,7 +15,7 @@ type config struct {
 }
 
 // newConfig crea una nueva configuración con los valores proporcionados
-func newConfig(user, password, host, port, dbName string) ports.Config {
+func newConfig(user, password, host, port, dbName string) defs.Config {
 	return &config{
 		Host:     host,
 		User:     user,

@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	sdkjwt "github.com/devpablocristo/golang/sdk/pkg/jwt/v5"
+	sdkjwtdefs "github.com/devpablocristo/golang/sdk/pkg/jwt/v5/defs"
 	sdktypes "github.com/devpablocristo/golang/sdk/pkg/types"
 
 	entities "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/entities"
@@ -13,13 +13,14 @@ import (
 
 // UseCases define las operaciones de casos de uso para autenticación
 type UseCases interface {
-	Login(context.Context, *sdktypes.LoginCredentials) (*sdkjwt.Token, error)
+	Login(context.Context, *sdktypes.LoginCredentials) (string, error)
 	AfipLogin(context.Context, string) error
 }
 
 // JwtService define las operaciones del servicio JWT
 type JwtService interface {
-	GenerateToken(string) (*sdkjwt.Token, error)
+	GenerateToken(string) (string, error)
+	ValidateToken(string) (*sdkjwtdefs.TokenClaims, error)
 }
 
 type Repository interface {

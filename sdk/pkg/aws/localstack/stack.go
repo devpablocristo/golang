@@ -8,21 +8,21 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 
-	"github.com/devpablocristo/golang/sdk/pkg/aws/localstack/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/aws/localstack/defs"
 )
 
 var (
-	instance  ports.Stack
+	instance  defs.Stack
 	once      sync.Once
 	initError error
 )
 
 type stack struct {
-	config ports.Config
+	config defs.Config
 	awsCfg aws.Config
 }
 
-func newStack(c ports.Config) (ports.Stack, error) {
+func newStack(c defs.Config) (defs.Stack, error) {
 	once.Do(func() {
 		svc := &stack{config: c}
 		initError = svc.Connect()

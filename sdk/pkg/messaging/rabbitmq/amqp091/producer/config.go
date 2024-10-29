@@ -3,10 +3,10 @@ package sdkrabbit
 import (
 	"fmt"
 
-	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/producer/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/producer/defs"
 )
 
-// config estructura que implementa la interfaz ports.Config para el productor de RabbitMQ.
+// config estructura que implementa la interfaz defs.Config para el productor de RabbitMQ.
 type config struct {
 	host         string
 	port         int
@@ -22,7 +22,7 @@ type config struct {
 }
 
 // newConfig crea una nueva configuración para el productor de RabbitMQ con opciones adicionales.
-func newConfig(host string, port int, user, password, vhost, exchange, exchangeType string, durable, autoDelete, internal, noWait bool) ports.Config {
+func newConfig(host string, port int, user, password, vhost, exchange, exchangeType string, durable, autoDelete, internal, noWait bool) defs.Config {
 	return &config{
 		host:         host,
 		port:         port,

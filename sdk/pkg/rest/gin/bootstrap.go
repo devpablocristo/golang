@@ -3,10 +3,10 @@ package sdkgin
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/rest/gin/defs"
 )
 
-func Bootstrap() (ports.Server, error) {
+func Bootstrap() (defs.Server, error) {
 	config := newConfig(
 		viper.GetString("WEB_SERVER_PORT"),
 		viper.GetString("API_VERSION"),

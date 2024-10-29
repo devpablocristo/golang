@@ -1,3 +1,5 @@
+// sdkjwt/service.go
+
 package sdkjwt
 
 import (
@@ -13,7 +15,6 @@ type service struct {
 	secretKey []byte
 }
 
-// NewService inicializa el servicio JWT con la configuración proporcionada.
 func newService(c defs.Config) (defs.Service, error) {
 	if err := c.Validate(); err != nil {
 		return nil, err
@@ -23,56 +24,44 @@ func newService(c defs.Config) (defs.Service, error) {
 	}, nil
 }
 
-func (s *service) GenerateToken(claims defs.Claims) (string, error) {
+func (s *service) GenerateTokenForSubject(subject string, expiration time.Duration) (string, error) {
+	claims := defs.Claims{
+		Subject: subject,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiration)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString(s.secretKey)
 	if err != nil {
-		return "", fmt.Errorf("failed to sign token: %w", err)
+		return "", fmt.Errorf("error al firmar el token: %w", err)
 	}
 	return signedToken, nil
 }
 
-func (j *service) ValidateToken(tokenString string) (*defs.TokenClaims, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+func (s *service) ValidateToken(tokenString string) (*defs.TokenClaims, error) {
+	claims := &defs.Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("método de firma inesperado: %v", token.Header["alg"])
 		}
-		return []byte(j.secretKey), nil
+		return s.secretKey, nil
 	})
 
 	if err != nil {
 		return nil, fmt.Errorf("error al validar el token: %w", err)
 	}
 
-	// Verifica que el token sea válido y extrae las claims
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
+	if !token.Valid {
 		return nil, fmt.Errorf("token inválido")
 	}
 
-	// Extrae las claims necesarias
-	subject, ok := claims["sub"].(string)
-	if !ok {
-		return nil, fmt.Errorf("el token no contiene 'sub'")
-	}
-
-	expFloat, ok := claims["exp"].(float64)
-	if !ok {
-		return nil, fmt.Errorf("el token no contiene 'exp'")
-	}
-	expiresAt := time.Unix(int64(expFloat), 0)
-
-	iatFloat, ok := claims["iat"].(float64)
-	if !ok {
-		return nil, fmt.Errorf("el token no contiene 'iat'")
-	}
-	issuedAt := time.Unix(int64(iatFloat), 0)
-
-	// Crea una estructura TokenClaims con la información extraída
 	tokenClaims := &defs.TokenClaims{
-		Subject:   subject,
-		ExpiresAt: expiresAt,
-		IssuedAt:  issuedAt,
+		Subject:   claims.Subject,
+		ExpiresAt: claims.ExpiresAt.Time,
+		IssuedAt:  claims.IssuedAt.Time,
 	}
 
 	return tokenClaims, nil

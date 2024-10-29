@@ -3,7 +3,7 @@ package sdkcassandra
 import (
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/cassandra/gocql/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/cassandra/gocql/defs"
 )
 
 type config struct {
@@ -13,7 +13,7 @@ type config struct {
 	password string
 }
 
-func newConfig(hosts []string, keyspace string, username string, password string) ports.Config {
+func newConfig(hosts []string, keyspace string, username string, password string) defs.Config {
 	h := make([]string, len(hosts))
 	copy(h, hosts)
 	return &config{

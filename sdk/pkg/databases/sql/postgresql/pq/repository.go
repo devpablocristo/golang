@@ -6,7 +6,7 @@ import (
 	"log"
 	"sync"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pq/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pq/defs"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	instance  ports.Repository
+	instance  defs.Repository
 	once      sync.Once
 	initError error
 )
@@ -23,7 +23,7 @@ type repository struct {
 	db *sql.DB
 }
 
-func newRepository(c ports.Config) (ports.Repository, error) {
+func newRepository(c defs.Config) (defs.Repository, error) {
 	once.Do(func() {
 		instance = &repository{}
 		initError = instance.Connect(c)
@@ -34,7 +34,7 @@ func newRepository(c ports.Config) (ports.Repository, error) {
 	return instance, initError
 }
 
-func (r *repository) Connect(c ports.Config) error {
+func (r *repository) Connect(c defs.Config) error {
 	// Construir la cadena de conexión
 	connString := c.DNS()
 

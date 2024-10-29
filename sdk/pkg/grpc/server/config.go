@@ -6,18 +6,18 @@ import (
 	"fmt"
 	"os"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/grpc/server/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/grpc/server/defs"
 )
 
-// config estructura que implementa la interfaz ports.Config para el servidor
+// config estructura que implementa la interfaz defs.Config para el servidor
 type config struct {
 	host      string
 	port      int
-	tlsConfig *ports.TLSConfig
+	tlsConfig *defs.TLSConfig
 }
 
 // newServerConfig crea una nueva configuración para el servidor gRPC
-func newConfig(host string, port int, tlsConfig *ports.TLSConfig) ports.Config {
+func newConfig(host string, port int, tlsConfig *defs.TLSConfig) defs.Config {
 	return &config{
 		host:      host,
 		port:      port,
@@ -41,11 +41,11 @@ func (c *config) SetPort(port int) {
 	c.port = port
 }
 
-func (c *config) GetTLSConfig() *ports.TLSConfig {
+func (c *config) GetTLSConfig() *defs.TLSConfig {
 	return c.tlsConfig
 }
 
-func (c *config) SetTLSConfig(tlsConfig *ports.TLSConfig) {
+func (c *config) SetTLSConfig(tlsConfig *defs.TLSConfig) {
 	c.tlsConfig = tlsConfig
 }
 
@@ -57,7 +57,7 @@ func (c *config) Validate() error {
 }
 
 // loadTLSConfig carga la configuración TLS para la conexión gRPC del servidor
-func loadTLSConfig(tlsConfig *ports.TLSConfig) (*tls.Config, error) {
+func loadTLSConfig(tlsConfig *defs.TLSConfig) (*tls.Config, error) {
 	certificate, err := tls.LoadX509KeyPair(tlsConfig.CertFile, tlsConfig.KeyFile)
 	if err != nil {
 		return nil, err

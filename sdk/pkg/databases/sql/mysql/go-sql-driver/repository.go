@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/devpablocristo/golang/sdk/pkg/databases/sql/mysql/go-sql-driver/ports"
 	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/devpablocristo/golang/sdk/pkg/databases/sql/mysql/go-sql-driver/defs"
 )
 
 var (
-	instance  ports.Repository
+	instance  defs.Repository
 	once      sync.Once
 	initError error
 )
@@ -21,7 +22,7 @@ type Repository struct {
 }
 
 // newRepository crea una nueva instancia de Repository con configuración proporcionada.
-func newRepository(c config) (ports.Repository, error) {
+func newRepository(c config) (defs.Repository, error) {
 	once.Do(func() {
 		client := &Repository{}
 		initError = client.connect(c)

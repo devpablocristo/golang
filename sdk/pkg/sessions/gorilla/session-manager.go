@@ -7,11 +7,11 @@ import (
 
 	"github.com/gorilla/sessions"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/sessions/gorilla/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/sessions/gorilla/defs"
 )
 
 var (
-	instance ports.SessionManager
+	instance defs.SessionManager
 	once     sync.Once
 )
 
@@ -20,7 +20,7 @@ type sessionManager struct {
 }
 
 // newSessionManager es una función que crea una única instancia del manejador de sesiones
-func newSessionManager(c ports.Config) (ports.SessionManager, error) {
+func newSessionManager(c defs.Config) (defs.SessionManager, error) {
 	var err error
 	once.Do(func() {
 		// Crear el almacén de cookies

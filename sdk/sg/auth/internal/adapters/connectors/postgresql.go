@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 
 	sdkpg "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool"
-	sdkpgports "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool/ports"
+	sdkpgdefs "github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool/defs"
 
 	entities "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/entities"
 	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
@@ -16,7 +16,7 @@ import (
 const dbNameKey = "AUTH_DB"
 
 type PostgreSQL struct {
-	repository sdkpgports.Repository
+	repository sdkpgdefs.Repository
 }
 
 func NewPostgreSQL() (ports.Repository, error) {

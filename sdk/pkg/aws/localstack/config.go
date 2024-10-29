@@ -3,7 +3,7 @@ package sdkaws
 import (
 	"fmt"
 
-	"github.com/devpablocristo/golang/sdk/pkg/aws/localstack/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/aws/localstack/defs"
 )
 
 type configSdk struct {
@@ -13,7 +13,7 @@ type configSdk struct {
 	LocalStackEndpoint string
 }
 
-func newConfig(awsAccessKeyID, awsSecretAccessKey, awsRegion, localStackEndpoint string) ports.Config {
+func newConfig(awsAccessKeyID, awsSecretAccessKey, awsRegion, localStackEndpoint string) defs.Config {
 	return &configSdk{
 		AWSAccessKeyID:     awsAccessKeyID,
 		AWSSecretAccessKey: awsSecretAccessKey,

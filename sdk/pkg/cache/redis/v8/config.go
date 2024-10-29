@@ -3,7 +3,7 @@ package sdkredis
 import (
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/cache/redis/v8/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/cache/redis/v8/defs"
 )
 
 type config struct {
@@ -13,7 +13,7 @@ type config struct {
 }
 
 // newConfig crea una nueva configuración de Redis
-func newConfig(address, password string, db int) ports.Config {
+func newConfig(address, password string, db int) defs.Config {
 	return &config{
 		Address:  address,
 		Password: password,

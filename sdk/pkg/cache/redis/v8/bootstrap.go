@@ -3,10 +3,10 @@ package sdkredis
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/cache/redis/v8/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/cache/redis/v8/defs"
 )
 
-func Bootstrap() (ports.Cache, error) {
+func Bootstrap() (defs.Cache, error) {
 	config := newConfig(
 		viper.GetString("REDIS_ADDRESS"),
 		viper.GetString("REDIS_PASSWORD"),

@@ -3,7 +3,7 @@ package sdksession
 import (
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/sessions/gorilla/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/sessions/gorilla/defs"
 )
 
 type config struct {
@@ -11,7 +11,7 @@ type config struct {
 }
 
 // newConfig crea una nueva configuración para Gorilla Sessions
-func newConfig(secretKey string) ports.Config {
+func newConfig(secretKey string) defs.Config {
 	return &config{
 		secretKey: secretKey,
 	}

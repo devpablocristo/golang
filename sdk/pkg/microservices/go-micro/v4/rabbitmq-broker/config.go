@@ -3,10 +3,10 @@ package sdkrabbit
 import (
 	"fmt"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/rabbitmq-broker/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/rabbitmq-broker/defs"
 )
 
-// config estructura que implementa la interfaz ports.Config para RabbitMQ.
+// config estructura que implementa la interfaz defs.Config para RabbitMQ.
 type config struct {
 	name string
 	host string
@@ -27,7 +27,7 @@ type config struct {
 }
 
 // NewConfig crea una nueva configuración para RabbitMQ con opciones adicionales.
-func newConfig(name, host, user, password, vhost, queue, exchange, exchangeType, routingKey string, port int, autoAck, exclusive, noLocal, noWait bool) ports.Config {
+func newConfig(name, host, user, password, vhost, queue, exchange, exchangeType, routingKey string, port int, autoAck, exclusive, noLocal, noWait bool) defs.Config {
 	return &config{
 		name:         name,
 		host:         host,

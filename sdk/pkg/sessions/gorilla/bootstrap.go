@@ -3,11 +3,11 @@ package sdksession
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/sessions/gorilla/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/sessions/gorilla/defs"
 )
 
 // Bootstrap inicializa el gestor de sesiones con la configuración necesaria
-func Bootstrap() (ports.SessionManager, error) {
+func Bootstrap() (defs.SessionManager, error) {
 	config := newConfig(
 		viper.GetString("GORILLA_SESSION_SECRET_KEY"),
 	)

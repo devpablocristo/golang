@@ -6,21 +6,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/rest/gin/defs"
 )
 
 var (
-	instance  ports.Server
+	instance  defs.Server
 	once      sync.Once
 	initError error
 )
 
 type server struct {
 	router *gin.Engine
-	config ports.Config
+	config defs.Config
 }
 
-func newServer(config ports.Config) (ports.Server, error) {
+func newServer(config defs.Config) (defs.Server, error) {
 	once.Do(func() {
 		err := config.Validate()
 		if err != nil {

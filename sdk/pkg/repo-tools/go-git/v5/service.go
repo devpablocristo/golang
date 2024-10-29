@@ -9,23 +9,23 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/repo-tools/go-git/v5/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/repo-tools/go-git/v5/defs"
 )
 
 var (
-	instance  ports.Client
+	instance  defs.Client
 	once      sync.Once
 	initError error
 )
 
 type client struct {
 	repo   *git.Repository
-	config ports.Config
+	config defs.Config
 }
 
 // newClient crea una nueva instancia del cliente Git.
 // Utiliza un patrón singleton para asegurar que solo exista una instancia.
-func newClient(config ports.Config) (ports.Client, error) {
+func newClient(config defs.Config) (defs.Client, error) {
 	once.Do(func() {
 		var repo *git.Repository
 		var err error

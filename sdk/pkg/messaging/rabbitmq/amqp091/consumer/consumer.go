@@ -7,24 +7,24 @@ import (
 
 	"github.com/rabbitmq/amqp091-go"
 
-	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/consumer/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/consumer/defs"
 )
 
 var (
-	instance  ports.Consumer
+	instance  defs.Consumer
 	once      sync.Once
 	initError error
 )
 
-// consumer implementa la interfaz ports.Consumer para RabbitMQ.
+// consumer implementa la interfaz defs.Consumer para RabbitMQ.
 type consumer struct {
 	conn    *amqp091.Connection
 	channel *amqp091.Channel
-	config  ports.Config
+	config  defs.Config
 }
 
 // newConsumer crea una nueva instancia de consumidor de RabbitMQ utilizando el patrón Singleton.
-func newConsumer(config ports.Config) (ports.Consumer, error) {
+func newConsumer(config defs.Config) (defs.Consumer, error) {
 	once.Do(func() {
 		connString := fmt.Sprintf("amqp://%s:%s@%s:%d%s",
 			config.GetUser(), config.GetPassword(), config.GetHost(), config.GetPort(), config.GetVHost())

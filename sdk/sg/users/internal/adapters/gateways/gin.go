@@ -8,7 +8,7 @@ import (
 
 	sdkmwr "github.com/devpablocristo/golang/sdk/pkg/middleware/gin"
 	sdkgin "github.com/devpablocristo/golang/sdk/pkg/rest/gin"
-	sdkginports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/ports"
+	sdkginports "github.com/devpablocristo/golang/sdk/pkg/rest/gin/defs"
 
 	trncreate "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/gateways/transport/create-user"
 	trnupdate "github.com/devpablocristo/golang/sdk/sg/users/internal/adapters/gateways/transport/update-user"

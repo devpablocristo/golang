@@ -9,14 +9,14 @@ import (
 	"time"
 
 	sdkhclnt "github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client"
-	sdkhclntports "github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/ports"
+	sdkhclntdefs "github.com/devpablocristo/golang/sdk/pkg/rest/net-http/client/defs"
 
 	ports "github.com/devpablocristo/golang/sdk/sg/auth/internal/core/ports"
 )
 
 type HttpClient struct {
-	httpClient  sdkhclntports.Client
-	config      sdkhclntports.Config
+	httpClient  sdkhclntdefs.Client
+	config      sdkhclntdefs.Config
 	token       string
 	tokenExpiry time.Time
 	mu          sync.Mutex

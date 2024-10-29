@@ -1,9 +1,9 @@
 package sdkmapdb
 
 import (
-	ports "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/databases/in-memory/mapdb/defs"
 )
 
-func Boostrap() ports.Repository {
+func Boostrap() defs.Repository {
 	return newRepository()
 }

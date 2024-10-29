@@ -11,11 +11,11 @@ import (
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/web"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/web-server/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/web-server/defs"
 )
 
 var (
-	instance  ports.Server
+	instance  defs.Server
 	once      sync.Once
 	initError error
 )
@@ -24,7 +24,7 @@ type server struct {
 	s web.Service
 }
 
-func newServer(config ports.Config) (ports.Server, error) {
+func newServer(config defs.Config) (defs.Server, error) {
 	once.Do(func() {
 		setupLogger()
 
@@ -46,7 +46,7 @@ func newServer(config ports.Config) (ports.Server, error) {
 	return instance, nil
 }
 
-func setupServer(config ports.Config) web.Service {
+func setupServer(config defs.Config) web.Service {
 	Server := web.NewService(
 		web.Name(config.GetServerName()),
 		web.Id(config.GetServerID()),
@@ -57,7 +57,7 @@ func setupServer(config ports.Config) web.Service {
 	return Server
 }
 
-func setupRegistry(config ports.Config) registry.Registry {
+func setupRegistry(config defs.Config) registry.Registry {
 	consulReg := consul.NewRegistry(func(op *registry.Options) {
 		op.Addrs = []string{config.GetConsulAddress()}
 	})

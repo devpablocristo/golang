@@ -3,10 +3,10 @@ package sdkgomicro
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/defs"
 )
 
-func Bootstrap() (ports.Client, error) {
+func Bootstrap() (defs.Client, error) {
 	config := newConfig(
 		viper.GetString("CONSUL_ADDRESS"),
 		viper.GetString("GRPC_SERVER_NAME"),

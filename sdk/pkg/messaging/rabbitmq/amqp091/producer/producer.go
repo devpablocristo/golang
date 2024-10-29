@@ -10,16 +10,16 @@ import (
 
 	"github.com/rabbitmq/amqp091-go"
 
-	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/producer/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/producer/defs"
 )
 
 var (
-	instance  ports.Producer
+	instance  defs.Producer
 	once      sync.Once
 	initError error
 )
 
-// producer implementa la interfaz ports.Producer para RabbitMQ.
+// producer implementa la interfaz defs.Producer para RabbitMQ.
 type producer struct {
 	conn     *amqp091.Connection
 	channel  *amqp091.Channel
@@ -27,7 +27,7 @@ type producer struct {
 }
 
 // newProducer crea una nueva instancia de RabbitMQ que actúa como productor.
-func newProducer(config ports.Config) (ports.Producer, error) {
+func newProducer(config defs.Config) (defs.Producer, error) {
 	once.Do(func() {
 		connString := fmt.Sprintf("amqp://%s:%s@%s:%d%s",
 			config.GetUser(), config.GetPassword(), config.GetHost(), config.GetPort(), config.GetVHost())
@@ -82,7 +82,7 @@ func newProducer(config ports.Config) (ports.Producer, error) {
 }
 
 // GetInstance devuelve la instancia única de RabbitMQ como productor.
-func GetInstance() (ports.Producer, error) {
+func GetInstance() (defs.Producer, error) {
 	if instance == nil {
 		return nil, fmt.Errorf("rabbitmq sdkrabbit instance is not initialized")
 	}

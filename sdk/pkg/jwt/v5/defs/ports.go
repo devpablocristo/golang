@@ -1,4 +1,8 @@
+// defs/types.go
+
 package defs
+
+import "time"
 
 // Config define la interfaz para la configuración del servicio JWT.
 type Config interface {
@@ -8,6 +12,6 @@ type Config interface {
 
 // Service define la interfaz para el servicio JWT.
 type Service interface {
-	GenerateToken(claims Claims) (string, error)
+	GenerateTokenForSubject(subject string, expiration time.Duration) (string, error)
 	ValidateToken(tokenString string) (*TokenClaims, error)
 }

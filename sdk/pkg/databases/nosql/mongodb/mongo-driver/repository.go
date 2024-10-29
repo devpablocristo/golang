@@ -9,11 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/mongodb/mongo-driver/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/mongodb/mongo-driver/defs"
 )
 
 var (
-	instance  ports.Repository
+	instance  defs.Repository
 	once      sync.Once
 	initError error
 )
@@ -22,7 +22,7 @@ type repository struct {
 	db *mongo.Database
 }
 
-func newRepository(c ports.Config) (ports.Repository, error) {
+func newRepository(c defs.Config) (defs.Repository, error) {
 	once.Do(func() {
 		instance = &repository{}
 		initError = instance.Connect(c)
@@ -33,7 +33,7 @@ func newRepository(c ports.Config) (ports.Repository, error) {
 	return instance, initError
 }
 
-func (r *repository) Connect(c ports.Config) error {
+func (r *repository) Connect(c defs.Config) error {
 	dsn := c.DSN()
 	clientOptions := options.Client().ApplyURI(dsn)
 

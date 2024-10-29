@@ -5,11 +5,11 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/prod-cons/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/prod-cons/defs"
 )
 
 // Bootstrap inicializa una nueva instancia de Messaging con configuración de Viper.
-func Bootstrap() (ports.Service, error) {
+func Bootstrap() (defs.Service, error) {
 	config := newConfig(
 		viper.GetString("RABBITMQ_HOST"),
 		viper.GetInt("RABBITMQ_PORT"),

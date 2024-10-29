@@ -7,7 +7,7 @@ import (
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/server"
 
-	"github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/micro-service/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/micro-service/defs"
 )
 
 type config struct {
@@ -22,7 +22,7 @@ func newConfig(
 	client client.Client,
 	broker broker.Broker,
 	consulAddress string,
-) ports.Config {
+) defs.Config {
 	return &config{
 		server:        server,
 		client:        client,

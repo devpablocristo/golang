@@ -3,10 +3,10 @@ package sdkpostgresql
 import (
 	"github.com/spf13/viper"
 
-	"github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/databases/sql/postgresql/pgxpool/defs"
 )
 
-func Bootstrap(dbNameKey string) (ports.Repository, error) {
+func Bootstrap(dbNameKey string) (defs.Repository, error) {
 	config := newConfig(
 		viper.GetString("POSTGRES_USERNAME"),
 		viper.GetString("POSTGRES_PASSWORD"),

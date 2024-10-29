@@ -9,11 +9,11 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/grpc/client/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/grpc/client/defs"
 )
 
 var (
-	instance ports.Client
+	instance defs.Client
 	once     sync.Once
 	initErr  error
 )
@@ -24,7 +24,7 @@ type Client struct {
 }
 
 // newClient creates a new instance of a gRPC client
-func newClient(config ports.Config) (ports.Client, error) {
+func newClient(config defs.Config) (defs.Client, error) {
 	once.Do(func() {
 		var opts []grpc.DialOption
 		if config.GetTLSConfig() != nil {

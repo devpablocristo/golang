@@ -5,10 +5,10 @@ import (
 
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/rabbitmq-broker/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/rabbitmq-broker/defs"
 )
 
-func Bootstrap() (ports.Broker, error) {
+func Bootstrap() (defs.Broker, error) {
 	config := newConfig(
 		viper.GetString("RABBITMQ_SERVICE_NAME"),
 		viper.GetString("RABBITMQ_HOST"),

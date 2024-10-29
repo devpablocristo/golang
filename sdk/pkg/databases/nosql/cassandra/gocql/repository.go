@@ -6,11 +6,11 @@ import (
 
 	"github.com/gocql/gocql"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/cassandra/gocql/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/cassandra/gocql/defs"
 )
 
 var (
-	instance  ports.Repository
+	instance  defs.Repository
 	once      sync.Once
 	initError error
 )
@@ -19,7 +19,7 @@ type repository struct {
 	session *gocql.Session
 }
 
-func newRepository(config ports.Config) (ports.Repository, error) {
+func newRepository(config defs.Config) (defs.Repository, error) {
 	once.Do(func() {
 		instance := &repository{}
 		initError = instance.Connect(config)
@@ -30,7 +30,7 @@ func newRepository(config ports.Config) (ports.Repository, error) {
 	return instance, initError
 }
 
-func (c *repository) Connect(config ports.Config) error {
+func (c *repository) Connect(config defs.Config) error {
 	cluster := gocql.NewCluster(config.GetHosts()...)
 	cluster.Keyspace = config.GetKeyspace()
 	cluster.Authenticator = gocql.PasswordAuthenticator{

@@ -10,11 +10,11 @@ import (
 	gmclient "go-micro.dev/v4/client"
 	"go-micro.dev/v4/registry"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/defs"
 )
 
 var (
-	instance   ports.Client
+	instance   defs.Client
 	once       sync.Once
 	instanceMu sync.RWMutex
 	initError  error
@@ -26,7 +26,7 @@ type client struct {
 }
 
 // newClient creates a gRPC client using the provided configuration and Consul as the service registry
-func newClient(config ports.Config) (ports.Client, error) {
+func newClient(config defs.Config) (defs.Client, error) {
 	once.Do(func() {
 		clt, err := setupClient(config)
 		if err != nil {
@@ -54,7 +54,7 @@ func newClient(config ports.Config) (ports.Client, error) {
 	return instance, nil
 }
 
-func attemptGettingRegisteredServices(config ports.Config) {
+func attemptGettingRegisteredServices(config defs.Config) {
 	for {
 		fmt.Println("Getting gRPC server...")
 
@@ -76,7 +76,7 @@ func attemptGettingRegisteredServices(config ports.Config) {
 	}
 }
 
-func getRegisteredServices(config ports.Config) ([]*registry.Service, error) {
+func getRegisteredServices(config defs.Config) ([]*registry.Service, error) {
 	consulRegistry := consul.NewRegistry(registry.Addrs(config.GetConsulAddress()))
 
 	services, err := consulRegistry.GetService(config.GetServerName())
@@ -107,7 +107,7 @@ func getRegisteredServices(config ports.Config) ([]*registry.Service, error) {
 	return services, nil
 }
 
-func setupClient(config ports.Config) (gmclient.Client, error) {
+func setupClient(config defs.Config) (gmclient.Client, error) {
 	consulRegistry := consul.NewRegistry(registry.Addrs(config.GetConsulAddress()))
 
 	c := grpc.NewClient(

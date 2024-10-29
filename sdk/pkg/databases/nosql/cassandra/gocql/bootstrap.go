@@ -3,10 +3,10 @@ package sdkcassandra
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/cassandra/gocql/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/cassandra/gocql/defs"
 )
 
-func Bootstrap() (ports.Repository, error) {
+func Bootstrap() (defs.Repository, error) {
 	config := newConfig(
 		viper.GetStringSlice("CASSANDRA_HOSTS"),
 		viper.GetString("CASSANDRA_KEYSPACE"),

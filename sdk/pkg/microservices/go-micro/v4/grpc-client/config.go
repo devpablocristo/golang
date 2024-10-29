@@ -3,7 +3,7 @@ package sdkgomicro
 import (
 	"fmt"
 
-	"github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-client/defs"
 )
 
 type config struct {
@@ -11,7 +11,7 @@ type config struct {
 	serverName    string
 }
 
-func newConfig(ca, sn string) ports.Config {
+func newConfig(ca, sn string) defs.Config {
 	return &config{
 		consulAddress: ca,
 		serverName:    sn,

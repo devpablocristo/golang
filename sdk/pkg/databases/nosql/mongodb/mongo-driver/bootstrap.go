@@ -3,10 +3,10 @@ package mongodbdriver
 import (
 	"github.com/spf13/viper"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/mongodb/mongo-driver/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/databases/nosql/mongodb/mongo-driver/defs"
 )
 
-func Bootstrap() (ports.Repository, error) {
+func Bootstrap() (defs.Repository, error) {
 	config := newConfig(
 		viper.GetString("MONGO_USER"),
 		viper.GetString("MONGO_PASSWORD"),

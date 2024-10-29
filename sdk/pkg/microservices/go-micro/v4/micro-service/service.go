@@ -9,11 +9,11 @@ import (
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/registry"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/micro-service/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/micro-service/defs"
 )
 
 var (
-	instance  ports.Service
+	instance  defs.Service
 	once      sync.Once
 	initError error
 )
@@ -22,7 +22,7 @@ type service struct {
 	s micro.Service
 }
 
-func newService(config ports.Config) (ports.Service, error) {
+func newService(config defs.Config) (defs.Service, error) {
 	once.Do(func() {
 		setupLogger()
 
@@ -38,7 +38,7 @@ func newService(config ports.Config) (ports.Service, error) {
 	return instance, nil
 }
 
-func setupService(config ports.Config) micro.Service {
+func setupService(config defs.Config) micro.Service {
 	service := micro.NewService(
 		micro.Server(config.GetServer()),
 		micro.Client(config.GetClient()),
@@ -58,7 +58,7 @@ func (s *service) GetService() micro.Service {
 	return s.s
 }
 
-func setupRegistry(config ports.Config) registry.Registry {
+func setupRegistry(config defs.Config) registry.Registry {
 	consulReg := consul.NewRegistry(func(op *registry.Options) {
 		op.Addrs = []string{config.GetConsulAddress()}
 	})

@@ -7,11 +7,11 @@ import (
 	"github.com/go-micro/plugins/v4/server/grpc"
 	gmserver "go-micro.dev/v4/server"
 
-	ports "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-server/ports"
+	defs "github.com/devpablocristo/golang/sdk/pkg/microservices/go-micro/v4/grpc-server/defs"
 )
 
 var (
-	instance  ports.Server
+	instance  defs.Server
 	once      sync.Once
 	initError error
 )
@@ -20,7 +20,7 @@ type server struct {
 	s gmserver.Server
 }
 
-func newServer(config ports.Config) (ports.Server, error) {
+func newServer(config defs.Config) (defs.Server, error) {
 	once.Do(func() {
 		srv, err := setupServer(config)
 		if err != nil {
@@ -39,7 +39,7 @@ func newServer(config ports.Config) (ports.Server, error) {
 	return instance, nil
 }
 
-func setupServer(config ports.Config) (gmserver.Server, error) {
+func setupServer(config defs.Config) (gmserver.Server, error) {
 	s := grpc.NewServer(
 		gmserver.Name(config.GetServerName()),
 		gmserver.Id(config.GetServerID()),

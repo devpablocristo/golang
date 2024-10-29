@@ -1,11 +1,12 @@
 package sdkgogit
 
 import (
-	ports "github.com/devpablocristo/golang/sdk/pkg/repo-tools/go-git/v5/ports"
 	"github.com/spf13/viper"
+
+	defs "github.com/devpablocristo/golang/sdk/pkg/repo-tools/go-git/v5/defs"
 )
 
-func Bootstrap(repoRemoteUrlKey, repoLocalPathKey, repoBranchKey string) (ports.Client, error) {
+func Bootstrap(repoRemoteUrlKey, repoLocalPathKey, repoBranchKey string) (defs.Client, error) {
 	config := newConfig(
 		viper.GetString(repoRemoteUrlKey),
 		viper.GetString(repoLocalPathKey),

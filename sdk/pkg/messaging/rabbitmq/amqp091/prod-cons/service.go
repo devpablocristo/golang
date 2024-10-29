@@ -7,11 +7,11 @@ import (
 
 	"github.com/rabbitmq/amqp091-go"
 
-	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/prod-cons/ports"
+	"github.com/devpablocristo/golang/sdk/pkg/messaging/rabbitmq/amqp091/prod-cons/defs"
 )
 
 var (
-	instance  ports.Service
+	instance  defs.Service
 	once      sync.Once
 	initError error
 )
@@ -19,12 +19,12 @@ var (
 type service struct {
 	conn    *amqp091.Connection
 	channel *amqp091.Channel
-	config  ports.Config
+	config  defs.Config
 	mutex   sync.Mutex
 }
 
 // newService crea una nueva instancia de RabbitMQ que actúa como productor y consumidor.
-func newService(config ports.Config) (ports.Service, error) {
+func newService(config defs.Config) (defs.Service, error) {
 	once.Do(func() {
 		conn, err := amqp091.Dial(config.GetAddress())
 		if err != nil {
