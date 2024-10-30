@@ -1,8 +1,8 @@
 FROM golang:1.23
 
-# Instalar git, Go tools (Delve y Air), y tzdata para configurar la zona horaria
+# Instalar Zsh, git, Go tools (Delve y Air), y tzdata para la zona horaria
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends docker.io git tzdata && \
+    apt-get install -y --no-install-recommends docker.io git zsh tzdata curl && \
     rm -rf /var/lib/apt/lists/* && \
     go install github.com/go-delve/delve/cmd/dlv@latest && \
     go install github.com/air-verse/air@latest
@@ -31,6 +31,23 @@ RUN go mod download && go mod verify
 
 # Crear el directorio tmp si no existe
 RUN mkdir -p /app/tmp
+
+# Crear un usuario no root de forma explícita y establecer Zsh como su shell predeterminado
+RUN useradd -m -s /usr/bin/zsh vscode
+
+# Cambiar al usuario vscode para instalar Oh My Zsh
+USER vscode
+WORKDIR /home/vscode
+
+# Instalar Oh My Zsh para el usuario vscode
+RUN curl -Lo install.sh https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && \
+    RUNZSH=no sh install.sh && \
+    rm install.sh && \
+    cp /home/vscode/.oh-my-zsh/templates/zshrc.zsh-template /home/vscode/.zshrc
+
+# Volver al directorio de trabajo y cambiar el propietario de los archivos
+WORKDIR /app
+RUN chown -R vscode:vscode /home/vscode
 
 # Exponer los puertos necesarios
 EXPOSE 8080 2345

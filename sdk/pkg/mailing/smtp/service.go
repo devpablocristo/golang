@@ -1,4 +1,4 @@
-package smtp
+package sdksmtp
 
 import (
 	"crypto/tls"
@@ -70,8 +70,14 @@ func (s *service) SendVerificationEmail(to string, expiration time.Duration) err
 
 	// Send the email using TLS
 	serverAddr := s.config.GetSMTPServer()
+
+	// TLS configuration for development (InsecureSkipVerify: true)
+	// For production, consider disabling this or using valid certificates
 	conn, err := tls.Dial("tcp", serverAddr, &tls.Config{
-		InsecureSkipVerify: true, // In production, consider disabling this or use valid certificates
+		InsecureSkipVerify: true, // DEVELOPMENT: Allows skipping cert verification for testing
+		// PRODUCTION: Set InsecureSkipVerify to false and use proper certificates.
+		// InsecureSkipVerify: false,
+		// RootCAs: Load your CA certificates here to verify the server's identity.
 	})
 	if err != nil {
 		return fmt.Errorf("failed to connect to SMTP server: %w", err)

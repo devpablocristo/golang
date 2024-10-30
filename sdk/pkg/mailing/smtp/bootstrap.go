@@ -1,4 +1,4 @@
-package smtp
+package sdksmtp
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ func Bootstrap() (defs.Service, error) {
 
 	// Validar la configuración
 	if err := config.Validate(); err != nil {
-		return nil, fmt.Errorf("Error en la configuración SMTP: %w", err)
+		return nil, fmt.Errorf("SMTP config error: %w", err)
 	}
 
 	// Crear el servicio SMTP con la configuración
