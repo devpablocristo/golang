@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	for {
 		t := temp()
 		localTemp := generateTemp(t)

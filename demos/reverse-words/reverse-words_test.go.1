@@ -4,11 +4,11 @@ import (
 	"testing"
 )
 
-func Test_reverseStringArray(t *testing.T) {
+func Test_reverseWords(t *testing.T) {
 	input := "today is the first day of the rest of my life"
 	expected := "life my of rest the of day first the is today"
 	//  life my of rest the
-	result := reverseStringArray(input)
+	result := reverseWords(input)
 
 	if result != expected {
 		t.Errorf("result: %s", result)
@@ -18,7 +18,7 @@ func Test_reverseStringArray(t *testing.T) {
 func Test_emptySentence(t *testing.T) {
 	input, expected := "", ""
 
-	result := reverseStringArray(input)
+	result := reverseWords(input)
 
 	if result != expected {
 		t.Errorf("result: %s", result)
@@ -45,11 +45,11 @@ func Test_reverseAlgo(t *testing.T) {
 	}
 }
 
-func Benchmark_reverseStringArray(b *testing.B) {
+func Benchmark_reverseWords(b *testing.B) {
 	b.ReportAllocs()
 	input := "today is the first day of the rest of my life"
 	expected := "life my of rest the of day first the is today"
-	result := reverseStringArray(input)
+	result := reverseWords(input)
 
 	if result != expected {
 		b.Error("")
